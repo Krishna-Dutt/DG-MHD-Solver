@@ -160,7 +160,7 @@ void DG_Element_2d::addVariable_onlyBoundary(string v) {
     for(int i=0; i<=N; i++){
         n_bottom[i] =   b_bottom[i] = &(variable[v][i]);
         n_top[i]    =   b_top[i]    = &(variable[v][3*(N+1) -1-i]);
-        n_left[i]   =   b_left[i]   = &(variable[v][4*(N+1)-1 -i];
+        n_left[i]   =   b_left[i]   = &(variable[v][4*(N+1)-1 -i]);
         n_right[i]  =   b_right[i]  = &(variable[v][i + N+1]);
     }
 
@@ -516,11 +516,12 @@ void DG_Element_2d::setFunctionsForVariables(string w, string x, string y, funct
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)> f, string z) {
-    for(int i = 0 ; i <= N ; i++)
+    for(int i = 0 ; i <= N ; i++){
          *boundaryTop[z][i] = f(*boundaryTop[x][i], *boundaryTop[y][i]);
          *boundaryRight[z][i] = f(*boundaryRight[x][i], *boundaryRight[y][i]);
          *boundaryLeft[z][i] = f(*boundaryLeft[x][i], *boundaryLeft[y][i]);
          *boundaryBottom[z][i] = f(*boundaryBottom[x][i], *boundaryBottom[y][i]);
+    }
     return ;
 }
 
@@ -536,11 +537,12 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(string x, string y, functio
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
-    for(int i = 0 ; i <= N ; i++)
+    for(int i = 0 ; i <= N ; i++){
          *boundaryTop[z][i] = f(*boundaryTop[w][i], *boundaryTop[x][i], *boundaryTop[y][i]);
          *boundaryRight[z][i] = f(*boundaryRight[w][i], *boundaryRight[x][i], *boundaryRight[y][i]);
          *boundaryLeft[z][i] = f(*boundaryLeft[w][i], *boundaryLeft[x][i], *boundaryLeft[y][i]);
          *boundaryBottom[z][i] = f(*boundaryBottom[w][i], *boundaryBottom[x][i], *boundaryBottom[y][i]);
+    }
     return;
 }
 
