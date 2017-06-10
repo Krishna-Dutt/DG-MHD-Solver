@@ -30,9 +30,12 @@ public:
     vector<string> variableNames; // This is stores all the variables which have been added to the field.
     vector<string> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
 
+    vector<string> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
+
     DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, double _x2, double _y2);
     void addVariable_withBounary(string v);
     void addVariable_withoutBounary(string v);
+    void addVariable_onlyBounary( string v);
     void initializeVariable(string v, function<double(double, double)>);
     void setBoundaryConditions(string type);
     void writeVTK(string fileName);

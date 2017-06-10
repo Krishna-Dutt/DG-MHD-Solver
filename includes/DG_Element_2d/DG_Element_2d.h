@@ -39,8 +39,8 @@ private:
     int N; /// This represents the order of polynomial interpolation which is done while solving the DG equations.
     double x_start, x_end, y_start, y_end; /// Since, this is a structured rectangular element. These variables define the position and size of the element.
     double* massMatrix;
-    double* derivativeMatrix_x; /// This is the matrix which is laid out in 1-D, this would help us to find t    he $\frac{d}{dx}$ of any term. 
     double* derivativeMatrix_y; /// This is the matrix which is laid out in 1-D, this would help us to find t    he $\frac{d}{dy}$ of any term.
+    double* derivativeMatrix_x; /// This is the matrix which is laid out in 1-D, this would help us to find t    he $\frac{d}{dx}$ of any term. 
     double* fluxMatrix_top; /// This is the flux matrix for the top edge.
     double* fluxMatrix_right; // The Flux Matrix for the right edge.
     double* fluxMatrix_bottom; /// This would be the flux term for the the bottom edge.
@@ -68,9 +68,11 @@ public:
     map<string, double**> neighboringLeft;
 
     vector<string> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
+    vector<string> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
 
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
     void addVariable_withBoundary(string v);
+    void addVariable_onlyBoundary( string v);
     void addVariable_withoutBoundary(string v);
     void initializeVariable(string v, function<double(double, double)> f);
     void setNeighboringElement(char type, DG_Element_2d* neighbor );

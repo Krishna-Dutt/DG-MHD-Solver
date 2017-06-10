@@ -26,8 +26,8 @@
  * @Param _ney The number of elements in the y-direction for the field
  * @Param _N The order of interpolation of the polynomial which is to be used.
  * @Param _x1 The grid is a structured rectangular grid, and hence this corresponds to the x-coord of the bottom left
- * corner of the grid.
  * @Param _y1 This corresponds to the y-coordinate of the bottom left corner of the grid
+ * corner of the grid.
  * @Param _x2 This corresponds to the x-coordinate of the top right corner of the grid
  * @Param _y2 This corresponds to the y- coordinate of the top right corner of the grid
  */
@@ -164,9 +164,36 @@ void DG_Field_2d::addVariable_withBounary(string v) {
            elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
        }
    }
-   variableNames.push_back(v);
+   variableNames.push_back(v);// What about vector variableWithBoundaryInfo, why is it there ??
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function adds the variable, required only at the boundary,to each and every element. In this the boundary points are not
+ * specifically stored in each element.
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::addVariable_onlyBounary(string v) {
+    
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+           elements[i][j]->addVariable_onlyBoundary(v); // Adding the variable for the (i, j) th element.
+       }
+   }
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+           elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
+       }
+   }
+   variableNames.push_back(v); // Is this required, or rather, would it affect the solver in some way ??
+   variableOnlyAtBoundary.push_back(v);
+    return ;
+}
+
+
 
 
 /* ----------------------------------------------------------------------------*/

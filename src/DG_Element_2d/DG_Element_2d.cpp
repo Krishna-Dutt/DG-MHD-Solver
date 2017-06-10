@@ -1,6 +1,6 @@
 #include "../../includes/DG_Element_2d/DG_Element_2d.h"
-
 #include "../../includes/Utilities/Zeros.h"
+
 #include "../../includes/Utilities/Inverse.h"
 
 #include "../../includes/Utilities/FluxMatrix.h"
@@ -130,6 +130,57 @@ void DG_Element_2d::addVariable_withBoundary(string v) {
 
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions creates space in order to take in one more variable, needed only at the Boundary of the cell, on which operators are needed to be
+ * applied.
+ *
+ * @Param v  This is the name of the variable which is to be added.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::addVariable_onlyBoundary(string v) {
+    double * newVariable = new double[(N+1)*(4)]; /// Allocating the space for the new variable which is to be created, and stored only at boundary of quadrilateral cell.
+    variable[v] = newVariable; /// Now assigning the same to the map.
+    
+    // **b_top is used because it will store the address to the boundary element, So whenever the actual value in the double* of the variable is changed then this will also change automatically. The same holds for all the other following mentioned variables.
+    // Assuming the variable is stored in anticlockwise direction in the 1D array.
+
+    double **b_top       = new double* [N+1];
+    double **b_bottom    = new double* [N+1];
+    double **b_left      = new double* [N+1];
+    double **b_right     = new double* [N+1];
+
+   
+    double **n_top       = new double* [N+1];
+    double **n_left      = new double* [N+1];
+    double **n_right     = new double* [N+1];
+    double **n_bottom    = new double* [N+1];
+
+    for(int i=0; i<=N; i++){
+        n_bottom[i] =   b_bottom[i] = &(variable[v][i]);
+        n_top[i]    =   b_top[i]    = &(variable[v][3*(N+1) -1-i]);
+        n_left[i]   =   b_left[i]   = &(variable[v][4*(N+1)-1 -i];
+        n_right[i]  =   b_right[i]  = &(variable[v][i + N+1]);
+    }
+
+
+    boundaryTop[v]      = b_top;
+    boundaryRight[v]    = b_right;
+    boundaryBottom[v]   = b_bottom;
+    boundaryLeft[v]     = b_left;
+
+
+    neighboringTop[v]   = n_top;
+    neighboringRight[v] = n_right;
+    neighboringBottom[v]= n_bottom;
+    neighboringLeft[v]  = n_left;
+
+    variableOnlyAtBoundary.push_back(v);
+
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
