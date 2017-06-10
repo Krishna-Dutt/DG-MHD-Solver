@@ -44,7 +44,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     /// Setting the grid, by setting the elements. The elements are set by providing their end points for the quads.
     elements.resize(ne_x);
 
-    double x_curr,y_curr, dx = (x2-x1)/ne_x, dy = (x2-x1)/ne_y;
+    double x_curr,y_curr, dx = (x2-x1)/ne_x, dy = (y2-y1)/ne_y;
     x_curr = x1;
     y_curr = y1;
 
