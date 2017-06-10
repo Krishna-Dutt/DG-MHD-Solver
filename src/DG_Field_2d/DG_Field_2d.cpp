@@ -188,7 +188,7 @@ void DG_Field_2d::addVariable_onlyBounary(string v) {
            elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
        }
    }
-   variableNames.push_back(v); // Is this required, or rather, would it affect the solver in some way ??
+  // variableNames.push_back(v); // Is this required, or rather, would it affect the solver in some way ; Shouldn't bee included in variablenames, as there are being written in output vtk file !!
    variableOnlyAtBoundary.push_back(v);
     return ;
 }
