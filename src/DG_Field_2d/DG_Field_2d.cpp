@@ -407,6 +407,43 @@ void DG_Field_2d::setFunctionsForVariables(string w, string x, string y, functio
 }
 
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of Boundary variable z to f(x, y).
+ *
+ * @Param x The first parameter of the function.
+ * @Param y The second parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)> f, string z) {
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->setFunctionsForBoundaryVariables(x, y, f, z);
+    return;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of Boundary variable z to f(w, x, y).
+ *
+ * @Param w The first parameter of the function
+ * @Param x The second parameter of the function.
+ * @Param y The third parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->setFunctionsForBoundaryVariables(w, x, y, f, z);
+    return ;
+}
+
+
+
 double DG_Field_2d::l2Norm(string v1, string v2) {
     double norm = 0.0;
     double elementNorm;

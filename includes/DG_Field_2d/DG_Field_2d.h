@@ -50,6 +50,9 @@ public:
     void scal(double a, string x);
     void setFunctionsForVariables(string x, string y, function<double(double, double)>, string z); 
     void setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)>, string z); 
+    // Functions to apply operations only on variables stored at Boundary
+    void setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)>, string z); 
+    void setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)>, string z); 
 
     // Functions to give the information about the error.
     double l2Norm(string v1, string v2);

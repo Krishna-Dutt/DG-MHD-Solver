@@ -504,6 +504,47 @@ void DG_Element_2d::setFunctionsForVariables(string w, string x, string y, funct
 }
 
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of Boundary variable z to f(x, y).
+ * 
+ *
+ * @Param x The first parameter of the function.
+ * @Param y The second parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)> f, string z) {
+    for(int i = 0 ; i <= N ; i++)
+         *boundaryTop[z][i] = f(*boundaryTop[x][i], *boundaryTop[y][i]);
+         *boundaryRight[z][i] = f(*boundaryRight[x][i], *boundaryRight[y][i]);
+         *boundaryLeft[z][i] = f(*boundaryLeft[x][i], *boundaryLeft[y][i]);
+         *boundaryBottom[z][i] = f(*boundaryBottom[x][i], *boundaryBottom[y][i]);
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of  Boundary variable z to f(w, x, y).
+ *
+ * @Param w The first parameter of the function
+ * @Param x The second parameter of the function.
+ * @Param y The third parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
+    for(int i = 0 ; i <= N ; i++)
+         *boundaryTop[z][i] = f(*boundaryTop[w][i], *boundaryTop[x][i], *boundaryTop[y][i]);
+         *boundaryRight[z][i] = f(*boundaryRight[w][i], *boundaryRight[x][i], *boundaryRight[y][i]);
+         *boundaryLeft[z][i] = f(*boundaryLeft[w][i], *boundaryLeft[x][i], *boundaryLeft[y][i]);
+         *boundaryBottom[z][i] = f(*boundaryBottom[w][i], *boundaryBottom[x][i], *boundaryBottom[y][i]);
+    return;
+}
+
+
 double DG_Element_2d::l2Norm(string v1, string v2) {
     double* diff = new double[(N+1)*(N+1)];
     cblas_dscal((N+1)*(N+1), 0.0, diff, 1);

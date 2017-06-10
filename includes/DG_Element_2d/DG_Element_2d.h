@@ -99,6 +99,11 @@ public:
     void setFunctionsForVariables(string x, string y, function<double(double, double)>, string z);
     void setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)>, string z);
 
+    // Function to apply linear operation on variables stored only on Boundary points.
+    void setFunctionsForVariables(string x, string y, function<double(double, double)>, string z);
+    void setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)>, string z);
+
+
     // Functions to do various other operations on the elements.
     double l2Norm(string v1, string v2);
 
