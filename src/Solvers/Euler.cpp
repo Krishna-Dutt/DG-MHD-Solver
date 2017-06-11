@@ -1,6 +1,4 @@
 #include "../../includes/Solvers/EulerSolver.h"
-#include<iostream>
-#include<cmath>
 
 EulerSolver::EulerSolver(int _ne_x, int _ne_y, int _N) {
     ne_x = _ne_x;
@@ -185,6 +183,8 @@ void EulerSolver::setInviscidFlux() {
   field->addVariable_withBounary("qvv_plus_P");
   field->addVariable_withBounary("qE_plus_P_u");
   field->addVariable_withBounary("qE_plus_P_v");
+
+  updateInviscidFlux();
   return ;
 }
 
@@ -233,67 +233,98 @@ void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) 
   return ;
 }
 
+void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
+  field->delByDelX(FluxX, "dqudx", "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
+
+  field->scal(0.0, K);
+  field->axpy(-1.0, "duqdx", K);
+  field->axpy(-1.0, "dvqdy", K);
+  
+  field->axpy(0.5*dt, K, Var);
+  return;
+}
+
+void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
+  field->delByDelX(FluxX, "dqudx", "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
+
+  field->scal(0.0, K2);
+  field->axpy(-1.0, "duqdx", K2);
+  field->axpy(-1.0, "dvqdy", K2);
+  
+  field->axpy(-1.5*dt, K1, Var);
+  field->axpy(2.0*dt, K2, Var);
+  return;
+}
+
+void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
+  field->delByDelX(FluxX, "dqudx", "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
+
+  field->scal(0.0, K3);
+  field->axpy(-1.0, "duqdx", K3);
+  field->axpy(-1.0, "dvqdy", K3);
+  
+  field->axpy((7.0/6.0)*dt, K1, Var);
+  field->axpy(-(4.0/3.0)*dt, K2, Var);
+  field->axpy((1.0/6.0)*dt, K3, Var);
+  return;
+}
 
 
-void EulerSolver::solve() {
-    field->addVariable_withoutBounary("dqdt");
-    field->addVariable_withBounary("uq");
-    field->addVariable_withBounary("vq");
-    field->addVariable_withoutBounary("duqdx");
-    field->addVariable_withoutBounary("dvqdy");
+void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<double(double,double)> T, function<double(double,double)> P, function<double(double,double,double)> IE) {
+  // Requires all Primitive and Conservative Variables to be setup and initialised.
+  setAuxillaryVariables();
+  setInviscidFlux();
+  setEigenValues(SoundSpeed);
 
-    field->addVariable_withoutBounary("k1");
-    field->addVariable_withoutBounary("k2");
-    field->addVariable_withoutBounary("k3");
+  // Till Now all variables have to be initialised !!
+  // For loop to march in time !!
+  for(int i=0; i < no_of_time_steps; i++) {
+    // First Step of RK3
+    updateInviscidFlux();
+    updateEigenValues(SoundSpeed);
+    
+    // Mass
+    RK_Step1("q", "qu", "qv", "k1q");
+    // X Momentum
+    RK_Step1("qu","quu_plus_P","quv","k1qu");
+    // Y Momentum
+    RK_Step1("qv","quv","qvv_plus_P","k1qv");
+    // Energy
+    RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
 
+    // Second Step of RK3
+    updateInviscidFlux();
+    updateEigenValues(SoundSpeed);
 
-    // Till now the variable has been initialized.
-    // This for-loop is used to march progressively in time. 
-    for(int i=0; i < no_of_time_steps; i++) {
-        /// First step of RK3
-        field->setFunctionsForVariables("u", "q", Product, "uq");
-        field->setFunctionsForVariables("v", "q", Product, "vq");
-        
-        field->delByDelX("uq", "duqdx", "rusanov", "u");
-        field->delByDelY("vq", "dvqdy", "rusanov", "v");
-        
-        field->scal(0.0, "k1");
-        field->axpy(-1.0, "duqdx", "k1");
-        field->axpy(-1.0, "dvqdy", "k1");
-        
-        field->axpy(0.5*dt, "k1", "q");
-        
-        ///Second Step of RK3
-        field->setFunctionsForVariables("u", "q", Product, "uq");
-        field->setFunctionsForVariables("v", "q", Product, "vq");
-        
-        field->delByDelX("uq", "duqdx", "rusanov", "u");
-        field->delByDelY("vq", "dvqdy", "rusanov", "v");
-        
-        field->scal(0.0, "k2");
-        field->axpy(-1.0, "duqdx", "k2");
-        field->axpy(-1.0, "dvqdy", "k2");
-        
-        field->axpy(-1.5*dt, "k1", "q");
-        field->axpy( 2.0*dt, "k2", "q");
+    // Mass
+    RK_Step2("q", "qu", "qv", "k1q", "k2q");
+    // X Momentum
+    RK_Step2("qu","quu_plus_P","quv","k1qu", "k2qu");
+    // Y Momentum
+    RK_Step2("qv","quv","qvv_plus_P","k1qv", "k2qv");
+    // Energy
+    RK_Step2("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE");
 
-        /// Third(&final) step of RK3
-        field->setFunctionsForVariables("u", "q", Product, "uq");
-        field->setFunctionsForVariables("v", "q", Product, "vq");
-        
-        field->delByDelX("uq", "duqdx", "rusanov", "u");
-        field->delByDelY("vq", "dvqdy", "rusanov", "v");
-        
-        field->scal(0.0, "k3");
-        field->axpy(-1.0, "duqdx", "k3");
-        field->axpy(-1.0, "dvqdy", "k3");
-        
-        field->axpy( (7.0/6.0)*dt, "k1", "q");
-        field->axpy(-(4.0/3.0)*dt, "k2", "q");
-        field->axpy( (1.0/6.0)*dt, "k3", "q");
-        
-        /// RK3 is done, incrementing the time step. 
-        time += dt;        
+   // Third (Final) Step of RK3
+    updateInviscidFlux();
+    updateEigenValues(SoundSpeed);
+
+    // Mass
+    RK_Step3("q", "qu", "qv", "k1q", "k2q", "k3q");
+    // X Momentum
+    RK_Step3("qu","quu_plus_P","quv","k1qu", "k2qu", "k3qu");
+    // Y Momentum
+    RK_Step3("qv","quv","qvv_plus_P","k1qv", "k2qv", "k3qv");
+    // Energy
+    RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
+
+   /// RK3 is done, incrementing the time step. 
+   // Updating the Primitive Variables !!
+   updatePrimitiveVariables(T, P);
+   time += dt;        
     }
 }
 

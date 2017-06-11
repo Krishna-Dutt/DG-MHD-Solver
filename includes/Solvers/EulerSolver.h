@@ -3,6 +3,9 @@
 
 # include "../DG_Field_2d/DG_Field_2d.h" 
 #include <functional>
+#include <iostream>
+#include <cmath>
+#include <cstring>
 
 using namespace std;
 
@@ -198,15 +201,55 @@ public:
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  set up Eigen Values stored only at Boundaries in the domain.
+     *
+     * @Param functionSoundSpeed This is the function to obtain the speed of sound
     */
     /* ----------------------------------------------------------------------------*/
     void setEigenValues(function<double(double,double)> SoundSpeed);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Eigen Values stored only at Boundaries in the domain.
+     *
+     * @Param functionSoundSpeed This is the function to obtain the speed of sound
     */
     /* ----------------------------------------------------------------------------*/
     void updateEigenValues(function<double(double,double)> SoundSpeed);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is used to perform First step of RK3.
+     *
+     * @Param Var String corresponding to Conservative Variable.
+     * @Param FluxX String corresponding to flux in x direction.
+     * @Param FluxY String corresponding to flux in y direction.
+     * @Param K Coefficient K1
+     */
+    /* ----------------------------------------------------------------------------*/
+    void RK_Step1(string Var, string FluxX, string FluxY, string K);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is used to perform Second step of RK3.
+     *
+     * @Param Var String corresponding to Conservative Variable.
+     * @Param FluxX String corresponding to flux in x direction.
+     * @Param FluxY String corresponding to flux in y direction.
+     * @Param K1 Coefficient K1
+     * @Param K2 Coefficient K2
+     */
+    /* ----------------------------------------------------------------------------*/
+    void RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is used to perform Third step of RK3.
+     *
+     * @Param Var String corresponding to Conservative Variable.
+     * @Param FluxX String corresponding to flux in x direction.
+     * @Param FluxY String corresponding to flux in y direction.
+     * @Param K1 Coefficient K1
+     * @Param K2 Coefficient K2
+     * @Param K3 Coefficient K3
+     */
+    /* ----------------------------------------------------------------------------*/
+    void RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
@@ -221,9 +264,14 @@ public:
     /**
      * @Synopsis  This function does all the main functionalitites of the solver. This must be called in order to solve
      * the problem
+     *
+     * @Param functionSoundSpeed This is the function to obtain the speed of sound at the boundaries, given Density and Temperature.
+     * @Param functionT This is the function to obtain Temperature, given Internal Energy and Density.
+     * @Param functionP This is the function to obtain Pressure, given Density and Temperature, using Equation of state.
+     * @Param functionIE This is the function to obtain Internal energy, given Density, Temperature and Pressure (??).
      */
     /* ----------------------------------------------------------------------------*/
-    void solve();
+    void solve(function<double(double,double)> SoundSpeed ,function<double(double,double)> T, function<double(double,double)> P, function<double(double,double,double)> IE);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function plots the function in vtk fileformat which can be further read by software packages like
