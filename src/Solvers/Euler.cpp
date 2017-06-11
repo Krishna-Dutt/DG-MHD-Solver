@@ -52,7 +52,7 @@ void EulerSolver::setInitialTemperature(function<double(double, double)> T) {
     return ;
 }
 
-void EulerSolver::setInitialVelocity(function<double(double, double)>U, function<double(double, double)>V) {
+void EulerSolver::setInitialVelocity(function<double(double, double)> U, function<double(double, double)> V) {
     field->initializeVariable("u", U);
     field->initializeVariable("v", V);
     return ;
@@ -64,15 +64,86 @@ void EulerSolver::setBoundaryCondtions(string type) {
 }
 
 void EulerSolver::setSolver(double _dt, double _no_of_time_steps) {
-    dt = _dt;
+    dt = _dt
     no_of_time_steps = _no_of_time_steps;
     return ;
 }
 
 
 double Product(double x, double y) {
-    return (x*y);
+    return (x*y) ;
 }
+
+double KineticEnergy(double rho, double u, double v) {
+  return 0.5*rho*(u*u + v*v) ;
+}
+
+double Add(double x, double y) {
+  return (x + y) ;
+}
+
+double Subtract(double x, double y) {
+  return (x - y) ;
+}
+
+double Divide(double x, double y){
+  if ( y != 0.0) {
+    return (x / y) ;
+  }
+  else {
+    cout << "Error :: Division by Zero !! \n";
+  }
+  return ;
+}
+
+
+void EulerSolver::setXMomentum() {
+  field->setFunctionsForVariables("q", "u", Product, "qu");
+  return ;
+}
+
+void EulerSolver::setYMomentum() {
+  field->setFunctionsForVariables("q", "v", Product, "qv");
+  return ;
+}
+
+void EulerSolver::setEnergy() {
+  field->setFunctionsForVariables("KE", "qe", Add, "qE");
+  return ;
+}
+
+void EulerSolver::setInternalEnergy(function<double(double,double,double)> IE) {
+  field->setFunctionsForVariables("q", "T", "P", IE, "qe");
+  return ;
+}
+
+void EulerSolver::setInternalEnergy() {
+  field->setFunctionsForVariables("qE", "KE", Subtract, "qe");
+  return ;
+}
+
+
+void EulerSolver::setKineticEnergy() {
+  field->setFunctionsForVariables("q", "u", "v", KineticEnergy, "KE");
+  return ;
+}
+
+void EulerSolver::updateVelocity() {
+  field->setFunctionsForVariables("qu", "q", Divide, "u");
+  field->setFunctionsForVariables("qv", "q", Divide, "v");
+  return ;
+}
+
+void EulerSolver::updateTemperature(function<double(double,double)> T) {
+  field->setFunctionsForVariables("qe", "q", T, "T");
+  return ;
+}
+
+void EulerSolver::updatePressure(function<double(double,double)> P) {
+  field->setFunctionsForVariables("q", "T", P, "P");
+  return ;
+}
+
 
 
 void EulerSolver::solve() {

@@ -68,7 +68,7 @@ public:
      * @Param functionRho This is the function used to initialize the `q` density as an input.
     */
     /* ----------------------------------------------------------------------------*/
-    void setInitialDensity(function<double(double, double)>Rho);
+    void setInitialDensity(function<double(double, double)> Rho);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to initialize the Pressure field of the domain  
@@ -76,7 +76,7 @@ public:
      * @Param functionP This is the function used to initialize the `P` pressure as an input.
     */
     /* ----------------------------------------------------------------------------*/
-    void setInitialPressure(function<double(double, double)>P);
+    void setInitialPressure(function<double(double, double)> P);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to initialize the Temperature field of the domain  
@@ -84,7 +84,7 @@ public:
      * @Param functionT This is the function used to initialize the `T` temperature as an input.
     */
     /* ----------------------------------------------------------------------------*/
-    void setInitialTemperature(function<double(double, double)>T);
+    void setInitialTemperature(function<double(double, double)> T);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to initialize the the veclocity of the domain  
@@ -93,7 +93,64 @@ public:
      * @Param functionV This is the function used to initialize the `V` velocity as an input.
      */
     /* ----------------------------------------------------------------------------*/
-    void setInitialVelocity(function<double(double, double)>U, function<double(double, double)>V);
+    void setInitialVelocity(function<double(double, double)> U, function<double(double, double)> V);
+    /**
+     * @Synopsis This is the function used to set and update momentum in X-direction.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setXMomentum();
+    /**
+     * @Synopsis This is the function used to set and update momentum in Y-direction.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setYMomentum();
+    /**
+     * @Synopsis This is the function used to set and update Energy ( Internal + KE ).
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setEnergy();
+    /**
+     * @Synopsis This is the function used to set and update Internal Energy.
+     *
+     * @Param functionIE This is the function used to compute Internal Energy, given Density, Temperature and Pressure(??).
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInternalEnergy(function<double(double,double,double)> IE);
+    /**
+     * @Synopsis This is the function used to set and update Internal Energy.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInternalEnergy();
+    /**
+     * @Synopsis This is the function used to set and update Kinetic Energy.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setKineticEnergy();
+     /**
+     * @Synopsis This is the function used to  update velocity Field (U,V) from Momentum.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateVelocity();
+    /**
+     * @Synopsis This is the function used to  update Temperature Field from Internal Energy.
+     *
+     * @Param functionT This is the function used to update the Temperature, given Internal Energy and Density.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateTemperature(function<double(double,double)> T);
+    /**
+     * @Synopsis This is the function used to  update Pressure Field using Equation of State.
+     *
+     * @Param functionP This is the function used to update Pressure , given Density and Temperature, using Equation of State.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updatePressure(function<double(double,double)> P);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
