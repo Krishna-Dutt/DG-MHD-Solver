@@ -179,6 +179,24 @@ public:
     void updateConservativeVariables(function<double(double,double,double)> IE);
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis This is the function used to  set up Invscid Flux Variables in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInviscidFlux();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Invscid Flux Variables in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateInviscidFlux();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  set up all auxillary Variables needed for performing RK, Time stepping.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setAuxillaryVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
      *
      * @Param _dt The time step for each iteration.

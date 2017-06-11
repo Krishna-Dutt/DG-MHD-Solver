@@ -97,6 +97,17 @@ double Divide(double x, double y){
   return 0 ;
 }
 
+double MomentumFluxPressure(double f, double u, double P) {
+  return (f * u + P) ;
+}
+
+double MomentumFlux(double f, double u) {
+  return (f * u) ;
+}
+
+double EnergyFlux(double E, double P, double u) {
+  return (E + P)*u ;
+}
 
 void EulerSolver::setXMomentum() {
   field->setFunctionsForVariables("q", "u", Product, "qu");
@@ -163,7 +174,43 @@ void EulerSolver::updateConservativeVariables(function<double(double,double,doub
   return ;
 }
 
+void EulerSolver::setInviscidFlux() {
+  field->addVariable_withBounary("quu_plus_P");
+  field->addVariable_withBounary("quv");
+  field->addVariable_withBounary("qvv_plus_P");
+  field->addVariable_withBounary("qE_plus_P_u");
+  field->addVariable_withBounary("qE_plus_P_v");
+  return ;
+}
 
+void EulerSolver::updateInviscidFlux() {
+  // Mass flux qu and qv already accounted for in the conservative Variables.
+  // Assuming, Requiring all Conservative and Primitive Variables have been updated !!
+  field->setFunctionsForVariables("qu", "u", "P", MomentumFluxPressure, "quu_plus_P");
+  field->setFunctionsForVariables("qv", "v", "P", MomentumFluxPressure, "qvv_plus_P");
+  field->setFunctionsForVariables("qu", "v", MomentumFlux, "quv");
+  field->setFunctionsForVariables("qE", "P", "u", EnergyFlux, "qE_plus_P_u");
+  field->setFunctionsForVariables("qE", "P", "v", EnergyFlux, "qE_plus_P_v");
+  return ;
+}
+
+void EulerSolver::setAuxillaryVariables() {
+  field->addVariable_withoutBounary("k1q");
+  field->addVariable_withoutBounary("dqudx");
+  field->addVariable_withoutBounary("dqvdy");
+  field->addVariable_withoutBounary("k1qu");
+  field->addVariable_withoutBounary("k1qv");
+  field->addVariable_withoutBounary("k1qE");
+  field->addVariable_withoutBounary("k2q");
+  field->addVariable_withoutBounary("k2qu");
+  field->addVariable_withoutBounary("k2qv");
+  field->addVariable_withoutBounary("k2qE");
+  field->addVariable_withoutBounary("k3q");
+  field->addVariable_withoutBounary("k3qu");
+  field->addVariable_withoutBounary("k3qv");
+  field->addVariable_withoutBounary("k3qE");
+  return ;
+}
 
 
 void EulerSolver::solve() {
