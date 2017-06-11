@@ -94,24 +94,28 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void setInitialVelocity(function<double(double, double)> U, function<double(double, double)> V);
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update momentum in X-direction.
      *
     */
     /* ----------------------------------------------------------------------------*/
     void setXMomentum();
-    /**
+    /* ----------------------------------------------------------------------------*/
+     /**
      * @Synopsis This is the function used to set and update momentum in Y-direction.
      *
     */
     /* ----------------------------------------------------------------------------*/
     void setYMomentum();
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update Energy ( Internal + KE ).
      *
     */
     /* ----------------------------------------------------------------------------*/
     void setEnergy();
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update Internal Energy.
      *
@@ -119,24 +123,28 @@ public:
     */
     /* ----------------------------------------------------------------------------*/
     void setInternalEnergy(function<double(double,double,double)> IE);
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update Internal Energy.
      *
     */
     /* ----------------------------------------------------------------------------*/
     void setInternalEnergy();
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update Kinetic Energy.
      *
     */
     /* ----------------------------------------------------------------------------*/
     void setKineticEnergy();
+    /* ----------------------------------------------------------------------------*/
      /**
      * @Synopsis This is the function used to  update velocity Field (U,V) from Momentum.
      *
     */
     /* ----------------------------------------------------------------------------*/
     void updateVelocity();
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Temperature Field from Internal Energy.
      *
@@ -144,6 +152,7 @@ public:
     */
     /* ----------------------------------------------------------------------------*/
     void updateTemperature(function<double(double,double)> T);
+    /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Pressure Field using Equation of State.
      *
@@ -151,6 +160,23 @@ public:
     */
     /* ----------------------------------------------------------------------------*/
     void updatePressure(function<double(double,double)> P);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Primitive Variables Field using updated Conservative Variables.
+     *
+     * @Param functionT This is the function used to update the Temperature, given Internal Energy and Density.
+     * @Param functionP This is the function used to update Pressure , given Density and Temperature, using Equation of State.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updatePrimitiveVariables(function<double(double,double)> T, function<double(double,double)> P);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Conservative Variables Field using updated Primitive Variables.
+     *
+     * @Param functionIE This is the function used to update Internal energy , given Density and Temperature and Pressure(??).
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateConservativeVariables(function<double(double,double,double)> IE);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.

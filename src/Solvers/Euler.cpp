@@ -1,4 +1,5 @@
 #include "../../includes/Solvers/EulerSolver.h"
+#include<iostream>
 
 EulerSolver::EulerSolver(int _ne_x, int _ne_y, int _N) {
     ne_x = _ne_x;
@@ -64,7 +65,7 @@ void EulerSolver::setBoundaryCondtions(string type) {
 }
 
 void EulerSolver::setSolver(double _dt, double _no_of_time_steps) {
-    dt = _dt
+    dt = _dt;
     no_of_time_steps = _no_of_time_steps;
     return ;
 }
@@ -91,9 +92,9 @@ double Divide(double x, double y){
     return (x / y) ;
   }
   else {
-    cout << "Error :: Division by Zero !! \n";
+    std::cout << "Error :: Division by Zero !! \n";
   }
-  return ;
+  return 0 ;
 }
 
 
@@ -143,6 +144,25 @@ void EulerSolver::updatePressure(function<double(double,double)> P) {
   field->setFunctionsForVariables("q", "T", P, "P");
   return ;
 }
+
+void EulerSolver::updatePrimitiveVariables(function<double(double,double)> T, function<double(double,double)> P) {
+  updateVelocity();
+  setKineticEnergy();
+  setInternalEnergy();
+  updateTemperature(T);
+  updatePressure(P);
+  return ;
+}
+
+void EulerSolver::updateConservativeVariables(function<double(double,double,double)> IE) {
+  setXMomentum();
+  setYMomentum();
+  setKineticEnergy();
+  setInternalEnergy(IE);
+  setEnergy();
+  return ;
+}
+
 
 
 
