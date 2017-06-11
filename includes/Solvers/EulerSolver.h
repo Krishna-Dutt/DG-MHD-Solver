@@ -197,6 +197,18 @@ public:
     void setAuxillaryVariables();
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis This is the function used to  set up Eigen Values stored only at Boundaries in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setEigenValues(function<double(double,double)> SoundSpeed);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Eigen Values stored only at Boundaries in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateEigenValues(function<double(double,double)> SoundSpeed);
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
      *
      * @Param _dt The time step for each iteration.

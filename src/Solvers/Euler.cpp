@@ -1,5 +1,6 @@
 #include "../../includes/Solvers/EulerSolver.h"
 #include<iostream>
+#include<cmath>
 
 EulerSolver::EulerSolver(int _ne_x, int _ne_y, int _N) {
     ne_x = _ne_x;
@@ -95,6 +96,10 @@ double Divide(double x, double y){
     std::cout << "Error :: Division by Zero !! \n";
   }
   return 0 ;
+}
+
+double ModulusAdd(double x, double y) {
+  return ( abs(x) + abs(y) ) ;
 }
 
 double MomentumFluxPressure(double f, double u, double P) {
@@ -211,6 +216,23 @@ void EulerSolver::setAuxillaryVariables() {
   field->addVariable_withoutBounary("k3qE");
   return ;
 }
+
+void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
+  field->addVariable_onlyBounary("c");
+  field->addVariable_onlyBounary("u_plus_c");
+  field->addVariable_onlyBounary("v_plus_c");// Recheck formulation of eigen value !!
+
+  updateEigenValues(SoundSpeed);
+  return ;
+}
+
+void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) {
+  field->setFunctionsForBoundaryVariables("q", "T", SoundSpeed, "c");
+  field->setFunctionsForBoundaryVariables("u", "c", ModulusAdd, "u_plus_c");
+  field->setFunctionsForBoundaryVariables("v", "c", ModulusAdd, "v_plus_c");
+  return ;
+}
+
 
 
 void EulerSolver::solve() {
