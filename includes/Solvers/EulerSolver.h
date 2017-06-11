@@ -26,7 +26,7 @@ public:
      * @Param _N    The order of interpolation used for getting the results.
      */
     /* ----------------------------------------------------------------------------*/
-    AdvectionSolver(int _ne_x, int _ne_y, int _N);
+    EulerSolver(int _ne_x, int _ne_y, int _N);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This is the function for setting the domain of the problem.
@@ -51,22 +51,49 @@ public:
     void setBoundaryCondtions(string type);
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis This is the function used to setup Primitive Variables in the domain.
+     
+    /* ----------------------------------------------------------------------------*/
+    void setPrimitiveVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to setup Conservative Variables in the domain.
+     */
+    /* ----------------------------------------------------------------------------*/
+    void setConservativeVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to initialize the density field of the domain  
+     *
+     * @Param functionRho This is the function used to initialize the `q` density as an input.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInitialDensity(function<double(double, double)>Rho);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to initialize the Pressure field of the domain  
+     *
+     * @Param functionP This is the function used to initialize the `P` pressure as an input.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInitialPressure(function<double(double, double)>P);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to initialize the Temperature field of the domain  
+     *
+     * @Param functionT This is the function used to initialize the `T` temperature as an input.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInitialTemperature(function<double(double, double)>T);
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis This is the function used to initialize the the veclocity of the domain  
      *
      * @Param functionU This is the function used to initialize the `U` velocity as an input.
      * @Param functionV This is the function used to initialize the `V` velocity as an input.
      */
     /* ----------------------------------------------------------------------------*/
-    void setVelocity(function<double(double, double)>U, function<double(double, double)>V);
-    /* ----------------------------------------------------------------------------*/
-    /**
-     * @Synopsis  This is the function used to give the initial input waveform as a function.
-     *
-     * @Param I The input function which is used to initialize the waveform. The function takes 2 inputs x and y in
-     * order.
-     */
-    /* ----------------------------------------------------------------------------*/
-    void setInitialConditions(function<double(double, double)> I);
+    void setInitialVelocity(function<double(double, double)>U, function<double(double, double)>V);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
