@@ -24,12 +24,7 @@
 #ifndef DG_ELEMENT_2D_H_
 #define DG_ELEMENT_2D_H_
 
-#include <map>
-#include <string>
-#include <vector>
-#include <functional>
-#include <iostream>
-#include <cblas.h>
+#include "../Utilities/HeaderFiles.h"
 
 using namespace std;
 

@@ -1,8 +1,8 @@
 #ifndef ADVECTIONSOLVER_H
 #define ADVECTIONSOLVER_H
 
-# include "../DG_Field_2d/DG_Field_2d.h" 
-#include <functional>
+#include "../DG_Field_2d/DG_Field_2d.h" 
+#include "../Utilities/HeaderFiles.h"
 
 using namespace std;
 

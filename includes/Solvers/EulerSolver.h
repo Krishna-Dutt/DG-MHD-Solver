@@ -2,10 +2,7 @@
 #define EULERSOLVER_H
 
 # include "../DG_Field_2d/DG_Field_2d.h" 
-#include <functional>
-#include <iostream>
-#include <cmath>
-#include <cstring>
+#include "../Utilities/HeaderFiles.h"
 
 using namespace std;
 

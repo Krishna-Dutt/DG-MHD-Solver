@@ -10,9 +10,7 @@
 #ifndef DG_FIELD_2D_H_
 #define DG_FIELD_2D_H_
 
-#include <vector>
-#include <functional>
-#include <fstream>
+#include "../Utilities/HeaderFiles.h"
 
 using namespace std; 
 
