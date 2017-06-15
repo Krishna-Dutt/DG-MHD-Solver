@@ -342,10 +342,12 @@ void EulerSolver::SetShockDetector(string _ShockDetector) {
 void EulerSolver::SetShockDetectorVariables() {
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered("CellMarker");
+    /*
     field->addVariable_CellCentered("VariableMax");
     field->addVariable_CellCentered("OutFlowSize");
     field->addVariable_CellCentered("OutFlowFlux");
     field->addVariable_CellCentered("Radius");
+    */
   }
 
   return ;
@@ -360,12 +362,17 @@ void EulerSolver::RunShockDetector() {
 }
 
 void EulerSolver::Run_KXRCF() {
+  /*
   field->ResetVariables_CellCentered("VariableMax");
   field->ResetVariables_CellCentered("OutFlowSize");
   field->ResetVariables_CellCentered("OutFlowFlux");
   field->ResetVariables_CellCentered("Radius");
+  */
   field->ResetVariables_CellCentered("CellMarker");
   field->ResetMap_OutFlow();
+
+  field->updateOutFlowBoundary("u", "v");
+  field->updateCellMarker("q", "CellMarker");
 
   return ;
 }

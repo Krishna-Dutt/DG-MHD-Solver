@@ -284,6 +284,25 @@ void DG_Field_2d::ResetMap_OutFlow() {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  Function to update the Map to OutFlow Boundaries.
+ * 
+ * @Param u This is the velocity in x direction.
+ * @Param v This is the velocity in y direction.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::updateOutFlowBoundary(string u, string v) {
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+            elements[i][j]->updateOutFlowBoundary(string u, string v);
+       }
+   }
+
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  Function in order to write the data in the form of VTK file.
  *
  * @Param fileName This is the string fileName with which the file is to be saved.

@@ -112,7 +112,7 @@ void DG_Element_2d::ResetVariables_CellCentered(string v, double value) {
 
 /* ----------------------------------------------------------------------------*/
 /**
- * @Synopsis  This functions resets the Map to the Outflow Bloundaries.
+ * @Synopsis  This function resets the Map to the Outflow Boundaries.
  *
 */
 /* ----------------------------------------------------------------------------*/
@@ -122,6 +122,19 @@ void DG_Element_2d::ResetMap_OutFlow() {
     OutFlow["Right"]= false;
     OutFlow["Left"] = false;
     return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the Map to the Outflow Boundaries.
+ *
+ * @Param u This is the velocity in the x direction.
+ * @Param v This is the velocity in the y direction.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
+
+   return ;
 }
 
 

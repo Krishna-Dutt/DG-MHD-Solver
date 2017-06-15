@@ -77,6 +77,7 @@ public:
     void setNeighboringElement(char type, DG_Element_2d* neighbor );
     void setVariableNeighbors(string v);
     void ResetMap_OutFlow();
+    void updateOutFlowBoundary(string u, string v);
 
     // Functions to manipulate Cell Centered Variables.
     void ResetVariables_CellCentered(string v, double value = 0.0);
