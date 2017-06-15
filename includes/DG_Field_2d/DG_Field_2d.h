@@ -40,6 +40,7 @@ public:
     void writeVTK(string fileName);
     void ResetMap_OutFlow(); // Function to Reset the Map to Outflow Boundaries.
     void updateOutFlowBoundary(string u, string v); // Function to update the map of Outflow Boundaries.
+    void updateCellMarker(string v, string m);
 
     // Function to Reset Cell Centered Variables 
     void ResetVariables_CellCentered(string v, double value = 0.0);

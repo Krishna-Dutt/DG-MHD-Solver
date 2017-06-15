@@ -152,8 +152,6 @@ void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
   return ;
 }
 
-
-
 /* ----------------------------------------------------------------------------*/
 /**
  * @Synopsis  This functions creates space in order to take in one more variable on which operators are needed to be

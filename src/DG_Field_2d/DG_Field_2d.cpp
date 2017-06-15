@@ -293,7 +293,25 @@ void DG_Field_2d::ResetMap_OutFlow() {
 void DG_Field_2d::updateOutFlowBoundary(string u, string v) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
-            elements[i][j]->updateOutFlowBoundary(string u, string v);
+            elements[i][j]->updateOutFlowBoundary(u, v);
+       }
+   }
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to update the Cell Markers for Shock Detection.
+ * 
+ * @Param v This is the quantity used for detecting Shocks/Discontinuities.
+ * @Param m This is the variable used to store the value of cell marker.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::updateCellMarker(string v, string m) {
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+            elements[i][j]->updateOutFlowBoundary(v, m);
        }
    }
 

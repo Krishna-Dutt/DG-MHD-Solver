@@ -41,8 +41,9 @@ double lobattoIntegration(double start, double end, unsigned N, function<double(
 }
 
 
-double lobattoIntegration(double start, double end, int N, const double **f_value) {
+double lobattoIntegration(double start, double end, int N, double **f_value) {
     N++;
+    const double *const *f = f_value;
     double *Nodes,*Weights,*Values;
     Nodes   =   new double[N];
     Weights =   new double[N];
@@ -64,7 +65,7 @@ double lobattoIntegration(double start, double end, int N, const double **f_valu
 
 
 	for(i=0;i<N;i++)
-		Values[i] =   *f_value[i];
+		Values[i] =   *f[i];
 
 	for(i=0;i<N;i++)
 		integral += (Values[i]*Weights[i]);
