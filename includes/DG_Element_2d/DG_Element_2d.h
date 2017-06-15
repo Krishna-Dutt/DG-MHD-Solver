@@ -79,6 +79,7 @@ public:
     void setVariableNeighbors(string v);
     void ResetMap_OutFlow();
     void updateOutFlowBoundary(string u, string v);
+    void updateCellMarker(string v, string m);
 
     // Functions to manipulate Cell Centered Variables.
     void ResetVariables_CellCentered(string v, double value = 0.0);

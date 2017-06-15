@@ -11,6 +11,7 @@
 #include <cmath>
 
 #define MAX(a, b)(a>b?a:b)
+#define MIN(a, b)(a<b?a:b)
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -151,6 +152,54 @@ void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
 
   return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates cell markers for Shock Detection, using LXRCF.
+ *
+ * @Param u This is the quantity used for detection.
+ * @Param v This is the variables used to store the cell marker.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateCellMarker(string v, string m) {
+  double radius = 1.0;
+  double OutflowSize = 0.0;
+  double MaxVariable = 0.0;
+  double VariableFlux = 0.0;
+
+  if (OutFlow["Top"]) {
+    VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryTop[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringTop[v]);
+    OutflowSize += abs(x_end -x_start);
+  }
+  if (OutFlow["Bottom"]) {
+    VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryBottom[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringBottom[v]);
+    OutflowSize += abs(x_end -x_start);
+  }
+  if (OutFlow["Left"]) {
+    VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryLeft[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringTop[v]);
+    OutflowSize += abs(y_end -y_start);
+  }
+  if (OutFlow["Right"]) {
+    VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryRight[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringRight[v]);
+    OutflowSize += abs(y_end -y_start);
+  }
+
+  MaxVariable = variable[v][0];
+  for (int i = 0; i < (N+1)*(N+1) ; ++i) {
+    MaxVariable = MAX(MaxVariable,variable[v][i]);
+  }
+
+  radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
+
+  *variable[m] = abs(VariableFlux) / ( abs(OutflowSize) * MaxVariable * pow(radius, 0.5 * (N+1)));
+  
+ return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**

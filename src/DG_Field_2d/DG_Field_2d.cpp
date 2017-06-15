@@ -311,7 +311,7 @@ void DG_Field_2d::updateOutFlowBoundary(string u, string v) {
 void DG_Field_2d::updateCellMarker(string v, string m) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
-            elements[i][j]->updateOutFlowBoundary(v, m);
+            elements[i][j]->updateCellMarker(v, m);
        }
    }
 
