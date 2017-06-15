@@ -43,7 +43,7 @@ void EulerSolver::setInitialDensity(function<double(double, double)> Rho) {
 }
 
 void EulerSolver::setInitialPressure(function<double(double, double)> P) {
-    field->initializeVariable("p", P);
+    field->initializeVariable("P", P);
     return ;
 }
 
@@ -178,6 +178,7 @@ void EulerSolver::updateConservativeVariables(function<double(double,double,doub
 }
 
 void EulerSolver::setInviscidFlux() {
+  //cout << " Calling setInviscidFlux " << endl;
   field->addVariable_withBounary("quu_plus_P");
   field->addVariable_withBounary("quv");
   field->addVariable_withBounary("qvv_plus_P");
@@ -191,6 +192,7 @@ void EulerSolver::setInviscidFlux() {
 void EulerSolver::updateInviscidFlux() {
   // Mass flux qu and qv already accounted for in the conservative Variables.
   // Assuming, Requiring all Conservative and Primitive Variables have been updated !!
+ // cout << " Calling updateInviscidFlux " << endl;
   field->setFunctionsForVariables("qu", "u", "P", MomentumFluxPressure, "quu_plus_P");
   field->setFunctionsForVariables("qv", "v", "P", MomentumFluxPressure, "qvv_plus_P");
   field->setFunctionsForVariables("qu", "v", MomentumFlux, "quv");
@@ -200,6 +202,7 @@ void EulerSolver::updateInviscidFlux() {
 }
 
 void EulerSolver::setAuxillaryVariables() {
+ // cout << " Calling setAuxillaryVariables " << endl;
   field->addVariable_withoutBounary("k1q");
   field->addVariable_withoutBounary("dqudx");
   field->addVariable_withoutBounary("dqvdy");
@@ -218,6 +221,7 @@ void EulerSolver::setAuxillaryVariables() {
 }
 
 void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
+ // cout << "Calling setEigenValues " << endl;
   field->addVariable_onlyBounary("c");
   field->addVariable_onlyBounary("u_plus_c");
   field->addVariable_onlyBounary("v_plus_c");// Recheck formulation of eigen value !!
@@ -227,6 +231,7 @@ void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
 }
 
 void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) {
+ // cout << " Calling updateEigenValues " << endl;
   field->setFunctionsForBoundaryVariables("q", "T", SoundSpeed, "c");
   field->setFunctionsForBoundaryVariables("u", "c", ModulusAdd, "u_plus_c");
   field->setFunctionsForBoundaryVariables("v", "c", ModulusAdd, "v_plus_c");
@@ -238,8 +243,8 @@ void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
   field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
 
   field->scal(0.0, K);
-  field->axpy(-1.0, "duqdx", K);
-  field->axpy(-1.0, "dvqdy", K);
+  field->axpy(-1.0, "dqudx", K);
+  field->axpy(-1.0, "dqvdy", K);
   
   field->axpy(0.5*dt, K, Var);
   return;
@@ -250,8 +255,8 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
   field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
 
   field->scal(0.0, K2);
-  field->axpy(-1.0, "duqdx", K2);
-  field->axpy(-1.0, "dvqdy", K2);
+  field->axpy(-1.0, "dqudx", K2);
+  field->axpy(-1.0, "dqvdy", K2);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
@@ -263,8 +268,8 @@ void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, st
   field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
 
   field->scal(0.0, K3);
-  field->axpy(-1.0, "duqdx", K3);
-  field->axpy(-1.0, "dvqdy", K3);
+  field->axpy(-1.0, "dqudx", K3);
+  field->axpy(-1.0, "dqvdy", K3);
   
   field->axpy((7.0/6.0)*dt, K1, Var);
   field->axpy(-(4.0/3.0)*dt, K2, Var);
