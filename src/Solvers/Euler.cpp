@@ -360,11 +360,11 @@ void EulerSolver::RunShockDetector() {
 }
 
 void EulerSolver::Run_KXRCF() {
-  field->ResetVariable_CellCentered("VariableMax");
-  field->ResetVariable_CellCentered("OutFlowSize");
-  field->ResetVariable_CellCentered("OutFlowFlux");
-  field->ResetVariable_CellCentered("Radius");
-  field->ResetVariable_CellCentered("CellMarker");
+  field->ResetVariables_CellCentered("VariableMax");
+  field->ResetVariables_CellCentered("OutFlowSize");
+  field->ResetVariables_CellCentered("OutFlowFlux");
+  field->ResetVariables_CellCentered("Radius");
+  field->ResetVariables_CellCentered("CellMarker");
   field->ResetMap_OutFlow();
 
   return ;

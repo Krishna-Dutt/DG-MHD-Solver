@@ -256,7 +256,7 @@ void DG_Field_2d::initializeVariable(string v, function<double(double, double)> 
  * @Param value The value to which the variable is to be reset.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::ResetVariables_CellCentered(string v, double value = 0.0) {
+void DG_Field_2d::ResetVariables_CellCentered(string v, double value) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
             elements[i][j]->ResetVariables_CellCentered(v, value);

@@ -105,8 +105,8 @@ void DG_Element_2d::addVariable_CellCentered(string v) {
  * @Param value The value to which the variable is to be reset.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::ResetVariables_CellCentered(string v, double value = 0.0) {
-    variable[v] = value; 
+void DG_Element_2d::ResetVariables_CellCentered(string v, double value) {
+   *variable[v] = value; 
     return ;
 }
 
