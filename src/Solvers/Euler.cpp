@@ -239,8 +239,8 @@ void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) 
 }
 
 void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
-  field->delByDelX(FluxX, "dqudx", "rusanov", "u_plus_c");
-  field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
+  field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K);
   field->axpy(-1.0, "dqudx", K);
@@ -251,8 +251,8 @@ void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
 }
 
 void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
-  field->delByDelX(FluxX, "dqudx", "rusanov", "u_plus_c");
-  field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
+  field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dqudx", K2);
@@ -264,8 +264,8 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
 }
 
 void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
-  field->delByDelX(FluxX, "dqudx", "rusanov", "u_plus_c");
-  field->delByDelY(FluxY, "dqvdy", "rusanov", "v_plus_c");
+  field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K3);
   field->axpy(-1.0, "dqudx", K3);

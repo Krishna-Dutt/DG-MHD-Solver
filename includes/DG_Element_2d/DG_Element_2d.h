@@ -85,9 +85,9 @@ public:
     void ResetVariables_CellCentered(string v, double value = 0.0);
 
     // Functions for various operations on the variables.
-    void delByDelX(string v, string vDash, string fluxType, string fluxVariable);
+    void delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
 
-    void delByDelY(string v, string vDash, string fluxType, string fluxVariable);
+    void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
 
     // Functions to set the various operator matrices.
     void setMassMatrix(double* m);

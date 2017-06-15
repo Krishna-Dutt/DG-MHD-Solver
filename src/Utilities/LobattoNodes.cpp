@@ -14,10 +14,13 @@ void lobattoNodes(double *Nodes, unsigned N)
     DerivedPoly =   new double[N-1];
     legendrePolynomial(Poly,N-1);
     polyDeriv(Poly,DerivedPoly,N-1);
-	Nodes[0]   =   -1;
+  	Nodes[0]   =   -1;
+    // Raising Exception for Linear case, where only end nodes are needed !!
+    if (N  > 2) {
     polynomialRoots(DerivedPoly, &(Nodes[1]), N-2);
-	Nodes[N-1] =   1;
-	sort(Nodes,Nodes+N);
+    }
+  	Nodes[N-1] =   1;
+  	sort(Nodes,Nodes+N);
 
     delete[] Poly;
     delete[] DerivedPoly;

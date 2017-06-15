@@ -46,9 +46,9 @@ public:
     void ResetVariables_CellCentered(string v, double value = 0.0);
     
     // Operators on the field.
-    void delByDelX(string v, string vDash, string fluxType, string fluxVariable);
+    void delByDelX(string v, string vDash,string conserVar, string fluxType, string fluxVariable);
 
-    void delByDelY(string v, string vDash, string fluxType, string fluxVariable);
+    void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
 
     // Functions to apply linear operations on the variables.
     void axpy(double a, string x, string y);

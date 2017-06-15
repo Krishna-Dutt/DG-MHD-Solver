@@ -66,8 +66,8 @@ void AdvectionSolver::solve() {
         field->setFunctionsForVariables("u", "q", product, "uq");
         field->setFunctionsForVariables("v", "q", product, "vq");
         
-        field->delByDelX("uq", "duqdx", "rusanov", "u");
-        field->delByDelY("vq", "dvqdy", "rusanov", "v");
+        field->delByDelX("uq", "duqdx", "q", "rusanov", "u");
+        field->delByDelY("vq", "dvqdy", "q", "rusanov", "v");
         
         field->scal(0.0, "k1");
         field->axpy(-1.0, "duqdx", "k1");
@@ -79,8 +79,8 @@ void AdvectionSolver::solve() {
         field->setFunctionsForVariables("u", "q", product, "uq");
         field->setFunctionsForVariables("v", "q", product, "vq");
         
-        field->delByDelX("uq", "duqdx", "rusanov", "u");
-        field->delByDelY("vq", "dvqdy", "rusanov", "v");
+        field->delByDelX("uq", "duqdx", "q", "rusanov", "u");
+        field->delByDelY("vq", "dvqdy", "q", "rusanov", "v");
         
         field->scal(0.0, "k2");
         field->axpy(-1.0, "duqdx", "k2");
@@ -93,8 +93,8 @@ void AdvectionSolver::solve() {
         field->setFunctionsForVariables("u", "q", product, "uq");
         field->setFunctionsForVariables("v", "q", product, "vq");
         
-        field->delByDelX("uq", "duqdx", "rusanov", "u");
-        field->delByDelY("vq", "dvqdy", "rusanov", "v");
+        field->delByDelX("uq", "duqdx", "q", "rusanov", "u");
+        field->delByDelY("vq", "dvqdy", "q", "rusanov", "v");
         
         field->scal(0.0, "k3");
         field->axpy(-1.0, "duqdx", "k3");

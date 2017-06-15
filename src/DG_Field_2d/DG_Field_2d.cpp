@@ -399,13 +399,14 @@ void DG_Field_2d::writeVTK(string fileName){
  *
  * @Param v The variable which is to be differentiated
  * @Param vDash The variable in which the differentiated value is to be stored.
+ * @Param conserVar The correpsonding conservative/dependent variable.
  * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::delByDelX(string v, string vDash, string fluxType, string fluxVariable = "") {
+void DG_Field_2d::delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
     for(int i = 0; i < ne_x; i++ )
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->delByDelX(v, vDash, fluxType, fluxVariable);
+            elements[i][j]->delByDelX(v, vDash, conserVar, fluxType, fluxVariable);
 
     return ;
 }
@@ -416,13 +417,14 @@ void DG_Field_2d::delByDelX(string v, string vDash, string fluxType, string flux
  *
  * @Param v The variable which is to be differentiated
  * @Param vDash The variable in which the differentiated value is to be stored.
+ * @Param conserVar The corresponding conservative/Dependent Variable.
  * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::delByDelY(string v, string vDash, string fluxType, string fluxVariable = "") {
+void DG_Field_2d::delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
     for(int i = 0; i < ne_x; i++ )
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->delByDelY(v, vDash, fluxType, fluxVariable);
+            elements[i][j]->delByDelY(v, vDash, conserVar, fluxType, fluxVariable);
 
     return ;
 }

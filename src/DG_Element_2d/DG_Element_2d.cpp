@@ -386,7 +386,7 @@ void DG_Element_2d::setNeighboringElement(char type, DG_Element_2d* neighbor) {
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::delByDelX(string v, string vDash, string fluxType, string fluxVariable = "") {
+void DG_Element_2d::delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
     
@@ -417,8 +417,8 @@ void DG_Element_2d::delByDelX(string v, string vDash, string fluxType, string fl
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
-            numericalFlux[i*(N+1)+N] = 0.5*(*boundaryRight[v][i] + *neighboringRight[v][i] + MAX(fabs(*boundaryRight[fluxVariable][i]), fabs(*neighboringRight[fluxVariable][i]))*(*boundaryRight[v][i] - *neighboringRight[v][i])  ) ;   
-            numericalFlux[i*(N+1)]   = 0.5*(*boundaryLeft[v][i]  + *neighboringLeft[v][i]  - MAX(fabs(*boundaryLeft[fluxVariable][i]), fabs(*neighboringLeft[fluxVariable][i]))*(*boundaryLeft[v][i] - *neighboringLeft[v][i])  ) ;   
+            numericalFlux[i*(N+1)+N] = 0.5*(*boundaryRight[v][i] + *neighboringRight[v][i] + MAX(fabs(*boundaryRight[fluxVariable][i]), fabs(*neighboringRight[fluxVariable][i]))*(*boundaryRight[conserVar][i] - *neighboringRight[conserVar][i])  ) ;   
+            numericalFlux[i*(N+1)]   = 0.5*(*boundaryLeft[v][i]  + *neighboringLeft[v][i]  - MAX(fabs(*boundaryLeft[fluxVariable][i]), fabs(*neighboringLeft[fluxVariable][i]))*(*boundaryLeft[conserVar][i] - *neighboringLeft[conserVar][i])  ) ;   
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -448,7 +448,7 @@ void DG_Element_2d::delByDelX(string v, string vDash, string fluxType, string fl
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::delByDelY(string v, string vDash, string fluxType, string fluxVariable = "") {
+void DG_Element_2d::delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -479,8 +479,8 @@ void DG_Element_2d::delByDelY(string v, string vDash, string fluxType, string fl
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
-            numericalFlux[N*(N+1)+i]= 0.5*(*boundaryTop[v][i] + *neighboringTop[v][i] + MAX(fabs(*boundaryTop[fluxVariable][i]), fabs(*neighboringTop[fluxVariable][i]))*(*boundaryTop[v][i] - *neighboringTop[v][i]));
-            numericalFlux[i]        = 0.5*(*boundaryBottom[v][i] + *neighboringBottom[v][i] - MAX(fabs(*boundaryBottom[fluxVariable][i]), fabs(*neighboringBottom[fluxVariable][i]))*(*boundaryBottom[v][i] - *neighboringBottom[v][i])); 
+            numericalFlux[N*(N+1)+i]= 0.5*(*boundaryTop[v][i] + *neighboringTop[v][i] + MAX(fabs(*boundaryTop[fluxVariable][i]), fabs(*neighboringTop[fluxVariable][i]))*(*boundaryTop[conserVar][i] - *neighboringTop[conserVar][i]));
+            numericalFlux[i]        = 0.5*(*boundaryBottom[v][i] + *neighboringBottom[v][i] - MAX(fabs(*boundaryBottom[fluxVariable][i]), fabs(*neighboringBottom[fluxVariable][i]))*(*boundaryBottom[conserVar][i] - *neighboringBottom[conserVar][i])); 
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
