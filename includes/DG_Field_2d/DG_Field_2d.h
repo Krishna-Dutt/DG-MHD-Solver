@@ -34,9 +34,14 @@ public:
     void addVariable_withBounary(string v);
     void addVariable_withoutBounary(string v);
     void addVariable_onlyBounary( string v);
+    void addVariable_CellCentered(string v);
     void initializeVariable(string v, function<double(double, double)>);
     void setBoundaryConditions(string type);
     void writeVTK(string fileName);
+    void ResetMap_OutFlow(); // Function to Reset the Map to Outflow Boundaries.
+
+    // Function to Reset Cell Centered Variables 
+    void ResetVariables_CellCentered(string v, double value = 0.0);
     
     // Operators on the field.
     void delByDelX(string v, string vDash, string fluxType, string fluxVariable);

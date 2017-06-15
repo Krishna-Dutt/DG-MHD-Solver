@@ -63,15 +63,23 @@ public:
     map<string, double**> neighboringLeft;
 
     vector<string> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
-    vector<string> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
+    vector<string> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
 
+    map<string, bool> OutFlow; /// Map to flag outflow boundaries of each cell.
+    
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
     void addVariable_withBoundary(string v);
     void addVariable_onlyBoundary( string v);
     void addVariable_withoutBoundary(string v);
+    void addVariable_CellCentered(string v);
+
     void initializeVariable(string v, function<double(double, double)> f);
     void setNeighboringElement(char type, DG_Element_2d* neighbor );
     void setVariableNeighbors(string v);
+    void ResetMap_OutFlow();
+
+    // Functions to manipulate Cell Centered Variables.
+    void ResetVariables_CellCentered(string v, double value = 0.0);
 
     // Functions for various operations on the variables.
     void delByDelX(string v, string vDash, string fluxType, string fluxVariable);

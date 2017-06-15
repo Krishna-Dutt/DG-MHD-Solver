@@ -13,14 +13,20 @@ double V(double x, double y) {
 }
 
 double initial(double x, double y) {
-    return (exp(-(x*x +  y*y)*16.0));
+    if (x*x + y*y <= 0.25) {
+      return 1.0 ;
+    }
+    else {
+      return 0 ;
+    }
+    //return (exp(-(x*x +  y*y)*16.0));
 }
 
 int main() {
     double dt = 1e-2;
     int time_steps = 100;
     AdvectionSolver* a;
-    a = new AdvectionSolver(10, 10, 2);
+    a = new AdvectionSolver(10, 10, 1);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
     a->setVelocity(U, V);
     a->setInitialConditions(initial);

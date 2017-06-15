@@ -81,6 +81,50 @@ void DG_Element_2d::addVariable_withoutBoundary(string v) {
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions creates space in order to a cell centered variable on which operators are needed to be
+ * applied.
+ *
+ * @Param v  This is the name of the variable which is to be added.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::addVariable_CellCentered(string v) {
+    double * newVariable = new double ;/// Allocating the space for the new variable which is to be created.
+    variable[v] = newVariable; /// Now assigning the same to the map.
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions resets cell centered variable on which operators are needed to be
+ * applied.
+ *
+ * @Param v  This is the name of the variable which is to be reset.
+ * @Param value The value to which the variable is to be reset.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::ResetVariables_CellCentered(string v, double value = 0.0) {
+    variable[v] = value; 
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions resets the Map to the Outflow Bloundaries.
+ *
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::ResetMap_OutFlow() {
+    OutFlow["Top"] = false ;
+    OutFlow["Bottom"] = false;
+    OutFlow["Right"]= false;
+    OutFlow["Left"] = false;
+    return ;
+}
+
+
 
 /* ----------------------------------------------------------------------------*/
 /**

@@ -332,3 +332,47 @@ void EulerSolver::plot(string filename) {
     field->writeVTK(filename);
     return ;
 }
+
+void EulerSolver::SetShockDetector(string _ShockDetector) {
+  ShockDetector = _ShockDetector;
+  SetShockDetectorVariables();
+  return ;
+}
+
+void EulerSolver::SetShockDetectorVariables() {
+  if (ShockDetector == "KXRCF") {
+    field->addVariable_CellCentered("CellMarker");
+    field->addVariable_CellCentered("VariableMax");
+    field->addVariable_CellCentered("OutFlowSize");
+    field->addVariable_CellCentered("OutFlowFlux");
+    field->addVariable_CellCentered("Radius");
+  }
+
+  return ;
+}
+
+void EulerSolver::RunShockDetector() {
+  if (ShockDetector == "KXRCF") {
+    Run_KXRCF();
+ }
+
+  return ;
+}
+
+void EulerSolver::Run_KXRCF() {
+  field->ResetVariable_CellCentered("VariableMax");
+  field->ResetVariable_CellCentered("OutFlowSize");
+  field->ResetVariable_CellCentered("OutFlowFlux");
+  field->ResetVariable_CellCentered("Radius");
+  field->ResetVariable_CellCentered("CellMarker");
+  field->ResetMap_OutFlow();
+
+  return ;
+}
+
+
+
+void EulerSolver::SetLimiter(string _Limiter) {
+  Limiter = _Limiter;
+  return ;
+}

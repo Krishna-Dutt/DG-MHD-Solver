@@ -211,9 +211,30 @@ void DG_Field_2d::addVariable_withoutBounary(string v) {
            elements[i][j]->addVariable_withoutBoundary(v); // Adding the variable for the (i, j) th element.
        }
    }
+  // variableNames.push_back(v); // These are support variables, Hence not required in output vtk files.
+   return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is similar to DG_Field_2d::addVariable_withoutBoundary.Just only one value is store at for each cell,
+ *  could be considered as cell centered value.
+ *
+ * @Param v This is the name of the variable which is to be added.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::addVariable_CellCentered(string v) {
+    
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+           elements[i][j]->addVariable_CellCentered(v); // Adding the variable for the (i, j) th element.
+       }
+   }
    variableNames.push_back(v);
    return ;
 }
+
 
 void DG_Field_2d::initializeVariable(string v, function<double(double, double)> f) {
     
@@ -227,6 +248,39 @@ void DG_Field_2d::initializeVariable(string v, function<double(double, double)> 
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function in order to Reset the Cell Centered Variables to given value.
+ *
+ * @Param v The variable to be reset.
+ * @Param value The value to which the variable is to be reset.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::ResetVariables_CellCentered(string v, double value = 0.0) {
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+            elements[i][j]->ResetVariables_CellCentered(v, value);
+       }
+   }
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function in order to Reset the Map to OutFlow Boundaries.
+ *
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::ResetMap_OutFlow() {
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+            elements[i][j]->ResetMap_OutFlow();
+       }
+   }
+
+    return ;
+}
 
 /* ----------------------------------------------------------------------------*/
 /**

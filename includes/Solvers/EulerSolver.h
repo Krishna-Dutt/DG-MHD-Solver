@@ -15,6 +15,9 @@ private:
     double dt;
     int no_of_time_steps;
 
+    string ShockDetector;
+    string Limiter;
+
 public:
     /* ----------------------------------------------------------------------------*/
     /**
@@ -278,6 +281,43 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void plot(string filename);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function sets the type of ShockDetector to be used for Euler Solver
+     *
+     * @Param _shockdetector This is the name of the shock detector to be used in the euler solver.
+     */
+    /* ----------------------------------------------------------------------------*/
+    void SetShockDetector(string _shockdetector);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function sets up all additional variables required for the given Shock Detector.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void SetShockDetectorVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function Runs the required Shock Detector Method.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void RunShockDetector();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function Resets and runs the KXRCF Shock Detector.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void Run_KXRCF();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function sets the type of Limiter to be used for Euler Solver
+     *
+     * @Param _limiter This is the name of the limiter to be used in the euler solver.
+     */
+    /* ----------------------------------------------------------------------------*/
+    void SetLimiter(string _limiter);
 };
 
 #endif
