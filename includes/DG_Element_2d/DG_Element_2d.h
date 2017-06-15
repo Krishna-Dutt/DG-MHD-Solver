@@ -25,6 +25,7 @@
 #define DG_ELEMENT_2D_H_
 
 #include "../Utilities/HeaderFiles.h"
+#include "../Utilities/LobattoIntegration.h"
 
 using namespace std;
 

@@ -133,8 +133,23 @@ void DG_Element_2d::ResetMap_OutFlow() {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
+  double start = -1.0;
+  double end = 1.0;
 
-   return ;
+  if (lobattoIntegration(start, end, N, boundaryTop[v]) < 0.0) {
+    OutFlow["Top"] = true;
+  }
+  if (lobattoIntegration(start, end, N, boundaryBottom[v]) > 0.0) {
+    OutFlow["Bottom"] = true;
+  }
+  if (lobattoIntegration(start, end, N, boundaryLeft[u]) > 0.0) {
+    OutFlow["Left"] = true;
+  }
+  if (lobattoIntegration(start, end, N, boundaryRight[u]) < 0.0) {
+    OutFlow["Right"] = true;
+  }
+
+  return ;
 }
 
 
