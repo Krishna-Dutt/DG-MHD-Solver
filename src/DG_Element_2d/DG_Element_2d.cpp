@@ -179,7 +179,7 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
   }
   if (OutFlow["Left"]) {
     VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryLeft[v]);
-    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringTop[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringLeft[v]);
     OutflowSize += abs(y_end -y_start);
   }
   if (OutFlow["Right"]) {
