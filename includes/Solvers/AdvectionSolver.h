@@ -29,6 +29,13 @@ public:
     AdvectionSolver(int _ne_x, int _ne_y, int _N);
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis  This is the class destructor.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    ~AdvectionSolver();
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis  This is the function for setting the domain of the problem.
      *
      * @Param _x1 The x-coordinate of the lower left corner of the domain.
