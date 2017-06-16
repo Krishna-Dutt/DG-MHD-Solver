@@ -71,6 +71,7 @@ public:
 
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
     ~DG_Element_2d();
+    void Destroy_Matrices(); // Function to destroy all the allocated DG Matrices, once the solver is done.!!
 
     void addVariable_withBoundary(string v);
     void addVariable_onlyBoundary( string v);

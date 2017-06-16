@@ -81,9 +81,18 @@ DG_Element_2d::~DG_Element_2d() {
       delete[] (itr->second);
     }
     // Do I need to delete other maps pointing to Boundary elements, since no new memory is dynamically allocated for them ??
+}
 
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function which deallocates the matrices of the class.
+ *
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::Destroy_Matrices() {
     delete[] massMatrix;
-
     delete[] derivativeMatrix_x;
     delete[] derivativeMatrix_y;
     delete[] fluxMatrix_top;
@@ -91,12 +100,8 @@ DG_Element_2d::~DG_Element_2d() {
     delete[] fluxMatrix_bottom;
     delete[] fluxMatrix_left;
     delete[] inverseMassMatrix;
-    delete[] topNeighbor;
-    delete[] rightNeighbor;
-    delete[] leftNeighbor;
-    delete[] bottomNeighbor;
-
 }
+
 
 
 /* ----------------------------------------------------------------------------*/
