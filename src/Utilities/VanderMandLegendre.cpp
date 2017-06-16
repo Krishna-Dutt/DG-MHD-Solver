@@ -13,7 +13,7 @@ void twoDVanderMandLegendre(double *VanderMandMatrix, unsigned N) {
   LegendrePoly = new double*[N+1];
   lobattoNodes(Nodes, N+1);
 
-  unsigned i,j;
+  unsigned i1,j1,i2,j2;
   double k;
 
   for( i=0; i<=N; ++i) {
@@ -22,12 +22,14 @@ void twoDVanderMandLegendre(double *VanderMandMatrix, unsigned N) {
   }
 
    function<double(double)> eval;
-   for(i=0;i<=N;i++)
+   for(i1=0;i1<=N;i1++)
     {
-        for(j=0;j<=N;j++)
+        for(j1=0;j1<=N;j1++)
         {
-            k = sqrt((2.0*i+1.0) * (2.0*j+1.0))*0.5;
-            VanderMandMatrix[i*(N+1)+j] = k * polyEval(LegendrePoly[i],i,Nodes[i]) * polyEval(LegendrePoly[j],j,Nodes[j]);
+          for(i2=0; i2<=N; ++i2)
+            for(j2=0 ; j2<=N; ++j2) {
+              k = sqrt((2.0*i2+1.0) * (2.0*j2+1.0))*0.5;
+              VanderMandMatrix[i*(N+1)+j] = k * polyEval(LegendrePoly[i],i,Nodes[i]) * polyEval(LegendrePoly[j],j,Nodes[j]);
         }
     }
 
