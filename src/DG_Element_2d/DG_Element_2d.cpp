@@ -69,6 +69,38 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This is the destructor which deallocates the member variables of the class and destroys the object.
+ *
+*/
+/* ----------------------------------------------------------------------------*/
+DG_Element_2d::~DG_Element_2d() {
+    delete[] X;
+    delete[] Y;
+
+    for ( map<string, double*>::iterator itr = variable.begin() ;itr != variable.end(); itr++){
+      delete[] (itr->second);
+    }
+    // Do I need to delete other maps pointing to Boundary elements, since no new memory is dynamically allocated for them ??
+
+    delete[] massMatrix;
+
+    delete[] derivativeMatrix_x;
+    delete[] derivativeMatrix_y;
+    delete[] fluxMatrix_top;
+    delete[] fluxMatrix_right;
+    delete[] fluxMatrix_bottom;
+    delete[] fluxMatrix_left;
+    delete[] inverseMassMatrix;
+    delete[] topNeighbor;
+    delete[] rightNeighbor;
+    delete[] leftNeighbor;
+    delete[] bottomNeighbor;
+
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This functions creates space in order to take in one more variable on which operators are needed to be
  * applied.
  *

@@ -123,6 +123,19 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the destructor method  which deallocates and destroys the current object.
+ * 
+*/
+/* ----------------------------------------------------------------------------*/
+DG_Field_2d::~DG_Field_2d() {
+  for(int i = 0; i < ne_x; i++)
+    for (int j = 0; j < ne_y; j++) {
+      delete elements[i][j];
+    }
+}
+
 void DG_Field_2d::setBoundaryConditions(string type) {
     if(type == "periodic") {
         // Setting the boundary for the top elements.

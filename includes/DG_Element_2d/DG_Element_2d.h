@@ -68,7 +68,10 @@ public:
 
     map<string, bool> OutFlow; /// Map to flag outflow boundaries of each cell.
     
+
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
+    ~DG_Element_2d();
+
     void addVariable_withBoundary(string v);
     void addVariable_onlyBoundary( string v);
     void addVariable_withoutBoundary(string v);

@@ -31,6 +31,8 @@ public:
     vector<string> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
 
     DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, double _x2, double _y2);
+    ~DG_Field_2d();
+
     void addVariable_withBounary(string v);
     void addVariable_withoutBounary(string v);
     void addVariable_onlyBounary( string v);
