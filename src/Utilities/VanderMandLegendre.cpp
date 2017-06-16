@@ -36,6 +36,8 @@ void twoDVanderMandLegendre(double *VanderMandMatrix, unsigned N) {
      delete[] LegendrePoly[i];
    }
    delete[] LegendrePoly;
+
+   return ;
 }
 
 

@@ -42,6 +42,9 @@ private:
     double* fluxMatrix_bottom; /// This would be the flux term for the the bottom edge.
     double* fluxMatrix_left; /// The Flux matrix for the left edge.
     double* inverseMassMatrix; /// The inverse of the mass matrix is also created only once in the field function. And just passed to each element.
+
+    double* vanderMandMatrix; /// Both VanderMadn and its Inverse are created once in the DG Field and passed to each element.
+    double* inverseVanderMandMatrix;
      
     DG_Element_2d* topNeighbor;
     DG_Element_2d* rightNeighbor;
@@ -102,6 +105,8 @@ public:
     void setRightFluxMatrix(double* f);
     void setLeftFluxMatrix(double* f);
     void setBottomFluxMatrix(double* f);
+    void setVanderMandMatrix(double* vm);
+    void setInverseVanderMandMatrix(double* ivm);
 
     // Functions to apply linear operations on the variables.
     void axpy(double a, string x, string y);

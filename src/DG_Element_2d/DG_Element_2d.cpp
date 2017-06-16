@@ -65,6 +65,9 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
     leftNeighbor        =   NULL;
     bottomNeighbor      =   NULL;
 
+    vanderMandMatrix    =   NULL;
+    inverseVanderMandMatrix = NULL;
+
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -100,6 +103,12 @@ void DG_Element_2d::Destroy_Matrices() {
     delete[] fluxMatrix_bottom;
     delete[] fluxMatrix_left;
     delete[] inverseMassMatrix;
+    if ( vanderMandMatrix != NULL){
+      delete[] vanderMandMatrix;
+      delete[] inverseVanderMandMatrix;
+    }
+
+    return ;
 }
 
 
@@ -551,6 +560,23 @@ void DG_Element_2d::setMassMatrix(double *m) {
 
 void DG_Element_2d::setInverseMassMatrix(double* im) {
     inverseMassMatrix = im;
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function takes VanderMand Matrix as an input
+ *
+ * @Param vm This is the VanderMandMatrix array(actually a matrix, but implemented as a 1-d array).
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setVanderMandMatrix(double *vm) {
+    vanderMandMatrix = vm;
+    return ;
+}
+
+void DG_Element_2d::setInverseVanderMandMatrix(double* ivm) {
+    inverseVanderMandMatrix = ivm;
     return ;
 }
 

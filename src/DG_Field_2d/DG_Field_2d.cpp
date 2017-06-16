@@ -13,6 +13,8 @@
 #include "../../includes/Utilities/DerivativeMatrix.h"
 #include "../../includes/Utilities/MassMatrix.h"
 #include "../../includes/Utilities/FluxMatrix.h"
+#include "../../includes/Utilities/VanderMandLegendre.h"
+
 
 
 
@@ -121,6 +123,28 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
         }
 
     
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function which finds and sets the VanderMandMatrix and its Inverse.
+ * 
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setVanderMandMatrix() {
+  double *vanderMand = new double [(N+1)*(N+1)];
+  double *inverseVanderMand = new double [(N+1)*(N+1)];
+
+  twoDVanderMandLegendre(vanderMand, N);
+  inverse(vanderMand, inverseVanderMand, (N+1)*(N+1));
+
+  for (int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+     elements[i][j]->setVanderMandMatrix(vanderMand);
+     elements[i][j]->setInverseVanderMandMatrix(inverseVanderMand);
+    }
+
+  return ;
 }
 
 /* ----------------------------------------------------------------------------*/
