@@ -22,7 +22,7 @@ void derivativeMatrix(double *DerivativeMatrix,unsigned N)
         poly[i] =   new double[N+1];
         deriv[i]=   new double[N];
         memcpy(poly[i],Poly[i],(N+1)*sizeof(double));
-        polyDeriv(poly[i],deriv[i],N+1);
+        polyDeriv(poly[i],deriv[i],N);
     }
 
     function<double(double)> eval;
