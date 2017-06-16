@@ -97,7 +97,7 @@ double Divide(double x, double y){
 }
 
 double ModulusAdd(double x, double y) {
-  return ( abs(x) + abs(y) ) ;
+  return ( fabs(x) + fabs(y) ) ;
 }
 
 double MomentumFluxPressure(double f, double u, double P) {
