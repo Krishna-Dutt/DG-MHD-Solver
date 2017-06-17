@@ -242,6 +242,14 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
   radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
 
   *variable[m] = abs(VariableFlux) / ( abs(OutflowSize) * MaxVariable * pow(radius, 0.5 * (N+1)));
+  // Updating Cell Marker value to 1 or 0, to set detection ON/OFF.
+
+  if (*variable[m] > 1.0) {
+    *variable[m] = 1.0;
+  }
+  else {
+    *variable[m] = 0.0;
+  }
   
  return ;
 }
