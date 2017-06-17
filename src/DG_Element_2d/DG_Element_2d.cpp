@@ -61,10 +61,10 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
     fluxMatrix_bottom   =   NULL;
     fluxMatrix_left     =   NULL;
     inverseMassMatrix   =   NULL;
-    topNeighbor         =   NULL;
-    rightNeighbor       =   NULL;
-    leftNeighbor        =   NULL;
-    bottomNeighbor      =   NULL;
+    topNeighbor         =   this;
+    rightNeighbor       =   this;
+    leftNeighbor        =   this;
+    bottomNeighbor      =   this;
 
     vanderMandMatrix    =   NULL;
     inverseVanderMandMatrix = NULL;
@@ -465,19 +465,19 @@ void DG_Element_2d::initializeVariable(string v, function<double(double, double)
 
 void DG_Element_2d::setVariableNeighbors(string v) {
     int j;
-    if(topNeighbor!=NULL) {
+    if(topNeighbor!=this) {
         for( j = 0 ; j <= N; j++) 
             neighboringTop[v][j] = topNeighbor->boundaryBottom[v][j];
     }
-    if(rightNeighbor!=NULL) {
+    if(rightNeighbor!=this) {
         for( j = 0 ; j <= N; j++) 
             neighboringRight[v][j] = rightNeighbor->boundaryLeft[v][j];
     }
-    if(leftNeighbor!=NULL) {
+    if(leftNeighbor!=this) {
         for( j = 0 ; j <= N; j++) 
             neighboringLeft[v][j] = leftNeighbor->boundaryRight[v][j];
     }
-    if(bottomNeighbor!=NULL) {
+    if(bottomNeighbor!=this) {
         for( j = 0 ; j <= N; j++) 
             neighboringBottom[v][j] = bottomNeighbor->boundaryTop[v][j];
     }
