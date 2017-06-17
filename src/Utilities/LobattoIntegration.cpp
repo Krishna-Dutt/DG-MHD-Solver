@@ -24,7 +24,7 @@ double lobattoIntegration(double start, double end, unsigned N, function<double(
     lobattoWeights(Weights,N);
 
     for (i=0;i<N;i++)
-	   Nodes[i] = 0.5*(start+end) +  (0.5*(start-end))*Nodes[i];///Made a shift from the computational space to the physical space.
+	   Nodes[i] = 0.5*(start+end) +  (0.5*(end-start))*Nodes[i];///Made a shift from the computational space to the physical space.
 
 
 	for(i=0;i<N;i++)
@@ -61,7 +61,7 @@ double lobattoIntegration(double start, double end, int N, double **f_value) {
     lobattoWeights(Weights,N);
 
     for (i=0;i<N;i++)
-	   Nodes[i] = 0.5*(start+end) +  (0.5*(start-end))*Nodes[i];///Made a shift from the computational space to the physical space.
+	   Nodes[i] = 0.5*(start+end) +  (0.5*(end-start))*Nodes[i];///Made a shift from the computational space to the physical space.
 
 
 	for(i=0;i<N;i++)

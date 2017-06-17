@@ -306,7 +306,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     updatePrimitiveVariables(T, P);
     RunShockDetector();
-    RunLimiter();
+    //RunLimiter();
     updateConservativeVariables(IE);
 
  
@@ -325,7 +325,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     updatePrimitiveVariables(T, P);
     RunShockDetector();
-    RunLimiter();
+    //RunLimiter();
     updateConservativeVariables(IE);
 
 
@@ -344,7 +344,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     updatePrimitiveVariables(T, P);
     RunShockDetector();
-    RunLimiter();
+    //RunLimiter();
     updateConservativeVariables(IE);
 
 
@@ -435,10 +435,10 @@ void EulerSolver::RunLimiter() {
 }
 
 void EulerSolver::Run_LiliaMomentLimiter(string v) {
-  field->computeMoments("q", "Moment");
-  field->computeMoments("q", "ModifiedMoment");
+  field->computeMoments(v, "Moment");
+  field->computeMoments(v, "ModifiedMoment");
   field->limitMoments("Moment", "ModifiedMoment", "CellMarker");
-  field->convertMomentToVariable("ModifiedMoment", "q", "CellMarker");
+  field->convertMomentToVariable("ModifiedMoment", v, "CellMarker");
 
   return ;
 }
