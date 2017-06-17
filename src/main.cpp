@@ -72,9 +72,9 @@ double Sound( double D, double T) {
 
 int main() {
     double dt = 1e-3;
-    int time_steps = 100;
+    int time_steps = 200;
     EulerSolver* a;
-    a = new EulerSolver(10, 10, 3);
+    a = new EulerSolver(10, 10, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -85,6 +85,8 @@ int main() {
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("Neumann");
+    a->SetShockDetector("KXRCF");
+    a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
     a->plot("output.vtk");

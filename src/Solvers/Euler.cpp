@@ -303,7 +303,13 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step1("qv","quv","qvv_plus_P","k1qv");
     // Energy
     RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
+ 
+    updatePrimitiveVariables(T, P);
+    RunShockDetector();
+    RunLimiter();
+    updateConservativeVariables(IE);
 
+ 
     // Second Step of RK3
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
@@ -316,6 +322,12 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step2("qv","quv","qvv_plus_P","k1qv", "k2qv");
     // Energy
     RK_Step2("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE");
+ 
+    updatePrimitiveVariables(T, P);
+    RunShockDetector();
+    RunLimiter();
+    updateConservativeVariables(IE);
+
 
    // Third (Final) Step of RK3
     updateInviscidFlux();
@@ -329,10 +341,16 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step3("qv","quv","qvv_plus_P","k1qv", "k2qv", "k3qv");
     // Energy
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
+ 
+    updatePrimitiveVariables(T, P);
+    RunShockDetector();
+    RunLimiter();
+    updateConservativeVariables(IE);
+
 
    /// RK3 is done, incrementing the time step. 
    // Updating the Primitive Variables !!
-   updatePrimitiveVariables(T, P);
+   // updatePrimitiveVariables(T, P);
    time += dt;        
     }
 }
