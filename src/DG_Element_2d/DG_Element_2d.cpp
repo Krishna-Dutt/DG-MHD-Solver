@@ -304,7 +304,7 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
- // if (*variable[cm]) 
+  if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
