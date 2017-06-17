@@ -325,6 +325,29 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void SetLimiter(string _limiter);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function sets up all additional variables required for the given Limiter.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void SetLimiterVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function Runs the required Limiter Method.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void RunLimiter();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function runs the Lilia Moment Limiter.
+     *
+     * @Param v The variable on which the the limiter is to be performed 
+     */
+    /* ----------------------------------------------------------------------------*/
+    void Run_LiliaMomentLimiter(string v);
+ 
 };
 
 #endif

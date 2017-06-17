@@ -390,5 +390,37 @@ void EulerSolver::Run_KXRCF() {
 
 void EulerSolver::SetLimiter(string _Limiter) {
   Limiter = _Limiter;
+  SetLimiterVariables();
+  return ;
+}
+
+void EulerSolver::SetLimiterVariables() {
+  if (Limiter == "LiliaMoment") {
+    field->addVariable_withoutBounary("Moment");
+    field->addVariable_withoutBounary("ModifiedMoment");
+    field->setVanderMandMatrix();
+  }
+
+  return ;
+}
+
+void EulerSolver::RunLimiter() {
+  if ( Limiter == "LiliaMoment") {
+    Run_LiliaMomentLimiter("q");
+    Run_LiliaMomentLimiter("u");
+    Run_LiliaMomentLimiter("v");
+    Run_LiliaMomentLimiter("P");
+    Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
+  }
+
+  return ;
+}
+
+void EulerSolver::Run_LiliaMomentLimiter(string v) {
+  field->computeMoments("q", "Moment");
+  field->computeMoments("q", "ModifiedMoment");
+  field->limitMoment("Moment", "ModifiedMoment");
+  field->convertMomentToVariable("ModifiedMoment", "q");
+
   return ;
 }
