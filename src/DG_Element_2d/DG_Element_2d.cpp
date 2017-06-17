@@ -183,19 +183,20 @@ void DG_Element_2d::ResetMap_OutFlow() {
 void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
   double start = -1.0;
   double end = 1.0;
-
-  if (lobattoIntegration(start, end, N+1, boundaryTop[v]) < 0.0) {
+  
+  if (lobattoIntegration(start, end, N, boundaryTop[v]) <= 0.0) {
     OutFlow["Top"] = true;
   }
-  if (lobattoIntegration(start, end, N+1, boundaryBottom[v]) > 0.0) {
+  if (lobattoIntegration(start, end, N, boundaryBottom[v]) >= 0.0) {
     OutFlow["Bottom"] = true;
   }
-  if (lobattoIntegration(start, end, N+1, boundaryLeft[u]) > 0.0) {
+  if (lobattoIntegration(start, end, N, boundaryLeft[u]) >= 0.0) {
     OutFlow["Left"] = true;
   }
-  if (lobattoIntegration(start, end, N+1, boundaryRight[u]) < 0.0) {
+  if (lobattoIntegration(start, end, N, boundaryRight[u]) <= 0.0) {
     OutFlow["Right"] = true;
   }
+  
 
   return ;
 }
@@ -215,23 +216,23 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
   double VariableFlux = 0.0;
 
   if (OutFlow["Top"]) {
-    VariableFlux += lobattoIntegration(x_start, x_end, N+1, boundaryTop[v]);
-    VariableFlux -= lobattoIntegration(x_start, x_end, N+1, neighboringTop[v]);
+    VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryTop[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringTop[v]);
     OutflowSize += abs(x_end -x_start);
   }
   if (OutFlow["Bottom"]) {
-    VariableFlux += lobattoIntegration(x_start, x_end, N+1, boundaryBottom[v]);
-    VariableFlux -= lobattoIntegration(x_start, x_end, N+1, neighboringBottom[v]);
+    VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryBottom[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringBottom[v]);
     OutflowSize += abs(x_end -x_start);
   }
   if (OutFlow["Left"]) {
-    VariableFlux += lobattoIntegration(y_start, y_end, N+1, boundaryLeft[v]);
-    VariableFlux -= lobattoIntegration(y_start, y_end, N+1, neighboringLeft[v]);
+    VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryLeft[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringLeft[v]);
     OutflowSize += abs(y_end -y_start);
   }
   if (OutFlow["Right"]) {
-    VariableFlux += lobattoIntegration(y_start, y_end, N+1, boundaryRight[v]);
-    VariableFlux -= lobattoIntegration(y_start, y_end, N+1, neighboringRight[v]);
+    VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryRight[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringRight[v]);
     OutflowSize += abs(y_end -y_start);
   }
 

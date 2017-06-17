@@ -72,7 +72,7 @@ double Sound( double D, double T) {
 
 int main() {
     double dt = 1e-3;
-    int time_steps = 200;
+    int time_steps = 100;
     EulerSolver* a;
     a = new EulerSolver(10, 10, 1);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
