@@ -419,8 +419,8 @@ void EulerSolver::RunLimiter() {
 void EulerSolver::Run_LiliaMomentLimiter(string v) {
   field->computeMoments("q", "Moment");
   field->computeMoments("q", "ModifiedMoment");
-  field->limitMoment("Moment", "ModifiedMoment");
-  field->convertMomentToVariable("ModifiedMoment", "q");
+  field->limitMoments("Moment", "ModifiedMoment", "CellMarker");
+  field->convertMomentToVariable("ModifiedMoment", "q", "CellMarker");
 
   return ;
 }

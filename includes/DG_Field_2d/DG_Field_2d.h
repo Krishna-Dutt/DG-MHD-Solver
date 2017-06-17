@@ -45,6 +45,11 @@ public:
     void updateCellMarker(string v, string m);
     void setVanderMandMatrix(); // Function to set the VanderMand and its Inverse
 
+    // Functions to handle Moment Limiter
+    void computeMoments(string v, string m);
+    void limitMoments(string m, string modifiedm, string cm);
+    void convertMomentToVariable(string m, string v, string cm);
+
     // Function to Reset Cell Centered Variables 
     void ResetVariables_CellCentered(string v, double value = 0.0);
     

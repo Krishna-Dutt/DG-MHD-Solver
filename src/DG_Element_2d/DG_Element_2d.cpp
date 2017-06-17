@@ -7,6 +7,7 @@
 #include "../../includes/Utilities/MassMatrix.h"
 #include "../../includes/Utilities/DerivativeMatrix.h"
 #include "../../includes/Utilities/LobattoNodes.h"
+#include "../../includes/Utilities/MinMod.h"
 
 #include <cmath>
 
@@ -203,8 +204,8 @@ void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
 /**
  * @Synopsis  This function updates cell markers for Shock Detection, using LXRCF.
  *
- * @Param u This is the quantity used for detection.
- * @Param v This is the variables used to store the cell marker.
+ * @Param v This is the quantity used for detection.
+ * @Param m This is the variables used to store the cell marker.
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::updateCellMarker(string v, string m) {
@@ -242,8 +243,6 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
   radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
 
   *variable[m] = abs(VariableFlux) / ( abs(OutflowSize) * MaxVariable * pow(radius, 0.5 * (N+1)));
-  // Updating Cell Marker value to 1 or 0, to set detection ON/OFF.
-
   if (*variable[m] > 1.0) {
     *variable[m] = 1.0;
   }
@@ -253,6 +252,98 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
   
  return ;
 }
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function computes the moments for a given variable using VandeMandMatrix with Legendre Basis.
+ *
+ * @Param v This is the variable whose moments are to be captured.
+ * @Param m This is the variable used to store the computed moments.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::computeMoments(string v, string m) {
+  /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
+  cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
+
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function computes the nodals values of the variable given its moments
+ * using VandeMandMatrix with Legendre Basis.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param v This is the variable whose nodal values are to be computed.
+ * @Param cm This is the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
+  /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
+
+  if (*variable[cm]) { // Checking if cell marker is not equal to zero
+  cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
+  }
+
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function limits the moments 
+ * using Lilia's Moment Limiter.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param modm This is the variable to store modified moments.
+ * @Param cm This is the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::limitMoments(string m, string modm, string cm) {
+
+  if (*variable[cm]) { // Checking if cell marker is not equal to zero
+    int count, Tempi, Tempj, i, j;
+    count = N+1;
+    double Temp1, Temp2, AlphaN;
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
+
+    for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
+     --count;
+     for(j=0; j < count; ++j) {
+       Tempi = i-j;
+       Tempj = i - j*(N+1);
+       Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       
+       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+         variable[modm][Tempi] = Temp1;
+         variable[modm][Tempj] = Temp2;
+       }
+       else {
+         return ; // Need to exit both loops
+       }
+     }
+     // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
+       Tempi = i-j;
+       Tempj = i - j*(N+1);
+       Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+      
+       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+         variable[modm][Tempi] = Temp1;
+         variable[modm][Tempj] = Temp2;
+       }
+       else {
+         return ; // Need to exit both loops
+       }
+    }
+ }
+
+  return ;
+}
+
 
 
 /* ----------------------------------------------------------------------------*/

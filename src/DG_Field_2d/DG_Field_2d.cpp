@@ -360,6 +360,61 @@ void DG_Field_2d::updateCellMarker(string v, string m) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  Function to compute the Moments for given variable.
+ * 
+ * @Param v This is the quantity whose moments are to be calculated.
+ * @Param m This is the variable used to store the moments.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::computeMoments(string v, string m) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+      elements[i][j]->computeMoments(v, m);
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to limit the Moments for given variable.
+ * 
+ * @Param m This is gives the moments to be limited.
+ * @Param modifiedm This is the variable to store the modified moments.
+ * @Param cm This the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::limitMoments(string m, string modifiedm, string cm) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+      elements[i][j]->limitMoments(m, modifiedm, cm);
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to obtain value of the variable from the moments.
+ * 
+ * @Param m This is gives the moments of the variable.
+ * @Param v This is the variable /quantity to be obtained.
+ * @Param cm This the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::convertMomentToVariable(string m, string v, string cm) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+      elements[i][j]->convertMomentToVariable(m, v, cm);
+    }
+
+  return ;
+}
+
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  Function in order to write the data in the form of VTK file.
  *
  * @Param fileName This is the string fileName with which the file is to be saved.
