@@ -17,14 +17,15 @@ void legendrePolynomial(double *LegPolyn, unsigned int n)
 
     unsigned i,j;
 
-    LegPolyn_1[0]   =   0;
-    LegPolyn_1[1]   =   1;
-    LegPolyn_2[0]   =   1;
-
     if(n==0)
     {
         LegPolyn[0] =   1;
+        return ;
     }
+
+    LegPolyn_1[0]   =   0;
+    LegPolyn_1[1]   =   1;
+    LegPolyn_2[0]   =   1;
 
     if(n==1)
     {

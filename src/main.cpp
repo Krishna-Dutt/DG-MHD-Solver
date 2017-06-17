@@ -86,7 +86,7 @@ int main() {
 
     a->setBoundaryCondtions("Neumann");
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
     a->plot("output.vtk");

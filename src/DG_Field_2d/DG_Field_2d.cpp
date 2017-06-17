@@ -132,8 +132,8 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setVanderMandMatrix() {
-  double *vanderMand = new double [(N+1)*(N+1)];
-  double *inverseVanderMand = new double [(N+1)*(N+1)];
+  double *vanderMand = new double [(N+1)*(N+1)*(N+1)*(N+1)];
+  double *inverseVanderMand = new double [(N+1)*(N+1)*(N+1)*(N+1)];
 
   twoDVanderMandLegendre(vanderMand, N);
   inverse(vanderMand, inverseVanderMand, (N+1)*(N+1));
@@ -270,7 +270,7 @@ void DG_Field_2d::addVariable_CellCentered(string v) {
            elements[i][j]->addVariable_CellCentered(v); // Adding the variable for the (i, j) th element.
        }
    }
-   variableNames.push_back(v);
+   // variableNames.push_back(v);
    return ;
 }
 

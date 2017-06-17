@@ -306,7 +306,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     updatePrimitiveVariables(T, P);
     RunShockDetector();
-    //RunLimiter();
+    RunLimiter();
     updateConservativeVariables(IE);
 
  
@@ -325,7 +325,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     updatePrimitiveVariables(T, P);
     RunShockDetector();
-    //RunLimiter();
+    RunLimiter();
     updateConservativeVariables(IE);
 
 
@@ -344,7 +344,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     updatePrimitiveVariables(T, P);
     RunShockDetector();
-    //RunLimiter();
+    RunLimiter();
     updateConservativeVariables(IE);
 
 
