@@ -180,6 +180,26 @@ void DG_Field_2d::setBoundaryConditions(string type) {
         for(int j=0; j < ne_y; j++)
             elements[0][j]->setNeighboringElement('L', elements[ne_x-1][j]);
     }
+    else if(type == "periodicX") {
+        
+        // Setting the boundary for the right elements.
+        for(int j=0; j < (ne_y); j++)
+            elements[ne_x-1][j]->setNeighboringElement('R', elements[0][j]);
+
+        // Setting the boundary for the left elements..
+        for(int j=0; j < ne_y; j++)
+            elements[0][j]->setNeighboringElement('L', elements[ne_x-1][j]);
+    }
+    else if(type == "periodicY") {
+        // Setting the boundary for the top elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->setNeighboringElement('T', elements[i][0]);
+
+        // Setting the boundary for the bottom elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][0]->setNeighboringElement('B', elements[i][ne_y-1]);
+    }
+    
     return ;
 }
 

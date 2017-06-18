@@ -1,6 +1,7 @@
 #include "../includes/Solvers/EulerSolver.h"
 #include <iostream>
 #include <cmath>
+#include <ctime>
 
 #define R 285.0
 #define gamma 1.4
@@ -71,10 +72,11 @@ double Sound( double D, double T) {
 
 
 int main() {
+    clock_t tstart = clock();
     double dt = 1e-3;
-    int time_steps = 100;
+    int time_steps = 300;
     EulerSolver* a;
-    a = new EulerSolver(40, 5, 1);
+    a = new EulerSolver(40, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -84,12 +86,14 @@ int main() {
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
-    a->setBoundaryCondtions("neumann");
-    //a->SetShockDetector("KXRCF");
-   // a->SetLimiter("LiliaMoment");
+    a->setBoundaryCondtions("periodicY");
+    a->SetShockDetector("KXRCF");
+    a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
     a->plot("output.vtk");
     
     delete a;
+    cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
+    return 0 ;
 }

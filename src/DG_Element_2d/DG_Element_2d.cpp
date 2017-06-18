@@ -284,7 +284,7 @@ void DG_Element_2d::computeMoments(string v, string m) {
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- // if (*variable[cm])
+  if (*variable[cm])
   { // Checking if cell marker is not equal to zero
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
   }
@@ -305,7 +305,7 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
- // if (*variable[cm]) 
+ if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
@@ -331,6 +331,12 @@ void DG_Element_2d::limitMoments(string m, string modm, string cm) {
      // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
        Tempi = i-j;
        Tempj = i - j*(N+1);
+       // Temporarily avoiding limiting lowest three modes.
+       /*
+       if (Tempi == 1.0 || Tempj == 1.0) {
+           return ;
+       }
+       */
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
       
