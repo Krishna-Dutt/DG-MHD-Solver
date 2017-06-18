@@ -4,3 +4,4 @@ bin/
 danda.cpp
 a.out
 *.vtk
+.vscode/*
