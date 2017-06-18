@@ -58,7 +58,7 @@ double ITemperature(double x, double y) {
 }
 
 double IE(double D, double T, double P) {
-  return P/(gamma - 1.0) ;
+  return D*R*T/(gamma - 1.0) ;
 }
 
 double T(double IE, double D) {
@@ -72,9 +72,9 @@ double Sound( double D, double T) {
 
 int main() {
     double dt = 1e-3;
-    int time_steps = 300;
+    int time_steps = 100;
     EulerSolver* a;
-    a = new EulerSolver(20, 10, 1);
+    a = new EulerSolver(40, 5, 1);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -86,7 +86,7 @@ int main() {
 
     a->setBoundaryCondtions("neumann");
     //a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
+   // a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
     a->plot("output.vtk");
