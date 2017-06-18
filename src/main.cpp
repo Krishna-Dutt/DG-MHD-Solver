@@ -67,7 +67,7 @@ double T(double IE, double D) {
 }
 
 double Sound( double D, double T) {
-  return sqrt(D*R*T);
+  return sqrt(gamma*R*T);
 }
 
 
@@ -76,7 +76,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 300;
     EulerSolver* a;
-    a = new EulerSolver(10, 5, 2);
+    a = new EulerSolver(50, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -86,7 +86,7 @@ int main() {
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
-    a->setBoundaryCondtions("neumann");
+    a->setBoundaryCondtions("periodicY");
     a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
