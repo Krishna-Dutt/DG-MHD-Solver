@@ -38,11 +38,18 @@ public:
     void addVariable_onlyBounary( string v);
     void addVariable_CellCentered(string v);
     void initializeVariable(string v, function<double(double, double)>);
+
+    // Functions to set Boundary Conditions
     void setBoundaryConditions(string type);
+    void setBoundaryConditions(string v, string type, string b);
+
+    // Functions to create output file in VTK format
     void writeVTK(string fileName);
+
     void ResetMap_OutFlow(); // Function to Reset the Map to Outflow Boundaries.
     void updateOutFlowBoundary(string u, string v); // Function to update the map of Outflow Boundaries.
     void updateCellMarker(string v, string m);
+    
     void setVanderMandMatrix(); // Function to set the VanderMand and its Inverse
 
     // Functions to handle Moment Limiter

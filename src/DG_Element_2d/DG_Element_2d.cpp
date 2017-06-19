@@ -848,3 +848,29 @@ double DG_Element_2d::l2Norm(string v1, string v2) {
     delete[] diff;
     return norm2;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates maps from a variable to its corresponding Boundary Setting methods
+ *
+ * @Param v  This is the name of the variable whose map is to be set.
+ * @Param type This is the type of the boundary.
+ * @Param b This defines the location of the boundary element.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::assignBoundary(string v, string type, string b) {
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the linear system for a variable corresponding 
+ * to its Boundary settings.
+ *
+ * @Param v  This is the name of the variable whose Boundary is to be set.
+ * @Param b This defines the location of the boundary element.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setBoundaryValue(string v, string b) {
+    return ;
+}

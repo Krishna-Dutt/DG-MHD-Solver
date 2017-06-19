@@ -30,7 +30,7 @@
 using namespace std;
 
 class DG_Element_2d {
-private:
+protected:
     
     int N; /// This represents the order of polynomial interpolation which is done while solving the DG equations.
     double x_start, x_end, y_start, y_end; /// Since, this is a structured rectangular element. These variables define the position and size of the element.
@@ -73,7 +73,7 @@ public:
     
 
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
-    ~DG_Element_2d();
+    virtual ~DG_Element_2d();
     void Destroy_Matrices(); // Function to destroy all the allocated DG Matrices, once the solver is done.!!
 
     void addVariable_withBoundary(string v);
@@ -126,6 +126,10 @@ public:
 
     // Functions to do various other operations on the elements.
     double l2Norm(string v1, string v2);
+
+    // Virtual Function for Polymorphic behaviour
+    virtual void assignBoundary(string v, string type, string b);
+    virtual void setBoundaryValue(string v, string b);
 
 };
 
