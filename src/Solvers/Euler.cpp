@@ -236,7 +236,7 @@ void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
 
 void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) {
  // cout << " Calling updateEigenValues " << endl;
-  field->setFunctionsForBoundaryVariables("q", "T", SoundSpeed, "c");
+  field->setFunctionsForBoundaryVariables("q", "P", SoundSpeed, "c");
   field->setFunctionsForBoundaryVariables("u", "c", ModulusAdd, "u_plus_c");
   field->setFunctionsForBoundaryVariables("v", "c", ModulusAdd, "v_plus_c");
   return ;
@@ -428,7 +428,7 @@ void EulerSolver::RunLimiter() {
     Run_LiliaMomentLimiter("u");
     Run_LiliaMomentLimiter("v");
     Run_LiliaMomentLimiter("P");
-    Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
+    //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
   return ;

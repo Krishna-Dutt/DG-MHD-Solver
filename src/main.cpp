@@ -59,15 +59,15 @@ double ITemperature(double x, double y) {
 }
 
 double IE(double D, double T, double P) {
-  return D*R*T/(gamma - 1.0) ;
+  return P/(gamma - 1.0) ;
 }
 
 double T(double IE, double D) {
   return IE*(gamma -1.0)/(D*R) ;
 }
 
-double Sound( double D, double T) {
-  return sqrt(gamma*R*T);
+double Sound( double D, double P) {
+  return sqrt(gamma*P/D);
 }
 
 
@@ -76,7 +76,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 300;
     EulerSolver* a;
-    a = new EulerSolver(30, 5, 3);
+    a = new EulerSolver(80, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
