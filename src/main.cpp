@@ -73,10 +73,10 @@ double Sound( double D, double P) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-3;
-    int time_steps = 300;
+    double dt = 0.5e-3;
+    int time_steps = 600;
     EulerSolver* a;
-    a = new EulerSolver(130, 5, 1);
+    a = new EulerSolver(150, 5, 1);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
