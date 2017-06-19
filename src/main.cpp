@@ -17,15 +17,6 @@ double V(double x, double y) {
     return 0.0;
 }
 
-double initial(double x, double y) {
-    if (x*x + y*y <= 0.25) {
-      return 1.0 ;
-    }
-    else {
-      return 0 ;
-    }
-    //return (exp(-(x*x +  y*y)*16.0));
-}
 
 double IDensity(double x, double y) {
   if ( x <= 0) {
@@ -80,7 +71,6 @@ int main() {
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
-    //a->setInitialConditions(initial);
     a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
