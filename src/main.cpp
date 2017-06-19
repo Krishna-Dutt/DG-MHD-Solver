@@ -76,7 +76,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 300;
     EulerSolver* a;
-    a = new EulerSolver(80, 5, 2);
+    a = new EulerSolver(130, 5, 1);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
