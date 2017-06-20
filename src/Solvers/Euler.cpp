@@ -395,7 +395,7 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered("OutFlowFlux");
   field->ResetVariables_CellCentered("Radius");
   */
-  field->ResetVariables_CellCentered("CellMarker");
+  field->ResetVariables_CellCentered("CellMarker", 1.5);
   field->ResetMap_OutFlow();
 
   field->updateOutFlowBoundary("u", "v");

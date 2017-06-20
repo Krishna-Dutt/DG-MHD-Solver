@@ -190,6 +190,7 @@ void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
   if (lobattoIntegration(start, end, N, boundaryBottom[v]) > 0.0) {
     OutFlow["Bottom"] = true;
   }
+  
   if (lobattoIntegration(start, end, N, boundaryLeft[u]) > 0.0) {
     OutFlow["Left"] = true;
   }
