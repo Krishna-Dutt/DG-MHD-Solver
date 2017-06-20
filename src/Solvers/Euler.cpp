@@ -414,8 +414,8 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_withoutBounary("Moment");
-    field->addVariable_withoutBounary("ModifiedMoment");
+    field->addVariable_withBounary("Moment");
+    field->addVariable_withBounary("ModifiedMoment");
     field->setVanderMandMatrix();
   }
 
@@ -426,8 +426,8 @@ void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
     Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("v");
     Run_LiliaMomentLimiter("P");
+    Run_LiliaMomentLimiter("v");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 

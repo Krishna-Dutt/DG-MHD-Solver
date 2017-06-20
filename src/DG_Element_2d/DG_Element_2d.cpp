@@ -304,7 +304,7 @@ void DG_Element_2d::computeMoments(string v, string m) {
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- if (*variable[cm])
+ //if (*variable[cm])
   { // Checking if cell marker is not equal to zero
   //cout << "Calling :: convertMomentToVariable()\n";
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
@@ -326,12 +326,13 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
-if (*variable[cm]) 
+//if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
+    //AlphaN = 0.5/sqrt(4.0*N*N - 1.0);
 
     for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
      --count;
@@ -341,7 +342,7 @@ if (*variable[cm])
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -361,7 +362,7 @@ if (*variable[cm])
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
       
-       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
