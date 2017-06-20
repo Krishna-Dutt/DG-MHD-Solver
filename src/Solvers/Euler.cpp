@@ -399,7 +399,7 @@ void EulerSolver::Run_KXRCF() {
   field->ResetMap_OutFlow();
 
   field->updateOutFlowBoundary("u", "v");
-  field->updateCellMarker("q", "CellMarker");
+  field->updateCellMarker("qE", "CellMarker");
 
   return ;
 }

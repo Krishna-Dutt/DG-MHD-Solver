@@ -219,27 +219,46 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
     VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryTop[v]);
     VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringTop[v]);
     OutflowSize += abs(x_end -x_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryTop[v][i]);
+    }
   }
   if (OutFlow["Bottom"]) {
     VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryBottom[v]);
     VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringBottom[v]);
     OutflowSize += abs(x_end -x_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryBottom[v][i]);
+    }
   }
   if (OutFlow["Left"]) {
     VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryLeft[v]);
     VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringLeft[v]);
     OutflowSize += abs(y_end -y_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryLeft[v][i]);
+    }
   }
   if (OutFlow["Right"]) {
     VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryRight[v]);
     VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringRight[v]);
     OutflowSize += abs(y_end -y_start);
-  }
 
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryRight[v][i]);
+    }
+  }
+/*
   MaxVariable = variable[v][0];
   for (int i = 0; i < (N+1)*(N+1) ; ++i) {
     MaxVariable = MAX(MaxVariable,variable[v][i]);
   }
+*/
+
+// Assert that MaxVariable is never equal to ZERO !!  
 
   radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
 
@@ -284,8 +303,9 @@ void DG_Element_2d::computeMoments(string v, string m) {
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- //if (*variable[cm])
+ if (*variable[cm])
   { // Checking if cell marker is not equal to zero
+  //cout << "Calling :: convertMomentToVariable()\n";
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
   }
 
@@ -305,7 +325,7 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
-//if (*variable[cm]) 
+if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;

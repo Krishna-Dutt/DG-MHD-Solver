@@ -28,16 +28,16 @@ double IDensity(double x, double y) {
     return  1.0 ;
   }
   else {
-    return 1.0 ;
+    return 0.125 ;
   }
 }
 
 double IPressure(double x, double y) {
   if ( x <= 0) {
-    return  0.01 ;
+    return  1.0 ;
   }
   else {
-    return 100.0 ;
+    return 0.1 ;
   }
 }
 
@@ -47,10 +47,10 @@ double StateEq(double D, double T) {
 
 double ITemperature(double x, double y) {
   if ( x <= 0) {
-    return  0.01/(R*1.0) ;
+    return  1.0/(R*1.0) ;
   }
   else {
-    return 100.0/(R*1.0) ;
+    return 0.1/(R*0.125) ;
   }
 }
 
@@ -69,10 +69,10 @@ double Sound( double D, double P) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 0.5e-5;
-    int time_steps = 2000;
+    double dt = 1e-3;
+    int time_steps = 300;
     EulerSolver* a;
-    a = new EulerSolver(10, 10, 2);
+    a = new EulerSolver(70, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -82,7 +82,7 @@ int main() {
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("periodicY");
-    //a->SetShockDetector("KXRCF");
+    a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
