@@ -11,10 +11,10 @@ using namespace std;
 
 double U(double x, double y) {
   if ( x <= 0.0) {
-    return -2.0 ;
+    return 0.0 ;
   }
   else {
-    return 2.0 ;
+    return 0.0 ;
   }
 }
 
@@ -34,10 +34,10 @@ double IDensity(double x, double y) {
 
 double IPressure(double x, double y) {
   if ( x <= 0) {
-    return  0.40 ;
+    return  0.01 ;
   }
   else {
-    return 0.40 ;
+    return 100.0 ;
   }
 }
 
@@ -47,10 +47,10 @@ double StateEq(double D, double T) {
 
 double ITemperature(double x, double y) {
   if ( x <= 0) {
-    return  0.4/(R*1.0) ;
+    return  0.01/(R*1.0) ;
   }
   else {
-    return 0.4/(R*1.0) ;
+    return 100.0/(R*1.0) ;
   }
 }
 
@@ -69,10 +69,10 @@ double Sound( double D, double P) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-3;
-    int time_steps = 300;
+    double dt = 0.5e-5;
+    int time_steps = 2000;
     EulerSolver* a;
-    a = new EulerSolver(50, 5, 2);
+    a = new EulerSolver(10, 10, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
