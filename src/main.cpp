@@ -10,7 +10,12 @@ using namespace std;
 
 
 double U(double x, double y) {
-    return 0.0;
+  if ( x <= 0.0) {
+    return -2.0 ;
+  }
+  else {
+    return 2.0 ;
+  }
 }
 
 double V(double x, double y) {
@@ -23,16 +28,16 @@ double IDensity(double x, double y) {
     return  1.0 ;
   }
   else {
-    return 0.125 ;
+    return 1.0 ;
   }
 }
 
 double IPressure(double x, double y) {
   if ( x <= 0) {
-    return  1.0 ;
+    return  0.40 ;
   }
   else {
-    return 0.1 ;
+    return 0.40 ;
   }
 }
 
@@ -42,10 +47,10 @@ double StateEq(double D, double T) {
 
 double ITemperature(double x, double y) {
   if ( x <= 0) {
-    return  1.0/(R*1.0) ;
+    return  0.4/(R*1.0) ;
   }
   else {
-    return 0.1/(R*0.125) ;
+    return 0.4/(R*1.0) ;
   }
 }
 
@@ -67,7 +72,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 300;
     EulerSolver* a;
-    a = new EulerSolver(30, 5, 3);
+    a = new EulerSolver(50, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -77,7 +82,7 @@ int main() {
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("periodicY");
-    a->SetShockDetector("KXRCF");
+    //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
