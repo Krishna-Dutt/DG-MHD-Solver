@@ -347,6 +347,15 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void Run_LiliaMomentLimiter(string v);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function finds the L2 norm of the converged solution ,
+     *
+     * @Param functionD This function gives analytical solution of Density.
+     * @Param functionV This function gives analytical solution of Velocity.
+     */
+    /* ----------------------------------------------------------------------------*/
+    void FindL2Norm(function<double(double, double)> D, function<double(double, double)> U);
  
 };
 

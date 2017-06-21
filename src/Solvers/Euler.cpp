@@ -442,3 +442,21 @@ void EulerSolver::Run_LiliaMomentLimiter(string v) {
 
   return ;
 }
+
+void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double(double, double)> U ) {
+  field->addVariable_withBounary("qAnalytical");
+  field->addVariable_withBounary("uAnalytical");
+
+  field->initializeVariable("qAnalytical", D);
+  field->initializeVariable("uAnalytical", U);
+
+  // Computing L2Norm
+
+  double qNorm = 0.0;
+  double uNorm = 0.0;
+  qNorm = field->l2Norm("q", "qAnalytical");
+  uNorm = field->l2Norm("u", "uAnalytical");
+
+  cout << "L2norms :  Density : " <<qNorm << "  , u Velocity : " <<uNorm <<"\n";
+  return ;
+}
