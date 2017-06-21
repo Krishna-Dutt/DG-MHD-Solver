@@ -660,6 +660,6 @@ double DG_Field_2d::l2Norm(string v1, string v2) {
             norm += (elementNorm*elementNorm);
         }
 
-    norm = sqrt(norm/(ne_x*ne_y));    
+    norm = sqrt(norm);    
     return norm;
 }

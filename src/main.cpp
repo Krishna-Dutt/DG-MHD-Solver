@@ -103,16 +103,16 @@ double Sound( double D, double P) {
 
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
 double AnalyticalDensity(double x, double y) {
-  if (-1.0 <= x <= -0.48) {
+  if (-1.0 <= x && x <= -0.48) {
     return 1.0 ;
   }
-  else if (-0.48 <= x <= -0.03) {
+  else if (-0.48 <= x && x <= -0.03) {
     return 1.0 + (x+0.48)*(0.42-1.0)/(-0.03+0.48) ;
   }
-  else if (-0.03 <= x <= 0.37) {
+  else if (-0.03 <= x && x <= 0.37) {
     return 0.42 ;
   }
-  else if (0.37 < x <= 0.71) {
+  else if (0.37 < x && x <= 0.71) {
     return 0.27 ;
   }
   else {
@@ -121,13 +121,13 @@ double AnalyticalDensity(double x, double y) {
 }
 
 double AnalyticalVelocity(double x, double y) {
-  if (-1.0 <= x <= -0.48) {
+  if (-1.0 <= x && x <= -0.48) {
     return 0.0 ;
   }
-  else if (-0.48 <= x <= -0.03) {
+  else if (-0.48 <= x && x <= -0.03) {
     return (x+0.48)*(0.93)/(-0.03+0.48) ;
   }
-  else if (-0.03 <= x <= 0.71) {
+  else if (-0.03 <= x & x <= 0.71) {
     return 0.93 ;
   }
   else {
@@ -138,9 +138,9 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-3;
-    int time_steps = 200;
+    int time_steps = 400;
     EulerSolver* a;
-    a = new EulerSolver(40, 5, 2);
+    a = new EulerSolver(20, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -154,8 +154,9 @@ int main() {
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
-    a->plot("output.vtk");
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
+    a->plot("output.vtk");
+    
 
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
