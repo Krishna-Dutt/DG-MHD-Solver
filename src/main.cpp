@@ -11,10 +11,10 @@ using namespace std;
 
 double U(double x, double y) {
   if ( x <= 0.0 && y <= 0.0 ) {
-    return -0.7259 ;
+    return 0.0 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
-    return -0.7259;
+    return 0.0;
   }
   else if ( x > 0.0 && y > 0.0) {
     return 0.0 ;
@@ -26,7 +26,7 @@ double U(double x, double y) {
 
 double V(double x, double y) {
   if ( x <= 0.0 && y <= 0.0 ) {
-    return -0.7259 ;
+    return 0.0 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
     return 0.0;
@@ -35,7 +35,7 @@ double V(double x, double y) {
     return 0.0 ;
   }
   else {
-    return -0.7259 ;
+    return 0.0 ;
   }
 }
 
@@ -45,13 +45,13 @@ double IDensity(double x, double y) {
     return 1.0 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
-    return 0.5197;
+    return 1.0;
   }
   else if ( x > 0.0 && y > 0.0) {
-    return 1.0 ;
+    return 0.125 ;
   }
   else {
-    return 0.5197 ;
+    return 0.125 ;
   }
 }
 
@@ -60,13 +60,13 @@ double IPressure(double x, double y) {
     return 1.0 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
-    return 0.4;
+    return 1.0;
   }
   else if ( x > 0.0 && y > 0.0) {
-    return 1.0 ;
+    return 0.1 ;
   }
   else {
-    return 0.4 ;
+    return 0.1 ;
   }
 }
 
@@ -79,13 +79,13 @@ double ITemperature(double x, double y) {
     return 1.0/(R*1.0) ;
   }
   else if ( x <= 0.0 && y > 0.0) {
-    return 0.4/(R*0.5197) ;
-  }
-  else if ( x > 0.0 && y > 0.0) {
     return 1.0/(R*1.0) ;
   }
+  else if ( x > 0.0 && y > 0.0) {
+    return 0.1/(R*0.125) ;
+  }
   else {
-    return 0.4/(R*0.5197) ;
+    return 0.1/(R*0.125) ;
   }
 }
 
@@ -104,10 +104,10 @@ double Sound( double D, double P) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-3;
-    int time_steps = 200;
+    double dt = 0.5e-3;
+    int time_steps = 400;
     EulerSolver* a;
-    a = new EulerSolver(20, 20, 2);
+    a = new EulerSolver(200, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -116,8 +116,8 @@ int main() {
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
-    a->setBoundaryCondtions("neumann");
-    a->SetShockDetector("KXRCF");
+    a->setBoundaryCondtions("periodicY");
+    //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);

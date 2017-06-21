@@ -399,7 +399,7 @@ void EulerSolver::Run_KXRCF() {
   field->ResetMap_OutFlow();
 
   field->updateOutFlowBoundary("u", "v");
-  field->updateCellMarker("q", "CellMarker");
+  field->updateCellMarker("qE", "CellMarker");
 
   return ;
 }
@@ -414,8 +414,8 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_withBounary("Moment");
-    field->addVariable_withBounary("ModifiedMoment");
+    field->addVariable_withoutBounary("Moment");
+    field->addVariable_withoutBounary("ModifiedMoment");
     field->setVanderMandMatrix();
   }
 
@@ -428,7 +428,7 @@ void EulerSolver::RunLimiter() {
     Run_LiliaMomentLimiter("u");
     Run_LiliaMomentLimiter("P");
     Run_LiliaMomentLimiter("v");
-    //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
+    Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
   return ;
