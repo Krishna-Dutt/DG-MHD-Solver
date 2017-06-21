@@ -107,7 +107,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 200;
     EulerSolver* a;
-    a = new EulerSolver(30, 30, 3);
+    a = new EulerSolver(20, 20, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -117,7 +117,7 @@ int main() {
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("neumann");
-    //a->SetShockDetector("KXRCF");
+    a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound, T, StateEq, IE);
