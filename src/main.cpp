@@ -26,7 +26,7 @@ double U(double x, double y) {
 
 double V(double x, double y) {
   if ( x <= 0.0 && y <= 0.0 ) {
-    return -1.4045 ;
+    return -0.7259 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
     return 0.0;
@@ -35,14 +35,14 @@ double V(double x, double y) {
     return 0.0 ;
   }
   else {
-    return -1.4045 ;
+    return -0.7259 ;
   }
 }
 
 
 double IDensity(double x, double y) {
   if ( x <= 0.0 && y <= 0.0 ) {
-    return 0.1072 ;
+    return 1.0 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
     return 0.5197;
@@ -51,13 +51,13 @@ double IDensity(double x, double y) {
     return 1.0 ;
   }
   else {
-    return 0.2579 ;
+    return 0.5197 ;
   }
 }
 
 double IPressure(double x, double y) {
   if ( x <= 0.0 && y <= 0.0 ) {
-    return 0.0439 ;
+    return 1.0 ;
   }
   else if ( x <= 0.0 && y > 0.0) {
     return 0.4;
@@ -66,7 +66,7 @@ double IPressure(double x, double y) {
     return 1.0 ;
   }
   else {
-    return 0.15 ;
+    return 0.4 ;
   }
 }
 
@@ -76,7 +76,7 @@ double StateEq(double D, double T) {
 
 double ITemperature(double x, double y) {
   if ( x <= 0.0 && y <= 0.0 ) {
-    return 0.0439/(R*0.1072) ;
+    return 1.0/(R*1.0) ;
   }
   else if ( x <= 0.0 && y > 0.0) {
     return 0.4/(R*0.5197) ;
@@ -85,7 +85,7 @@ double ITemperature(double x, double y) {
     return 1.0/(R*1.0) ;
   }
   else {
-    return 0.15/(R*0.2579) ;
+    return 0.4/(R*0.5197) ;
   }
 }
 
@@ -107,7 +107,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 200;
     EulerSolver* a;
-    a = new EulerSolver(20, 20, 2);
+    a = new EulerSolver(30, 30, 3);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
