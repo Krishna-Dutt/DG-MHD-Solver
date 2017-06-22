@@ -3,7 +3,7 @@
 #include <cmath>
 #include <ctime>
 
-#define R 285.0
+#define R 2850.0
 #define gamma 1.4
 
 using namespace std;
@@ -98,7 +98,11 @@ double T(double IE, double D) {
 }
 
 double Sound( double D, double P) {
-  return sqrt(gamma*P/D);
+  return sqrt(gamma*P/D) ;
+}
+
+double Pressure(double D, double IE) {
+    return IE*(gamma - 1.0) ;
 }
 
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
@@ -140,7 +144,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 200;
     EulerSolver* a;
-    a = new EulerSolver(10, 5, 2);
+    a = new EulerSolver(70, 5, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -153,7 +157,7 @@ int main() {
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
-    a->solve( Sound, T, StateEq, IE);
+    a->solve( Sound,T, Pressure, IE);
     //a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
     a->plot("output.vtk");
     

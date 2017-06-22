@@ -159,7 +159,7 @@ void EulerSolver::updateTemperature(function<double(double,double)> T) {
 }
 
 void EulerSolver::updatePressure(function<double(double,double)> P) {
-  field->setFunctionsForVariables("q", "T", P, "P");
+  field->setFunctionsForVariables("q", "qe", P, "P");
   return ;
 }
 
