@@ -11,10 +11,10 @@ using namespace std;
 
 double U(double x, double y) {
   if (x <= 0.5) {
-      return 0.0 ;
+      return -2.0 ;
   }
   else {
-      return 0.0 ;
+      return 2.0 ;
   }
 }
 
@@ -33,16 +33,16 @@ double IDensity(double x, double y) {
       return 1.0 ;
   }
   else {
-      return 0.125 ;
+      return 1.0 ;
   }
 }
 
 double IPressure(double x, double y) {
   if (x <= 0.5) {
-      return 1.0 ;
+      return 0.4 ;
   }
   else {
-      return 0.1 ;
+      return 0.4 ;
   }
 }
 
@@ -52,10 +52,10 @@ double StateEq(double D, double T) {
 
 double ITemperature(double x, double y) {
   if (x <= 0.5) {
-      return 1.0/(R*1.0) ;
+      return 0.4/(R*1.0) ;
   }
   else {
-      return 0.1/(R*0.125) ;
+      return 0.4/(R*1.0) ;
   }
 }
 
@@ -111,10 +111,10 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 0.5e-3;
-    int time_steps = 400;
+    double dt = 1e-4;
+    int time_steps = 1500;
     EulerSolver* a;
-    a = new EulerSolver(100, 5, 1);
+    a = new EulerSolver(70, 5, 2);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
@@ -128,7 +128,7 @@ int main() {
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
-    a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
+    //a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
     a->plot("output.vtk");
     
 

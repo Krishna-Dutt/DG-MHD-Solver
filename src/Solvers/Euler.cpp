@@ -304,13 +304,13 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
     
-    //RunShockDetector();
+   // RunShockDetector();
     //RunLimiter();
     updatePrimitiveVariables(T, P);
-    /*RunShockDetector();
+    RunShockDetector();
     RunLimiter();
     updateConservativeVariables(IE);
-    */
+    
     
     // Second Step of RK3
     updateInviscidFlux();
@@ -328,10 +328,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     //RunShockDetector();
     //RunLimiter();
     updatePrimitiveVariables(T, P);
-    /*RunShockDetector();
+    RunShockDetector();
     RunLimiter();
     updateConservativeVariables(IE);
-    */
+    
 
    // Third (Final) Step of RK3
     updateInviscidFlux();
@@ -346,18 +346,20 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
  
-    //RunShockDetector();
+    
+   //RunShockDetector();
     //RunLimiter();
     updatePrimitiveVariables(T, P); 
     RunShockDetector();
     RunLimiter();
-    //updateConservativeVariables(IE);
-    setXMomentum();
+    updateConservativeVariables(IE);
+    /*setXMomentum();
     setYMomentum();
     setKineticEnergy();
-    setInternalEnergy();
+    setEnergy();
     updateTemperature(T);
     updatePressure(P);
+    */
 
     updateInviscidFlux();
 
@@ -439,7 +441,7 @@ void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
     Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("qE");
+    Run_LiliaMomentLimiter("P");
     Run_LiliaMomentLimiter("v");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }

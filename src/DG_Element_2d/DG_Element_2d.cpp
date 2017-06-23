@@ -331,8 +331,8 @@ void DG_Element_2d::limitMoments(string m, string modm, string cm) {
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
-    AlphaN = sqrt((2.0*N)/(2.0*N+1));
-    //AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+    //AlphaN = sqrt((2.0*N)/(2.0*N+1));
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
     //AlphaN = 0.5/sqrt(4.0*N*N - 1.0);        // Too diffusive
     //AlphaN = (2.0*N-0.5)/sqrt(4.0*N*N-1.0);  // Too diffusive
     //AlphaN = 1.0;                           // Do not work for HO polynomials
