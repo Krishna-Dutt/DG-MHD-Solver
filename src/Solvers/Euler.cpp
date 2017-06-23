@@ -345,8 +345,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     updatePrimitiveVariables(T, P);
     RunShockDetector();
     RunLimiter();
+     
     updateConservativeVariables(IE);
     
+    updateInviscidFlux();
 
    /// RK3 is done, incrementing the time step. 
    // Updating the Primitive Variables !!
@@ -414,8 +416,8 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_withoutBounary("Moment");
-    field->addVariable_withoutBounary("ModifiedMoment");
+    field->addVariable_withBounary("Moment");
+    field->addVariable_withBounary("ModifiedMoment");
     field->setVanderMandMatrix();
   }
 
@@ -428,7 +430,7 @@ void EulerSolver::RunLimiter() {
     Run_LiliaMomentLimiter("u");
     Run_LiliaMomentLimiter("P");
     Run_LiliaMomentLimiter("v");
-    Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
+    //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
   return ;

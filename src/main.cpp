@@ -10,63 +10,39 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if ( x <= 0.0 && y <= 0.0 ) {
-    return 0.0 ;
-  }
-  else if ( x <= 0.0 && y > 0.0) {
-    return 0.0;
-  }
-  else if ( x > 0.0 && y > 0.0) {
-    return 0.0 ;
+  if (x <= 0.5) {
+      return 0.0 ;
   }
   else {
-    return 0.0 ;
+      return 0.0 ;
   }
 }
 
 double V(double x, double y) {
-  if ( x <= 0.0 && y <= 0.0 ) {
-    return 0.0 ;
-  }
-  else if ( x <= 0.0 && y > 0.0) {
-    return 0.0;
-  }
-  else if ( x > 0.0 && y > 0.0) {
-    return 0.0 ;
+  if (x <= 0.5) {
+      return 0.0 ;
   }
   else {
-    return 0.0 ;
+      return 0.0 ;
   }
 }
 
 
 double IDensity(double x, double y) {
-  if ( x <= 0.0 && y <= 0.0 ) {
-    return 1.0 ;
-  }
-  else if ( x <= 0.0 && y > 0.0) {
-    return 1.0;
-  }
-  else if ( x > 0.0 && y > 0.0) {
-    return 0.125 ;
+  if (x <= 0.5) {
+      return 1.0 ;
   }
   else {
-    return 0.125 ;
+      return 0.125 ;
   }
 }
 
 double IPressure(double x, double y) {
-  if ( x <= 0.0 && y <= 0.0 ) {
-    return 1.0 ;
-  }
-  else if ( x <= 0.0 && y > 0.0) {
-    return 1.0;
-  }
-  else if ( x > 0.0 && y > 0.0) {
-    return 0.1 ;
+  if (x <= 0.5) {
+      return 1.0 ;
   }
   else {
-    return 0.1 ;
+      return 0.1 ;
   }
 }
 
@@ -75,17 +51,11 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  if ( x <= 0.0 && y <= 0.0 ) {
-    return 1.0/(R*1.0) ;
-  }
-  else if ( x <= 0.0 && y > 0.0) {
-    return 1.0/(R*1.0) ;
-  }
-  else if ( x > 0.0 && y > 0.0) {
-    return 0.1/(R*0.125) ;
+  if (x <= 0.5) {
+      return 1.0/(R*1.0) ;
   }
   else {
-    return 0.1/(R*0.125) ;
+      return 0.1/(R*0.125) ;
   }
 }
 
@@ -107,16 +77,16 @@ double Pressure(double D, double IE) {
 
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
 double AnalyticalDensity(double x, double y) {
-  if (-1.0 <= x && x <= -0.478) {
+  if (0.0 <= x && x <= 0.26) {
     return 1.0 ;
   }
-  else if (-0.478 <= x && x <= -0.025) {
-    return 1.0 + (x+0.478)*(0.42-1.0)/(-0.025+0.478) ;
+  else if (0.26 <= x && x <= 0.48) {
+    return 1.0 + (x-0.26)*(0.42-1.0)/(0.48-0.26) ;
   }
-  else if (-0.025 <= x && x <= 0.37) {
+  else if (0.48 <= x && x <= 0.68) {
     return 0.42 ;
   }
-  else if (0.37 < x && x <= 0.70) {
+  else if (0.68 < x && x <= 0.844) {
     return 0.27 ;
   }
   else {
@@ -125,14 +95,14 @@ double AnalyticalDensity(double x, double y) {
 }
 
 double AnalyticalVelocity(double x, double y) {
-  if (-1.0 <= x && x <= -0.478) {
+  if (0.0 <= x && x <= 0.26) {
     return 0.0 ;
   }
-  else if (-0.478 <= x && x <= -0.025) {
-    return (x+0.478)*(0.925)/(-0.025+0.48) ;
+  else if (0.26 <= x && x <= 0.48) {
+    return (x-0.26)*(0.926)/(0.48-0.26) ;
   }
-  else if (-0.025 <= x & x <= 0.7) {
-    return 0.925 ;
+  else if (0.48 <= x & x <= 0.844) {
+    return 0.926 ;
   }
   else {
     return 0.0 ;
@@ -142,10 +112,10 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-3;
-    int time_steps = 200;
+    int time_steps = 3;
     EulerSolver* a;
-    a = new EulerSolver(70, 5, 2);
-    a->setDomain(-1.0, -1.0, 1.0, 1.0);
+    a = new EulerSolver(10, 50, 1);
+    a->setDomain(0.0, 0.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
     a->setInitialDensity(IDensity);
@@ -158,7 +128,7 @@ int main() {
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
-    //a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
+    a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
     a->plot("output.vtk");
     
 
