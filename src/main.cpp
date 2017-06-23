@@ -3,7 +3,7 @@
 #include <cmath>
 #include <ctime>
 
-#define R 2850.0
+#define R 285.0
 #define gamma 1.4
 
 using namespace std;
@@ -112,9 +112,9 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-3;
-    int time_steps = 3;
+    int time_steps = 200;
     EulerSolver* a;
-    a = new EulerSolver(10, 50, 1);
+    a = new EulerSolver(30, 10, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);

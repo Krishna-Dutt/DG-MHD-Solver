@@ -304,6 +304,8 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
     
+    RunShockDetector();
+    RunLimiter();
     updatePrimitiveVariables(T, P);
     /*RunShockDetector();
     RunLimiter();
@@ -323,9 +325,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step2("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE");
     
-    updatePrimitiveVariables(T, P);
-    /*RunShockDetector();
+    RunShockDetector();
     RunLimiter();
+    updatePrimitiveVariables(T, P);
+    /*
     updateConservativeVariables(IE);
     */
 
@@ -342,11 +345,12 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
  
-    updatePrimitiveVariables(T, P);
+    
     RunShockDetector();
     RunLimiter();
-     
-    updateConservativeVariables(IE);
+    updatePrimitiveVariables(T, P); 
+    
+    //updateConservativeVariables(IE);
     
     updateInviscidFlux();
 
@@ -427,9 +431,9 @@ void EulerSolver::SetLimiterVariables() {
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
-    Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("P");
-    Run_LiliaMomentLimiter("v");
+    Run_LiliaMomentLimiter("qu");
+    Run_LiliaMomentLimiter("qE");
+    Run_LiliaMomentLimiter("qv");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
