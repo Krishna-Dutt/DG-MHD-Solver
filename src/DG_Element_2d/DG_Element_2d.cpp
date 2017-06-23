@@ -304,7 +304,7 @@ void DG_Element_2d::computeMoments(string v, string m) {
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- if (*variable[cm])
+// if (*variable[cm])
   { // Checking if cell marker is not equal to zero
   //cout << "Calling :: convertMomentToVariable()\n";
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
@@ -326,13 +326,17 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
-if (*variable[cm]) 
+//if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
-    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
-    //AlphaN = 0.5/sqrt(4.0*N*N - 1.0);
+    AlphaN = sqrt((2.0*N)/(2.0*N+1));
+    //AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+    //AlphaN = 0.5/sqrt(4.0*N*N - 1.0);        // Too diffusive
+    //AlphaN = (2.0*N-0.5)/sqrt(4.0*N*N-1.0);  // Too diffusive
+    //AlphaN = 1.0;                           // Do not work for HO polynomials
+    //AlphaN = 1.0/(2.0*N-1.0);               // Do not work for HO polynomials
 
     for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
      --count;

@@ -41,7 +41,7 @@ void twoDVanderMandLegendre(double *VanderMandMatrix, unsigned N) {
   double VM[N+1][N+1];
 
   int i1,i2,j1,j2;
-  double k;
+  double k =1.0;
 
   VanderMandLegendre(*VM, N);
 
