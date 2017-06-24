@@ -440,9 +440,9 @@ void EulerSolver::SetLimiterVariables() {
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
-    Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("P");
     Run_LiliaMomentLimiter("v");
+    Run_LiliaMomentLimiter("P");
+    Run_LiliaMomentLimiter("u");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 

@@ -287,6 +287,14 @@ void DG_Element_2d::computeMoments(string v, string m) {
   /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
 
+// Additional filter to set values less than 1e-8 to zero !!, Recheck /Temporary
+/*
+  for (int i=0; i <(N+1)*(N+1); ++i) {
+      if (abs(variable[m][i]) <= 1e-7) {
+          variable[m][i] = 0.0;
+      }
+  }
+*/
   return ;
 }
 
@@ -307,7 +315,16 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 // if (*variable[cm])
   { // Checking if cell marker is not equal to zero
   //cout << "Calling :: convertMomentToVariable()\n";
+
+  // Additional filter to set values less than 1e-8 to zero !!, Recheck /Temporary
+  /*for (int i=0; i <(N+1)*(N+1); ++i) {
+      if (abs(variable[v][i]) <= 5e-6) {
+          variable[v][i] = 0.0;
+      }
+  }
+  */
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
+  
   }
 
   return ;
