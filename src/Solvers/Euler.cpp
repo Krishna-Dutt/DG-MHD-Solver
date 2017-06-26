@@ -29,6 +29,7 @@ void EulerSolver::setPrimitiveVariables(){
   field->addVariable_withBounary("v");
   field->addVariable_withBounary("P");
   field->addVariable_withBounary("T");
+  field->addVariable_withBounary("e");
   return ;
 }
 
@@ -116,6 +117,10 @@ double EnergyFlux(double E, double P, double u) {
   return (E + P)*u ;
 }
 
+double PressureE(double D, double e) {
+  return D*e*(1.4 -1.0) ;
+}
+
 void EulerSolver::setXMomentum() {
   field->setFunctionsForVariables("q", "u", Product, "qu");
   return ;
@@ -169,6 +174,9 @@ void EulerSolver::updatePrimitiveVariables(function<double(double,double)> T, fu
   setInternalEnergy();
   updateTemperature(T);
   updatePressure(P);
+
+  field->setFunctionsForVariables("qe", "q", Divide, "e");
+
   return ;
 }
 
@@ -307,6 +315,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    // RunShockDetector();
     //RunLimiter();
     updatePrimitiveVariables(T, P);
+    RunShockDetector();
+    RunLimiter();
+    field->setFunctionsForVariables("q", "e", PressureE, "P");
+    updateConservativeVariables(IE);
     /*RunShockDetector();
     RunLimiter();
     updateConservativeVariables(IE);
@@ -328,6 +340,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     //RunShockDetector();
     //RunLimiter();
     updatePrimitiveVariables(T, P);
+    RunShockDetector();
+    RunLimiter();
+    field->setFunctionsForVariables("q", "e", PressureE, "P");
+    updateConservativeVariables(IE);
     /*RunShockDetector();
     RunLimiter();
     updateConservativeVariables(IE);
@@ -353,6 +369,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     updatePrimitiveVariables(T, P); 
     RunShockDetector();
     RunLimiter();
+    field->setFunctionsForVariables("q", "e", PressureE, "P");
     updateConservativeVariables(IE);
     /*Run_LiliaMomentLimiter("qE");
     setInternalEnergy();
@@ -447,7 +464,7 @@ void EulerSolver::RunLimiter() {
     Run_LiliaMomentLimiter("q");
     Run_LiliaMomentLimiter("v");
     Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("P");
+    Run_LiliaMomentLimiter("e");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
