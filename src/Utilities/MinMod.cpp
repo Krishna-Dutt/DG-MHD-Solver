@@ -12,7 +12,7 @@ double MIN(double x, double y, double z, double a, double b) {
 double Signum(double x) {
   if ( x > 0.0) return 1.0 ;
   if ( x < 0.0) return -1.0 ;
-  return x ;
+  return 0.0 ;
 }
 
 double MinMod(double a, double b, double c) {

@@ -349,10 +349,14 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
    //RunShockDetector();
     //RunLimiter();
+    
     updatePrimitiveVariables(T, P); 
     RunShockDetector();
     RunLimiter();
     updateConservativeVariables(IE);
+    /*Run_LiliaMomentLimiter("qE");
+    setInternalEnergy();
+    updatePressure(P);*/
     /*setXMomentum();
     setYMomentum();
     setKineticEnergy();
@@ -384,6 +388,7 @@ void EulerSolver::SetShockDetector(string _ShockDetector) {
 void EulerSolver::SetShockDetectorVariables() {
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered("CellMarker");
+    field->addVariable_withBounary("CellMarkerGlobal");
     /*
     field->addVariable_CellCentered("VariableMax");
     field->addVariable_CellCentered("OutFlowSize");
@@ -414,7 +419,7 @@ void EulerSolver::Run_KXRCF() {
   field->ResetMap_OutFlow();
 
   field->updateOutFlowBoundary("u", "v");
-  field->updateCellMarker("qE", "CellMarker");
+  field->updateCellMarker("q", "CellMarker");
 
   return ;
 }
@@ -441,8 +446,8 @@ void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
     Run_LiliaMomentLimiter("v");
-    Run_LiliaMomentLimiter("P");
     Run_LiliaMomentLimiter("u");
+    Run_LiliaMomentLimiter("P");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
