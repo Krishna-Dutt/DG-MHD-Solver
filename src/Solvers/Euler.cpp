@@ -29,7 +29,6 @@ void EulerSolver::setPrimitiveVariables(){
   field->addVariable_withBounary("v");
   field->addVariable_withBounary("P");
   field->addVariable_withBounary("T");
-  field->addVariable_withBounary("e");
   return ;
 }
 
@@ -174,9 +173,6 @@ void EulerSolver::updatePrimitiveVariables(function<double(double,double)> T, fu
   setInternalEnergy();
   updateTemperature(T);
   updatePressure(P);
-
-  field->setFunctionsForVariables("qe", "q", Divide, "e");
-
   return ;
 }
 
@@ -312,17 +308,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
     
-   // RunShockDetector();
-    //RunLimiter();
-    updatePrimitiveVariables(T, P);
     RunShockDetector();
     RunLimiter();
-    field->setFunctionsForVariables("q", "e", PressureE, "P");
-    updateConservativeVariables(IE);
-    /*RunShockDetector();
-    RunLimiter();
-    updateConservativeVariables(IE);
-    */
+    updatePrimitiveVariables(T, P);
+    
     
     // Second Step of RK3
     updateInviscidFlux();
@@ -337,17 +326,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step2("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE");
     
-    //RunShockDetector();
-    //RunLimiter();
-    updatePrimitiveVariables(T, P);
     RunShockDetector();
     RunLimiter();
-    field->setFunctionsForVariables("q", "e", PressureE, "P");
-    updateConservativeVariables(IE);
-    /*RunShockDetector();
-    RunLimiter();
-    updateConservativeVariables(IE);
-    */
+    updatePrimitiveVariables(T, P);
+    
 
    // Third (Final) Step of RK3
     updateInviscidFlux();
@@ -363,25 +345,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
  
     
-   //RunShockDetector();
-    //RunLimiter();
+   RunShockDetector();
+   RunLimiter();
+   updatePrimitiveVariables(T, P); 
     
-    updatePrimitiveVariables(T, P); 
-    RunShockDetector();
-    RunLimiter();
-    field->setFunctionsForVariables("q", "e", PressureE, "P");
-    updateConservativeVariables(IE);
-    /*Run_LiliaMomentLimiter("qE");
-    setInternalEnergy();
-    updatePressure(P);*/
-    /*setXMomentum();
-    setYMomentum();
-    setKineticEnergy();
-    setEnergy();
-    updateTemperature(T);
-    updatePressure(P);
-    */
-
     updateInviscidFlux();
 
    /// RK3 is done, incrementing the time step. 
@@ -462,9 +429,9 @@ void EulerSolver::SetLimiterVariables() {
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
-    Run_LiliaMomentLimiter("v");
-    Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("e");
+    Run_LiliaMomentLimiter("qv");
+    Run_LiliaMomentLimiter("qu");
+    Run_LiliaMomentLimiter("qE");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 

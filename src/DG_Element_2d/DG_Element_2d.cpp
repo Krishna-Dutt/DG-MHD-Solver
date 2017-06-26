@@ -315,7 +315,7 @@ void DG_Element_2d::computeMoments(string v, string m) {
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
-// if (*variable[cm])
+ //if (*variable[cm])
   { // Checking if cell marker is not equal to zero
   //cout << "Calling :: convertMomentToVariable()\n";
   
