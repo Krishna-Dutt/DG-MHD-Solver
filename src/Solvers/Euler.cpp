@@ -459,12 +459,15 @@ void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double
 
   // Computing L2Norm
 
-  double qNorm = 0.0;
-  double uNorm = 0.0;
+  double qNorm = 0.0, qAnalytic = 0.0;
+  double uNorm = 0.0, uAnalytic = 0.0;
   
-  qNorm = field->l2Norm("q", "qAnalytical")/field->l2Norm("qAnalytical", "Zero");
-  uNorm = field->l2Norm("u", "uAnalytical")/field->l2Norm("uAnalytical", "Zero");
+  qNorm = field->l2Norm("q", "qAnalytical");
+  qAnalytic = field->l2Norm("qAnalytical", "Zero");
+  uNorm = field->l2Norm("u", "uAnalytical");
+  uAnalytic = field->l2Norm("uAnalytical", "Zero");
 
-  cout << "L2norms :  Density : " <<qNorm << "  , u Velocity : " <<uNorm <<"\n";
+  cout << "L2norms :\n  Density : " <<qNorm <<" : "<< qAnalytic <<"\n";
+  cout <<" u Velocity : " <<uNorm << " : " << uAnalytic <<"\n";
   return ;
 }
