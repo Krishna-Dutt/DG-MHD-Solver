@@ -80,13 +80,13 @@ double AnalyticalDensity(double x, double y) {
   if (0.0 <= x && x <= 0.26) {
     return 1.0 ;
   }
-  else if (0.26 <= x && x <= 0.48) {
-    return 1.0 + (x-0.26)*(0.42-1.0)/(0.48-0.26) ;
+  else if (0.26 <= x && x <= 0.485) {
+    return 1.0 + (x-0.26)*(0.42-1.0)/(0.485-0.26) ;
   }
-  else if (0.48 <= x && x <= 0.68) {
-    return 0.42 ;
+  else if (0.485 <= x && x <= 0.682) {
+    return 0.423 ;
   }
-  else if (0.68 < x && x <= 0.844) {
+  else if (0.682 < x && x <= 0.852) {
     return 0.27 ;
   }
   else {
@@ -98,10 +98,10 @@ double AnalyticalVelocity(double x, double y) {
   if (0.0 <= x && x <= 0.26) {
     return 0.0 ;
   }
-  else if (0.26 <= x && x <= 0.48) {
-    return (x-0.26)*(0.926)/(0.48-0.26) ;
+  else if (0.26 <= x && x <= 0.485) {
+    return (x-0.26)*(0.926)/(0.485-0.26) ;
   }
-  else if (0.48 <= x & x <= 0.844) {
+  else if (0.485 <= x & x <= 0.852) {
     return 0.926 ;
   }
   else {
@@ -111,10 +111,10 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 0.5e-3;
-    int time_steps = 400;
+    double dt = 1e-4;
+    int time_steps = 2000;
     EulerSolver* a;
-    a = new EulerSolver(130, 5, 3);
+    a = new EulerSolver(120, 5, 5);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
 
     a->setInitialVelocity(U, V);
