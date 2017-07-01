@@ -18,8 +18,6 @@ void EulerSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
 
-    setPrimitiveVariables();
-    setConservativeVariables();
    return ;
 }
 
@@ -264,7 +262,7 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dqudx", K2);
-  field->axpy(-1.0, "dqvdy", K2);
+ field->axpy(-1.0, "dqvdy", K2);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
@@ -467,7 +465,7 @@ void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double
   uNorm = field->l2Norm("u", "uAnalytical");
   uAnalytic = field->l2Norm("uAnalytical", "Zero");
 
-  cout << "L2norms :\n  Density : " <<qNorm <<" : "<< qAnalytic <<"\n";
-  cout <<" u Velocity : " <<uNorm << " : " << uAnalytic <<"\n";
+  cout << "L2norms :\n  Density : " <<qNorm <<" : L2 Norm : "<< qNorm/qAnalytic <<"\n";
+  cout <<" u Velocity : " <<uNorm << " : L2 Norm :  " << uNorm/uAnalytic <<"\n";
   return ;
 }
