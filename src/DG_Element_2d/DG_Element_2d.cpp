@@ -363,50 +363,33 @@ void DG_Element_2d::limitMoments(string m, string modm, string cm) {
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       //Temp1 = MinMod(variable[m][Tempi], rightNeighbor->variable[m][Tempi], leftNeighbor->variable[m][Tempi] ,topNeighbor->variable[m][Tempi] , bottomNeighbor->variable[m][Tempi]);
-       //Temp2 = MinMod(variable[m][Tempj], rightNeighbor->variable[m][Tempj], leftNeighbor->variable[m][Tempj] , topNeighbor->variable[m][Tempj], bottomNeighbor->variable[m][Tempj]);
-       // Removing gradients in y direction
-       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]));
-       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
-
-       
        if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else {
+       else if( Temp1 !=0 && Temp2 !=0) 
+       {
          return ; // Need to exit both loops
        }
      }
      // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
        Tempi = i-j;
        Tempj = i - j*(N+1);
-       // Temporarily avoiding limiting lowest three modes.
-       /*
-       if (Tempi == 1.0 || Tempj == 1.0) {
-           return ;
-       }
-       */
+       
        // Original Detector
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
        
-       //Temp1 = MinMod(variable[m][Tempi], topNeighbor->variable[m][Tempi], bottomNeighbor->variable[m][Tempi]);
-       //Temp2 = MinMod(variable[m][Tempj], rightNeighbor->variable[m][Tempj], leftNeighbor->variable[m][Tempj]);
-
-       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -leftNeighbor->variable[m][Tempi-(N+1)]));
-
        if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else {
+       else if( Temp1 !=0 && Temp2 !=0)
+       {
          return ; // Need to exit both loops
        }
     }
 
-    // Temporary limiting of avg value in cell !!
-    //variable[modm][i] = MinMod(variable[m][i], 0.5*(topNeighbor->variable[m][i] + bottomNeighbor->variable[m][i]), 0.5*(rightNeighbor->variable[m][i] + leftNeighbor->variable[m][i]));
  }
 
   return ;
