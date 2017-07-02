@@ -41,7 +41,7 @@ public:
         DG_BoundaryElement_2d(int _N, double x1, double y1, double x2, double y2);
         ~DG_BoundaryElement_2d();
 
-        void assignBoundary(string v, string type, string b);
+        void assignBoundary(string v, string type, char b);
         void setBoundaryValue(string v, string b);
 
 

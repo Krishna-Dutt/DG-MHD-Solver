@@ -128,7 +128,7 @@ public:
     double l2Norm(string v1, string v2);
 
     // Virtual Function for Polymorphic behaviour
-    virtual void assignBoundary(string v, string type, string b);
+    virtual void assignBoundary(string v, string type, char b);
     virtual void setBoundaryValue(string v, string b);
 
 };

@@ -43,7 +43,7 @@ DG_BoundaryElement_2d::~DG_BoundaryElement_2d() {
  * @Param b This defines the location of the boundary element.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::assignBoundary(string v, string type, string b) {
+void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
     return ;
 }
 

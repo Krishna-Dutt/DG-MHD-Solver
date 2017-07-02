@@ -862,7 +862,7 @@ double DG_Element_2d::l2Norm(string v1, string v2) {
  * @Param b This defines the location of the boundary element.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::assignBoundary(string v, string type, string b) {
+void DG_Element_2d::assignBoundary(string v, string type, char b) {
     return ;
 }
 

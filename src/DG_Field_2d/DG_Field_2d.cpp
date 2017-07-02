@@ -205,6 +205,177 @@ void DG_Field_2d::setBoundaryConditions(string type) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This function sets the boundary type for a variable at Top Boundary.
+ *
+ * @Param v This is a string which defines the variable name.
+ * @Param type This is a string which defines the boundary type.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setTopBoundary(string v, string type) {
+    if(type == "periodic") {
+        // Setting the boundary for the top elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->setNeighboringElement('T', elements[i][0]);
+
+
+        // Setting the boundary for the bottom elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][0]->setNeighboringElement('B', elements[i][ne_y-1]);
+
+    }
+    else if(type == "neumann") {
+        // Keep the neighbour cell pointer as this pointer
+        
+        
+    }
+    else if(type == "dirichlet") {
+        // Keep the neighbour cell pointer as this pointer
+       
+    }
+
+    for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->assignBoundary(v, type,'T');
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the boundary type for a variable at Bottom Boundary.
+ *
+ * @Param v This is a string which defines the variable name.
+ * @Param type This is a string which defines the boundary type.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setBottomBoundary(string v, string type) {
+    if(type == "periodic") {
+        // Setting the boundary for the top elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->setNeighboringElement('T', elements[i][0]);
+
+
+        // Setting the boundary for the bottom elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][0]->setNeighboringElement('B', elements[i][ne_y-1]);
+
+    }
+    else if(type == "neumann") {
+        // Keep the neighbour cell pointer as this pointer
+        
+        
+    }
+    else if(type == "dirichlet") {
+        // Keep the neighbour cell pointer as this pointer
+       
+    }
+
+    for(int i = 0; i < ne_x; i++)
+            elements[i][0]->assignBoundary(v, type,'B');
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the boundary type for a variable at Left Boundary.
+ *
+ * @Param v This is a string which defines the variable name.
+ * @Param type This is a string which defines the boundary type.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setLeftBoundary(string v, string type) {
+    if(type == "periodic") {
+        // Setting the boundary for the right elements.
+        for(int j=0; j < (ne_y); j++)
+            elements[ne_x-1][j]->setNeighboringElement('R', elements[0][j]);
+
+        // Setting the boundary for the left elements..
+        for(int j=0; j < ne_y; j++)
+            elements[0][j]->setNeighboringElement('L', elements[ne_x-1][j]);
+
+    }
+    else if(type == "neumann") {
+        // Keep the neighbour cell pointer as this pointer
+        
+        
+    }
+    else if(type == "dirichlet") {
+        // Keep the neighbour cell pointer as this pointer
+       
+    }
+
+    for(int i = 0; i < ne_y; i++)
+            elements[0][i]->assignBoundary(v, type,'L');
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the boundary type for a variable at Right Boundary.
+ *
+ * @Param v This is a string which defines the variable name.
+ * @Param type This is a string which defines the boundary type.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setRightBoundary(string v, string type) {
+    if(type == "periodic") {
+        // Setting the boundary for the right elements.
+        for(int j=0; j < (ne_y); j++)
+            elements[ne_x-1][j]->setNeighboringElement('R', elements[0][j]);
+
+        // Setting the boundary for the left elements..
+        for(int j=0; j < ne_y; j++)
+            elements[0][j]->setNeighboringElement('L', elements[ne_x-1][j]);
+
+    }
+    else if(type == "neumann") {
+        // Keep the neighbour cell pointer as this pointer
+        
+        
+    }
+    else if(type == "dirichlet") {
+        // Keep the neighbour cell pointer as this pointer
+       
+    }
+
+    for(int i = 0; i < ne_y; i++)
+            elements[ne_x-1][i]->assignBoundary(v, type,'R');
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the boundary  for a variable for Boundary Cells .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setBoundaryNeighbours(string v) {
+        // Setting the boundary for the top elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->setVariableNeighbors(v);
+
+
+        // Setting the boundary for the bottom elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][0]->setVariableNeighbors(v);
+
+        // Setting the boundary for the right elements.
+        for(int j=0; j < (ne_y); j++)
+            elements[ne_x-1][j]->setVariableNeighbors(v);
+
+        // Setting the boundary for the left elements..
+        for(int j=0; j < ne_y; j++)
+            elements[0][j]->setVariableNeighbors(v);
+
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This function adds the variable to each and every element. In this the boundary points are not
  * specifically stored in each element.
  *

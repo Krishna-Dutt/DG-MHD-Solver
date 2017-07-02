@@ -442,3 +442,12 @@ void EulerSolver::Run_LiliaMomentLimiter(string v) {
 
   return ;
 }
+
+void EulerSolver::setBoundary(string v, string Bottom, string Right, string Top, string Left) {
+  field->setTopBoundary(v, Top);
+  field->setBottomBoundary(v, Bottom);
+  field->setRightBoundary(v, Right);
+  field->setLeftBoundary(v, Left);
+
+  field->setBoundaryNeighbours(v);
+}

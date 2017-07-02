@@ -42,6 +42,11 @@ public:
     // Functions to set Boundary Conditions
     void setBoundaryConditions(string type);
     void setBoundaryConditions(string v, string type, string b);
+    void setTopBoundary(string v, string type);
+    void setBottomBoundary(string v, string type);
+    void setLeftBoundary(string v, string type);
+    void setRightBoundary(string v, string type);
+    void setBoundaryNeighbours(string v);
 
     // Functions to create output file in VTK format
     void writeVTK(string fileName);
