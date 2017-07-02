@@ -44,6 +44,35 @@ DG_BoundaryElement_2d::~DG_BoundaryElement_2d() {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
+    switch(b) {
+        case 't' : // `t` or `T` for top 
+        case 'T' :
+            if (type == "dirichlet") TopBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
+            //else if (type == "neumann") TopBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
+            //else if (type == "periodic") TopBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            break;
+        case 'r' : // `r` or `R` for right
+        case 'R' :
+            if (type == "dirichlet") RightBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
+            else if (type == "neumann") RightBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
+            else if (type == "periodic") RightBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            break;
+        case 'b' : // `b` or `B` for bottom
+        case 'B' :
+            if (type == "dirichlet") BottomBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
+            else if (type == "neumann") BottomBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
+            else if (type == "periodic") BottomBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            break;
+        case 'l' : // `l` or `L` for left
+        case 'L' :
+            if (type == "dirichlet") LeftBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
+            else if (type == "neumann") LeftBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
+            else if (type == "periodic") LeftBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            break;
+        default:
+            cout << "WARNING!. No such neighbor type " << type << endl;
+    }
+
     return ;
 }
 
@@ -102,7 +131,18 @@ void DG_BoundaryElement_2d::NeumannBoundary(double *Matrix, initializer_list<int
             Matrix[(Start_I + i*Inc)*(N+1)*(N+1) + j] = Matrix[(Start_I + Copy_I + i*Inc)*(N+1)*(N+1) + j];
         }
     }
-    
+
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function implements Periodic BC .
+ *
+ * @Param Matrix  RHS Matrix that is to be modified.
+ * @Param List I List of indices and corresponding increments required to access elements to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::PeriodicBoundary(double *Matrix, initializer_list<int> I) {
+    return ;
+}

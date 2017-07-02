@@ -31,10 +31,10 @@ using namespace std;
 class DG_BoundaryElement_2d : public DG_Element_2d {
 protected:
 
-        map<string, function<void(double *Matrix, initializer_list<unsigned> I)> > TopBoundary;
-        map<string, function<void(double *Matrix, initializer_list<unsigned> I)> > BottomBoundary;
-        map<string, function<void(double *Matrix, initializer_list<unsigned> I)> > LeftBoundary;
-        map<string, function<void(double *Matrix, initializer_list<unsigned> I)> > RightBoundary;
+        map<string, function<void(DG_BoundaryElement_2d* ,double *Matrix, initializer_list<int> I)> > TopBoundary;
+        map<string, function<void(DG_BoundaryElement_2d* ,double *Matrix, initializer_list<int> I)> > BottomBoundary;
+        map<string, function<void(DG_BoundaryElement_2d* ,double *Matrix, initializer_list<int> I)> > LeftBoundary;
+        map<string, function<void(DG_BoundaryElement_2d* ,double *Matrix, initializer_list<int> I)> > RightBoundary;
         // function objects, should I use Variadic functions ??
         // Use Initializer_list !!
 
@@ -47,6 +47,7 @@ public:
         void setBoundaryValue(string v, string b);
         void DirichletBoundary(double *Matrix, initializer_list<int> I);
         void NeumannBoundary(double *Matrix, initializer_list<int> I);
+        void PeriodicBoundary(double *Matrix, initializer_list<int> I);
 
 
 

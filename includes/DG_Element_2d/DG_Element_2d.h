@@ -29,6 +29,8 @@
 
 using namespace std;
 
+class DG_BoundaryElement_2d;
+
 class DG_Element_2d {
 protected:
     
@@ -131,7 +133,8 @@ public:
     virtual void assignBoundary(string v, string type, char b);
     virtual void setBoundaryValue(string v, string b);
     virtual void DirichletBoundary(double *Matrix, initializer_list<int> I);
-    virtual void NeumannBoundary(double *Matrix, initializer_list<int> I);
+    virtual void NeumannBoundary( double *Matrix, initializer_list<int> I);
+    virtual void PeriodicBoundary(double *Matrix, initializer_list<int> I);
 
 };
 #endif

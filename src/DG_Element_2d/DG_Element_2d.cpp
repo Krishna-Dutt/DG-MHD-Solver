@@ -903,3 +903,15 @@ void DG_Element_2d::NeumannBoundary(double *Matrix, initializer_list<int> I) {
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function implements Periodic BC .
+ *
+ * @Param Matrix  RHS Matrix that is to be modified.
+ * @Param List I List of indices and corresponding increments required to access elements to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::PeriodicBoundary(double *Matrix, initializer_list<int> I) {
+    return ;
+}
+
