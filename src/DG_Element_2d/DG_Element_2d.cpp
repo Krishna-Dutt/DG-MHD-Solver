@@ -878,3 +878,28 @@ void DG_Element_2d::assignBoundary(string v, string type, char b) {
 void DG_Element_2d::setBoundaryValue(string v, string b) {
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function implements Dirichlet BC.
+ *
+ * @Param Matrix  RHS Matrix that is to be modified.
+ * @Param List I List of indices and corresponding increments to access elements to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::DirichletBoundary(double *Matrix, initializer_list<int> I) {
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function implements Neumann BC ( To be precise, zero gradient condition).
+ *
+ * @Param Matrix  RHS Matrix that is to be modified.
+ * @Param List I List of indices and corresponding increments required to access elements to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::NeumannBoundary(double *Matrix, initializer_list<int> I) {
+    return ;
+}
+

@@ -130,7 +130,8 @@ public:
     // Virtual Function for Polymorphic behaviour
     virtual void assignBoundary(string v, string type, char b);
     virtual void setBoundaryValue(string v, string b);
+    virtual void DirichletBoundary(double *Matrix, initializer_list<int> I);
+    virtual void NeumannBoundary(double *Matrix, initializer_list<int> I);
 
 };
-
 #endif

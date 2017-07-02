@@ -7,6 +7,7 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <initializer_list>
 
 #include <cblas.h>
 #include <fstream>

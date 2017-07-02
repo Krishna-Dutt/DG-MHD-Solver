@@ -59,3 +59,50 @@ void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
 void DG_BoundaryElement_2d::setBoundaryValue(string v, string b) {
     return ;
 }
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function implements Dirichlet BC.
+ *
+ * @Param Matrix  RHS Matrix that is to be modified.
+ * @Param List I List of indices and corresponding increments to access elements to be modified, which 
+ * includes the starting index, and the increment in index required.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::DirichletBoundary(double *Matrix, initializer_list<int> I) {
+    int Start_I, Inc;
+    Start_I = I.begin()[0];
+    Inc = I.begin()[1];
+
+    for (int i=0; i<=N; ++i) {
+        for (int j=0; j<(N+1)*(N+1); ++j) {
+            Matrix[(Start_I + i*Inc)*(N+1)*(N+1) + j] = 0.0;
+        }
+    }
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function implements Neumann BC ( To be precise, zero gradient condition).
+ *
+ * @Param Matrix  RHS Matrix that is to be modified.
+ * @Param List I List of indices and corresponding increments required to access elements to be modified, which 
+ * includes the starting index, the increment in index and the  index from which to copy data.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::NeumannBoundary(double *Matrix, initializer_list<int> I) {
+    int Start_I, Inc, Copy_I;
+    Start_I = I.begin()[0];
+    Inc = I.begin()[1];
+    Copy_I = I.begin()[2];
+
+    for (int i=0; i<=N; ++i) {
+        for (int j=0; j<(N+1)*(N+1); ++j) {
+            Matrix[(Start_I + i*Inc)*(N+1)*(N+1) + j] = Matrix[(Start_I + Copy_I + i*Inc)*(N+1)*(N+1) + j];
+        }
+    }
+    
+    return ;
+}
+
