@@ -72,6 +72,9 @@ double Sound( double D, double P) {
   return sqrt(gamma*P/D);
 }
 
+double Pressure(double D, double IE) {
+    return IE*(gamma - 1.0) ;
+}
 
 int main() {
     clock_t tstart = clock();
@@ -93,7 +96,7 @@ int main() {
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
-    a->solve( Sound, T, StateEq, IE);
+    a->solve( Sound, T, Pressure, IE);
     //a->solve();
     a->plot("output.vtk");
     
