@@ -8,6 +8,7 @@
 
 #include "../../includes/DG_Field_2d/DG_Field_2d.h"
 #include "../../includes/DG_Element_2d/DG_Element_2d.h"
+#include "../../includes/DG_BoundaryElement_2d/DG_BoundaryElement_2d.h"
 
 #include "../../includes/Utilities/Inverse.h"
 #include "../../includes/Utilities/DerivativeMatrix.h"
@@ -53,7 +54,13 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     for(int i=0; i<ne_x; i++){
         y_curr = y1;
         for(int j=0; j<ne_y; j++){
-            elements[i].push_back( new DG_Element_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
+            if ( i == 0 || i == ne_x-1 || j == 0 || j == ne_y-1) {
+                elements[i].push_back( new DG_BoundaryElement_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
+            }
+            else {
+                elements[i].push_back( new DG_Element_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
+            }
+
             y_curr += dy;
         }
         x_curr += dx;
