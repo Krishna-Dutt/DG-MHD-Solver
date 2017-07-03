@@ -11,7 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
-    return 1.0;
+    return 0.0;
 }
 
 double V(double x, double y) {
@@ -30,7 +30,7 @@ double initial(double x, double y) {
 }
 
 double IDensity(double x, double y) {
-  if ( x <= 0) {
+  if ( x <= 0.5) {
     return  1.0 ;
   }
   else {
@@ -39,7 +39,7 @@ double IDensity(double x, double y) {
 }
 
 double IPressure(double x, double y) {
-  if ( x <= 0) {
+  if ( x <= 0.5) {
     return  1.0 ;
   }
   else {
@@ -52,7 +52,7 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  if ( x <= 0) {
+  if ( x <= 0.5) {
     return  1.0/(R*1.0) ;
   }
   else {
@@ -75,26 +75,26 @@ double Sound( double D, double P) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-2;
+    double dt = 1e-3;
     int time_steps = 100;
-    AdvectionSolver* a;
-    a = new AdvectionSolver(30, 1, 2);
-    a->setDomain(-1.0, -1.0, 1.0, 1.0);
+    EulerSolver* a;
+    a = new EulerSolver(20, 5, 2);
+    a->setDomain(0.0, 0.0, 1.0, 1.0);
 
-    a->setVelocity(U, V);
-    a->setInitialConditions(initial);
+    a->setInitialVelocity(U, V);
+    //a->setInitialConditions(initial);
     //a->setBoundaryCondtions("periodic");
-    /*a->setInitialDensity(IDensity);
+    a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("periodicY");
-    a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");*/
+    //a->SetShockDetector("KXRCF");
+    a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
-    //a->solve( Sound, T, StateEq, IE);
-    a->solve();
+    a->solve( Sound, T, StateEq, IE);
+    //a->solve();
     a->plot("output.vtk");
     
     delete a;

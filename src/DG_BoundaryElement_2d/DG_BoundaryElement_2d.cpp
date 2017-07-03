@@ -339,9 +339,9 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
  * @Param cm This is the cell marker used to identified troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
+/*void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
 
- if (*variable[cm]) 
+ //if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
@@ -369,12 +369,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
      // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
        Tempi = i-j;
        Tempj = i - j*(N+1);
-       // Temporarily avoiding limiting lowest three modes.
-       /*
-       if (Tempi == 1.0 || Tempj == 1.0) {
-           return ;
-       }
-       */
+       
        Temp1 = BoundaryMinMod(m, Tempi, AlphaN, this, this, topNeighbor, bottomNeighbor);
        Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, this, this);
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
@@ -392,7 +387,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
 
   return ;
 }
-
+*/
 /* ----------------------------------------------------------------------------*/
 /**
  * @Synopsis  This function performs MinMod for Boundary elements, eliminating all non-existing 
