@@ -100,6 +100,19 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void plot(string filename);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is set the Boundary conditions for a given variable.
+     *
+     * @Param Var String corresponding to the Variable.
+     * @Param Bottom String corresponding to  Bottom Boundary type.
+     * @Param Right String corresponding to Right Boundary type.
+     * @Param Top String corresponding to Top Boundary type.
+     * @Param Left String corresponding to Left Boundary type.
+     */
+    /* ----------------------------------------------------------------------------*/
+    void setBoundary(string Var, string Bottom, string Right, string Top, string Left);
+ 
 };
 
 #endif

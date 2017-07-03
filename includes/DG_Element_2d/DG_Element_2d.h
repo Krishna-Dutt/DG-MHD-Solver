@@ -29,7 +29,7 @@
 
 using namespace std;
 
-class DG_BoundaryElement_2d;
+//class DG_BoundaryElement_2d;
 
 class DG_Element_2d {
 protected:
