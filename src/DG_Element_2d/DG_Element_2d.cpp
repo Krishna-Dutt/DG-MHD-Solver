@@ -324,7 +324,7 @@ void DG_Element_2d::limitMoments(string m, string modm, string cm) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else {
+       else if(Temp1 != 0.0 && Temp2 != 0.0){
          return ; // Need to exit both loops
        }
      }
@@ -344,7 +344,7 @@ void DG_Element_2d::limitMoments(string m, string modm, string cm) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else {
+       else if(Temp1 != 0.0 && Temp2 != 0.0){
          return ; // Need to exit both loops
        }
     }
@@ -939,3 +939,20 @@ void DG_Element_2d::updateDirichlet(string v, double *Matrix) {
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function performs MinMod for Boundary elements, eliminating all non-existing 
+ * neighbouring cells.
+ *
+ * @Param m This string represents the moment of the variable
+ * @Param Index This is represents to be limited.
+ * @Param Alpha This is the scaling factor used in Lilia's Moment Limiter.
+ * @Param R This is the pointer to RightNeighbour.
+ * @Param L This is the pointer to LeftNeighbour.
+ * @Param T This is the pointer to TopNeighbour.
+ * @Param B This is the pointer to BottomNeighbour.
+*/
+/* ----------------------------------------------------------------------------*/
+double DG_Element_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
+    return 0.0 ;
+}

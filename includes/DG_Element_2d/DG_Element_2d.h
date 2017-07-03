@@ -92,7 +92,7 @@ public:
 
     // Functions to support Moment Limiters.
     void computeMoments(string v, string m);
-    void limitMoments(string m, string modm, string cm);
+    virtual void limitMoments(string m, string modm, string cm);
     void convertMomentToVariable(string m, string v, string cm);
 
     // Functions to manipulate Cell Centered Variables.
@@ -138,6 +138,8 @@ public:
 
     virtual void updateDirichlet(string v, double *Matrix);
     virtual void updateNeumann(string v, double *Matrix);
+
+    virtual double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
 
 };
 #endif

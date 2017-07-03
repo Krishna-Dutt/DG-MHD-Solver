@@ -328,3 +328,96 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
 
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function limits the moments 
+ * using Lilia's Moment Limiter.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param modm This is the variable to store modified moments.
+ * @Param cm This is the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
+
+ if (*variable[cm]) 
+  { // Checking if cell marker is not equal to zero
+    int count, Tempi, Tempj, i, j;
+    count = N+1;
+    double Temp1, Temp2, AlphaN;
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
+
+    for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
+     --count;
+     for(j=0; j < count; ++j) {
+       Tempi = i-j;
+       Tempj = i - j*(N+1);
+       Temp1 = BoundaryMinMod(m, Tempi, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
+       Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
+       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       
+       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+         variable[modm][Tempi] = Temp1;
+         variable[modm][Tempj] = Temp2;
+       }
+       else if(Temp1 != 0.0 && Temp2 != 0.0){
+         return ; // Need to exit both loops
+       }
+     }
+     // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
+       Tempi = i-j;
+       Tempj = i - j*(N+1);
+       // Temporarily avoiding limiting lowest three modes.
+       /*
+       if (Tempi == 1.0 || Tempj == 1.0) {
+           return ;
+       }
+       */
+       Temp1 = BoundaryMinMod(m, Tempi, AlphaN, this, this, topNeighbor, bottomNeighbor);
+       Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, this, this);
+       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+      
+       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+         variable[modm][Tempi] = Temp1;
+         variable[modm][Tempj] = Temp2;
+       }
+       else if(Temp1 != 0.0 && Temp2 != 0.0){
+         return ; // Need to exit both loops
+       }
+    }
+ }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function performs MinMod for Boundary elements, eliminating all non-existing 
+ * neighbouring cells.
+ *
+ * @Param m This string represents the moment of the variable
+ * @Param Index This is represents to be limited.
+ * @Param Alpha This is the scaling factor used in Lilia's Moment Limiter.
+ * @Param R This is the pointer to RightNeighbour.
+ * @Param L This is the pointer to LeftNeighbour.
+ * @Param T This is the pointer to TopNeighbour.
+ * @Param B This is the pointer to BottomNeighbour.
+*/
+/* ----------------------------------------------------------------------------*/
+double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
+    vector<double> Elements;
+
+    Elements.push_back(variable[m][Index]);
+    if (R != this) Elements.push_back(Alpha*(R->variable[m][Index-1] -variable[m][Index-1]));
+    if (L != this) Elements.push_back(Alpha*(variable[m][Index-1] - L->variable[m][Index-1]));
+    if (T != this) Elements.push_back(Alpha*(T->variable[m][Index-(N+1)] -variable[m][Index-(N+1)]));
+    if (B != this) Elements.push_back(Alpha*(variable[m][Index-(N+1)] - B->variable[m][Index-(N+1)]));
+    
+    return MinMod(Elements);
+}
+
+
+
