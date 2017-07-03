@@ -19,14 +19,14 @@ double V(double x, double y) {
 }
 
 double initial(double x, double y) {
-   /* if (x*x + y*y <= 0.25) {
+    if (x<= 0) {
       return 1.0 ;
     }
     else {
       return 0 ;
-    }*/
+    }
     //return (exp(-(x*x )*16.0));
-    return -x;
+   // return -x;
 }
 
 double IDensity(double x, double y) {
@@ -76,9 +76,9 @@ double Sound( double D, double P) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-2;
-    int time_steps = 100;
+    int time_steps = 110;
     AdvectionSolver* a;
-    a = new AdvectionSolver(30, 1, 1);
+    a = new AdvectionSolver(30, 1, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setVelocity(U, V);
