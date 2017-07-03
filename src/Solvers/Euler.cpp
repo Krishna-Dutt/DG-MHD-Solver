@@ -314,6 +314,9 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RunShockDetector();
     RunLimiter();
     updatePrimitiveVariables(T, P);
+    /*RunShockDetector();
+    RunLimiter();
+    updateConservativeVariables(IE);*/
     
     
     // Second Step of RK3
@@ -332,6 +335,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RunShockDetector();
     RunLimiter();
     updatePrimitiveVariables(T, P);
+    RunShockDetector();
+    RunLimiter();
+    updateConservativeVariables(IE);
+    
     
 
    // Third (Final) Step of RK3
@@ -351,6 +358,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    RunShockDetector();
    RunLimiter();
    updatePrimitiveVariables(T, P); 
+   /*RunShockDetector();
+   RunLimiter();
+   updateConservativeVariables(IE);*/
+    
     
     updateInviscidFlux();
 
