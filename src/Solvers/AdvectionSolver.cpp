@@ -35,7 +35,8 @@ void AdvectionSolver::setInitialConditions(function<double(double, double)> I) {
 }
 
 void AdvectionSolver::setBoundaryCondtions(string type) {
-    field->setBoundaryConditions(type);
+    setBoundary("q", type, "neumann", type, "dirichlet");
+   // field->setBoundaryConditions(type);
     return ;
 }
 
@@ -116,4 +117,13 @@ void AdvectionSolver::solve() {
 void AdvectionSolver::plot(string filename) {
     field->writeVTK(filename);
     return ;
+}
+
+void AdvectionSolver::setBoundary(string v, string Bottom, string Right, string Top, string Left) {
+  field->setTopBoundary(v, Top);
+  field->setBottomBoundary(v, Bottom);
+  field->setRightBoundary(v, Right);
+  field->setLeftBoundary(v, Left);
+
+  field->setBoundaryNeighbours(v);
 }
