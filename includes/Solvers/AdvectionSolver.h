@@ -112,6 +112,7 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void setBoundary(string Var, string Bottom, string Right, string Top, string Left);
+ 
 };
 
 #endif
