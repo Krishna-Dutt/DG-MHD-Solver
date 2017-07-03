@@ -136,5 +136,8 @@ public:
     virtual void NeumannBoundary( double *Matrix, initializer_list<int> I);
     virtual void PeriodicBoundary(double *Matrix, initializer_list<int> I);
 
+    virtual void updateDirichlet(string v, double *Matrix);
+    virtual void updateNeumann(string v, double *Matrix);
+
 };
 #endif

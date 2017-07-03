@@ -915,3 +915,27 @@ void DG_Element_2d::PeriodicBoundary(double *Matrix, initializer_list<int> I) {
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates Neumann Boundaries of a cell.
+ *
+ * @Param v This is the variable ,whose boundary values are to be fixed.
+ * @Param Matrix  RHS Matrix that is to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateNeumann(string v, double *Matrix) {
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates Dirichlet Boundaries of a cell.
+ *
+ * @Param v This is the variable ,whose boundary values are to be fixed.
+ * @Param Matrix  RHS Matrix that is to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateDirichlet(string v, double *Matrix) {
+    return ;
+}
+

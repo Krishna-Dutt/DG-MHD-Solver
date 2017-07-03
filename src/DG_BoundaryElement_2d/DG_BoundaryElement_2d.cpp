@@ -47,27 +47,19 @@ void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
     switch(b) {
         case 't' : // `t` or `T` for top 
         case 'T' :
-            if (type == "dirichlet") TopBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
-            //else if (type == "neumann") TopBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
-            //else if (type == "periodic") TopBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            TopBoundary[v] = type;
             break;
         case 'r' : // `r` or `R` for right
         case 'R' :
-            if (type == "dirichlet") RightBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
-            else if (type == "neumann") RightBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
-            else if (type == "periodic") RightBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            RightBoundary[v] = type;
             break;
         case 'b' : // `b` or `B` for bottom
         case 'B' :
-            if (type == "dirichlet") BottomBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
-            else if (type == "neumann") BottomBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
-            else if (type == "periodic") BottomBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            BottomBoundary[v] = type;
             break;
         case 'l' : // `l` or `L` for left
         case 'L' :
-            if (type == "dirichlet") LeftBoundary[v] = &DG_BoundaryElement_2d::DirichletBoundary;
-            else if (type == "neumann") LeftBoundary[v] = &DG_BoundaryElement_2d::NeumannBoundary;
-            else if (type == "periodic") LeftBoundary[v] = &DG_BoundaryElement_2d::PeriodicBoundary;
+            LeftBoundary[v] = type;
             break;
         default:
             cout << "WARNING!. No such neighbor type " << type << endl;
@@ -144,5 +136,53 @@ void DG_BoundaryElement_2d::NeumannBoundary(double *Matrix, initializer_list<int
  */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::PeriodicBoundary(double *Matrix, initializer_list<int> I) {
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates Neumann Boundaries of a cell.
+ *
+ * @Param v This is the variable ,whose boundary values are to be fixed.
+ * @Param Matrix  RHS Matrix that is to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::updateNeumann(string v, double *Matrix) {
+    if (TopBoundary.count(v)) {
+        if (TopBoundary[v] == "neumann") NeumannBoundary(Matrix, {N*(N+1), 1, -(N+1)});
+    }
+    if (BottomBoundary.count(v)) {
+        if (BottomBoundary[v] == "neumann") NeumannBoundary(Matrix, {0, 1, (N+1)});
+    }
+    if (RightBoundary.count(v)) {
+        if (RightBoundary[v] == "neumann") NeumannBoundary(Matrix, {N, N+1, -1});
+    }
+    if (LeftBoundary.count(v)) {
+        if (LeftBoundary[v] == "neumann") NeumannBoundary(Matrix, {0, N+1, 1});
+    }
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates Dirichlet Boundaries of a cell.
+ *
+ * @Param v This is the variable ,whose boundary values are to be fixed.
+ * @Param Matrix  RHS Matrix that is to be modified.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::updateDirichlet(string v, double *Matrix) {
+    if (TopBoundary.count(v)) {
+        if (TopBoundary[v] == "dirichlet") DirichletBoundary(Matrix, {N*(N+1), 1});
+    }
+    if (BottomBoundary.count(v)) {
+        if (BottomBoundary[v] == "dirichlet") DirichletBoundary(Matrix, {0, 1});
+    }
+    if (RightBoundary.count(v)) {
+        if (RightBoundary[v] == "dirichlet") DirichletBoundary(Matrix, {N, N+1});
+    }
+    if (LeftBoundary.count(v)) {
+        if (LeftBoundary[v] == "dirichlet") DirichletBoundary(Matrix, {0, N+1});
+    }
     return ;
 }
