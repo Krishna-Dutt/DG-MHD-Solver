@@ -52,6 +52,12 @@ public:
         void updateDirichlet(string v, double *Matrix);
         void updateNeumann(string v, double *Matrix);
 
+        // Functions for various operations on the variables.
+        void delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+
+        void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+
+
 
 
 

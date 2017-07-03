@@ -7,6 +7,8 @@
 #include "../../includes/Utilities/LobattoNodes.h"
 #include "../../includes/Utilities/MinMod.h"
 
+#define MAX(a, b)(a>b?a:b)
+#define MIN(a, b)(a<b?a:b)
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -184,5 +186,145 @@ void DG_BoundaryElement_2d::updateDirichlet(string v, double *Matrix) {
     if (LeftBoundary.count(v)) {
         if (LeftBoundary[v] == "dirichlet") DirichletBoundary(Matrix, {0, N+1});
     }
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `x` and then store it in the
+ * variable `vDash`. The function also takes `fluxType` as an input which would describe the numerical scheme that
+ * should be used in order to obtain the derivative, modified for a boundary cell.
+ *
+ * @Param v         Variable which is to be differentiated.
+ * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param fluxType  The type of flux that is to be used. eg "central"
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+    double dy = (y_end - y_start);
+    double dx = (x_end - x_start);
+
+    double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+    double* RMatrix              =   new double[(N+1)*(N+1)*(N+1)*(N+1)]; // Creating a new temporary matrix, to store the modified RHS Matrices
+    
+    zeros(numericalFlux, (N+1)*(N+1));
+    
+    if(fluxType == "central") {                                          
+        for(int i=0; i<=N; i++){
+            numericalFlux[i*(N+1)+N]    = 0.5*( *boundaryRight[v][i]    + *neighboringRight[v][i] ) ;   
+            numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
+        }
+        
+    }
+
+    else if(fluxType == "rusanov") {                                                    
+        for(int i=0; i<=N; i++){
+          // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
+            numericalFlux[i*(N+1)+N] = 0.5*(*boundaryRight[v][i] + *neighboringRight[v][i] + MAX(fabs(*boundaryRight[fluxVariable][i]), fabs(*neighboringRight[fluxVariable][i]))*(*boundaryRight[conserVar][i] - *neighboringRight[conserVar][i])  ) ;   
+            numericalFlux[i*(N+1)]   = 0.5*(*boundaryLeft[v][i]  + *neighboringLeft[v][i]  - MAX(fabs(*boundaryLeft[fluxVariable][i]), fabs(*neighboringLeft[fluxVariable][i]))*(*boundaryLeft[conserVar][i] - *neighboringLeft[conserVar][i])  ) ;   
+        }
+
+    }
+
+    // Derivative Matrix
+    /// vDash = -0.5*dy*D*v
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+
+    // Implementing Boundary Condition
+    updateDirichlet(conserVar, RMatrix);
+    updateNeumann(conserVar, RMatrix);
+        
+    cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
+
+    /// Adding the numeical Flux terms as necessary.
+
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_right, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+
+    // Implementing Boundary Condition
+    updateDirichlet(conserVar, RMatrix);
+    updateNeumann(conserVar, RMatrix);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
+
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_left, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+
+    // Implementing Boundary Condition
+    updateDirichlet(conserVar, RMatrix);
+    updateNeumann(conserVar, RMatrix);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
+
+    delete[] numericalFlux;
+    delete[] RMatrix;
+
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `y` and then store it in the
+ * variable `vDash`. The function also takes `fluxType` as an input which would describe the numerical scheme that
+ * should be used in order to obtain the derivative, modified for boundary cells.
+ *
+ * @Param v         Variable which is to be differentiated.
+ * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param fluxType  The type of flux that is to be used. eg "central"
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+    double dy = (y_end - y_start);
+    double dx = (x_end - x_start);
+
+    double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+    double* RMatrix              =   new double[(N+1)*(N+1)*(N+1)*(N+1)]; // Creating a new temporary matrix, to store the modified RHS Matrices
+    
+    zeros(numericalFlux, (N+1)*(N+1));
+
+    if(fluxType == "central") {                                          
+        for(int i=0; i<=N; i++){
+            numericalFlux[N*(N+1)+i]    = 0.5*( *boundaryTop[v][i]    + *neighboringTop[v][i] ) ;   
+            numericalFlux[i]            = 0.5*( *boundaryBottom[v][i]     + *neighboringBottom[v][i] ) ;  
+        }
+        
+    }
+    
+    else if(fluxType == "rusanov") {                                                     
+        for(int i=0; i<=N; i++){
+          // Normals nx, ny have been incorporated into the signs, need to set them separately !!
+            numericalFlux[N*(N+1)+i]= 0.5*(*boundaryTop[v][i] + *neighboringTop[v][i] + MAX(fabs(*boundaryTop[fluxVariable][i]), fabs(*neighboringTop[fluxVariable][i]))*(*boundaryTop[conserVar][i] - *neighboringTop[conserVar][i]));
+            numericalFlux[i]        = 0.5*(*boundaryBottom[v][i] + *neighboringBottom[v][i] - MAX(fabs(*boundaryBottom[fluxVariable][i]), fabs(*neighboringBottom[fluxVariable][i]))*(*boundaryBottom[conserVar][i] - *neighboringBottom[conserVar][i])); 
+        }
+      
+    }
+
+    // Derivative Matrix
+    /// vDash = -0.5*dy*D*v
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+
+    // Implementing Boundary Condition
+    updateDirichlet(conserVar, RMatrix);
+    updateNeumann(conserVar, RMatrix);
+        
+    cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
+
+    /// Adding the numeical Flux terms as necessary.
+
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_top, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+
+    // Implementing Boundary Condition
+    updateDirichlet(conserVar, RMatrix);
+    updateNeumann(conserVar, RMatrix);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
+
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_bottom, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+
+    // Implementing Boundary Condition
+    updateDirichlet(conserVar, RMatrix);
+    updateNeumann(conserVar, RMatrix);
+    cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
+
+    delete[] numericalFlux;
+    delete[] RMatrix;
+
     return ;
 }
