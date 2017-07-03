@@ -18,8 +18,6 @@ void EulerSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
 
-    setPrimitiveVariables();
-    setConservativeVariables();
    return ;
 }
 
@@ -119,6 +117,10 @@ double MomentumFlux(double f, double u) {
 
 double EnergyFlux(double E, double P, double u) {
   return (E + P)*u ;
+}
+
+double PressureE(double D, double e) {
+  return D*e*(1.4 -1.0) ;
 }
 
 void EulerSolver::setXMomentum() {
@@ -265,7 +267,7 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dqudx", K2);
-  field->axpy(-1.0, "dqvdy", K2);
+ field->axpy(-1.0, "dqvdy", K2);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
@@ -309,12 +311,11 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
     
-    updatePrimitiveVariables(T, P);
     RunShockDetector();
     RunLimiter();
-    updateConservativeVariables(IE);
+    updatePrimitiveVariables(T, P);
     
- 
+    
     // Second Step of RK3
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
@@ -328,10 +329,9 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step2("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE");
     
-    updatePrimitiveVariables(T, P);
     RunShockDetector();
     RunLimiter();
-    updateConservativeVariables(IE);
+    updatePrimitiveVariables(T, P);
     
 
    // Third (Final) Step of RK3
@@ -347,11 +347,12 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
  
-    updatePrimitiveVariables(T, P);
-    RunShockDetector();
-    RunLimiter();
-    updateConservativeVariables(IE);
     
+   RunShockDetector();
+   RunLimiter();
+   updatePrimitiveVariables(T, P); 
+    
+    updateInviscidFlux();
 
    /// RK3 is done, incrementing the time step. 
    // Updating the Primitive Variables !!
@@ -374,6 +375,7 @@ void EulerSolver::SetShockDetector(string _ShockDetector) {
 void EulerSolver::SetShockDetectorVariables() {
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered("CellMarker");
+    field->addVariable_withBounary("CellMarkerGlobal");
     /*
     field->addVariable_CellCentered("VariableMax");
     field->addVariable_CellCentered("OutFlowSize");
@@ -400,11 +402,11 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered("OutFlowFlux");
   field->ResetVariables_CellCentered("Radius");
   */
-  field->ResetVariables_CellCentered("CellMarker");
+  field->ResetVariables_CellCentered("CellMarker", 1.5);
   field->ResetMap_OutFlow();
 
   field->updateOutFlowBoundary("u", "v");
-  field->updateCellMarker("qE", "CellMarker");
+  field->updateCellMarker("q", "CellMarker");
 
   return ;
 }
@@ -419,8 +421,8 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_withoutBounary("Moment");
-    field->addVariable_withoutBounary("ModifiedMoment");
+    field->addVariable_withBounary("Moment");
+    field->addVariable_withBounary("ModifiedMoment");
     field->setVanderMandMatrix();
   }
 
@@ -430,9 +432,9 @@ void EulerSolver::SetLimiterVariables() {
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
     Run_LiliaMomentLimiter("q");
-    Run_LiliaMomentLimiter("u");
-    Run_LiliaMomentLimiter("v");
-    Run_LiliaMomentLimiter("P");
+    Run_LiliaMomentLimiter("qv");
+    Run_LiliaMomentLimiter("qu");
+    Run_LiliaMomentLimiter("qE");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 
@@ -455,4 +457,30 @@ void EulerSolver::setBoundary(string v, string Bottom, string Right, string Top,
   field->setLeftBoundary(v, Left);
 
   field->setBoundaryNeighbours(v);
+  return ;
+}
+
+void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double(double, double)> U ) {
+  field->addVariable_withBounary("qAnalytical");
+  field->addVariable_withBounary("uAnalytical");
+  
+  field->addVariable_withoutBounary("Zero");
+  field->scal(0.0,"Zero");
+
+  field->initializeVariable("qAnalytical", D);
+  field->initializeVariable("uAnalytical", U);
+
+  // Computing L2Norm
+
+  double qNorm = 0.0, qAnalytic = 0.0;
+  double uNorm = 0.0, uAnalytic = 0.0;
+  
+  qNorm = field->l2Norm("q", "qAnalytical");
+  qAnalytic = field->l2Norm("qAnalytical", "Zero");
+  uNorm = field->l2Norm("u", "uAnalytical");
+  uAnalytic = field->l2Norm("uAnalytical", "Zero");
+
+  cout << "L2norms :\n  Density : " <<qNorm <<" : L2 Norm : "<< qNorm/qAnalytic <<"\n";
+  cout <<" u Velocity : " <<uNorm << " : L2 Norm :  " << uNorm/uAnalytic <<"\n";
+  return ;
 }

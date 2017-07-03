@@ -11,39 +11,39 @@ using namespace std;
 
 
 double U(double x, double y) {
-    return 0.0;
+  if (x <= 0.5) {
+      return 0.0 ;
+  }
+  else {
+      return 0.0 ;
+  }
 }
 
 double V(double x, double y) {
-    return 0.0;
-}
-
-double initial(double x, double y) {
-   /* if (x*x + y*y <= 0.25) {
-      return 1.0 ;
-    }
-    else {
-      return 0 ;
-    }*/
-    //return (exp(-(x*x)*16.0));
-    return -x ;
-}
-
-double IDensity(double x, double y) {
-  if ( x <= 0.5) {
-    return  1.0 ;
+  if (x <= 0.5) {
+      return 0.0 ;
   }
   else {
-    return 0.125 ;
+      return 0.0 ;
+  }
+}
+
+
+double IDensity(double x, double y) {
+  if (x <= 0.5) {
+      return 1.0 ;
+  }
+  else {
+      return 0.125 ;
   }
 }
 
 double IPressure(double x, double y) {
-  if ( x <= 0.5) {
-    return  1.0 ;
+  if (x <= 0.5) {
+      return 1.0 ;
   }
   else {
-    return 0.1 ;
+      return 0.1 ;
   }
 }
 
@@ -52,11 +52,11 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  if ( x <= 0.5) {
-    return  1.0/(R*1.0) ;
+  if (x <= 0.5) {
+      return 1.0/(R*1.0) ;
   }
   else {
-    return 0.1/(R*0.125) ;
+      return 0.1/(R*0.125) ;
   }
 }
 
@@ -69,24 +69,58 @@ double T(double IE, double D) {
 }
 
 double Sound( double D, double P) {
-  return sqrt(gamma*P/D);
+  return sqrt(gamma*P/D) ;
 }
 
 double Pressure(double D, double IE) {
     return IE*(gamma - 1.0) ;
 }
 
+// Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
+double AnalyticalDensity(double x, double y) {
+  if (0.0 <= x && x <= 0.26) {
+    return 1.0 ;
+  }
+  else if (0.26 <= x && x <= 0.485) {
+    return 1.0 + (x-0.26)*(0.42-1.0)/(0.485-0.26) ;
+  }
+  else if (0.485 <= x && x <= 0.682) {
+    return 0.423 ;
+  }
+  else if (0.682 < x && x <= 0.852) {
+    return 0.27 ;
+  }
+  else {
+    return 0.125 ;
+  }
+}
+
+double AnalyticalVelocity(double x, double y) {
+  if (0.0 <= x && x <= 0.26) {
+    return 0.0 ;
+  }
+  else if (0.26 <= x && x <= 0.485) {
+    return (x-0.26)*(0.926)/(0.485-0.26) ;
+  }
+  else if (0.485 <= x & x <= 0.852) {
+    return 0.926 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}
+
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-3;
-    int time_steps = 100;
+    double dt = 1e-4;
+    int time_steps = 2000;
     EulerSolver* a;
-    a = new EulerSolver(20, 5, 2);
+    a = new EulerSolver(120, 1, 4);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
+    a->setPrimitiveVariables();
+    a->setConservativeVariables();
 
     a->setInitialVelocity(U, V);
-    //a->setInitialConditions(initial);
-    //a->setBoundaryCondtions("periodic");
     a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
@@ -96,10 +130,11 @@ int main() {
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
-    a->solve( Sound, T, Pressure, IE);
-    //a->solve();
+    a->solve( Sound,T, Pressure, IE);
+    a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
     a->plot("output.vtk");
     
+
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
     return 0 ;

@@ -184,16 +184,17 @@ void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
   double start = -1.0;
   double end = 1.0;
   
-  if (lobattoIntegration(start, end, N, boundaryTop[v]) <= 0.0) {
+  if (lobattoIntegration(start, end, N, boundaryTop[v]) < 0.0) {
     OutFlow["Top"] = true;
   }
-  if (lobattoIntegration(start, end, N, boundaryBottom[v]) >= 0.0) {
+  if (lobattoIntegration(start, end, N, boundaryBottom[v]) > 0.0) {
     OutFlow["Bottom"] = true;
   }
-  if (lobattoIntegration(start, end, N, boundaryLeft[u]) >= 0.0) {
+  
+  if (lobattoIntegration(start, end, N, boundaryLeft[u]) > 0.0) {
     OutFlow["Left"] = true;
   }
-  if (lobattoIntegration(start, end, N, boundaryRight[u]) <= 0.0) {
+  if (lobattoIntegration(start, end, N, boundaryRight[u]) < 0.0) {
     OutFlow["Right"] = true;
   }
   
@@ -219,27 +220,46 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
     VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryTop[v]);
     VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringTop[v]);
     OutflowSize += abs(x_end -x_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryTop[v][i]);
+    }
   }
   if (OutFlow["Bottom"]) {
     VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryBottom[v]);
     VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringBottom[v]);
     OutflowSize += abs(x_end -x_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryBottom[v][i]);
+    }
   }
   if (OutFlow["Left"]) {
     VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryLeft[v]);
     VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringLeft[v]);
     OutflowSize += abs(y_end -y_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryLeft[v][i]);
+    }
   }
   if (OutFlow["Right"]) {
     VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryRight[v]);
     VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringRight[v]);
     OutflowSize += abs(y_end -y_start);
+
+    for(int i=0; i<=N; ++i) {
+        MaxVariable = MAX(MaxVariable, *boundaryRight[v][i]);
+    }
   }
 
   MaxVariable = variable[v][0];
   for (int i = 0; i < (N+1)*(N+1) ; ++i) {
     MaxVariable = MAX(MaxVariable,variable[v][i]);
   }
+
+
+// Assert that MaxVariable is never equal to ZERO !!  
 
   radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
 
@@ -251,6 +271,9 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
     *variable[m] = 0.0;
   }
   
+  for(int b=0; b <(N+1)*(N+1); ++b) {
+      variable["CellMarkerGlobal"][b] = *variable[m];
+  }
  return ;
 }
 
@@ -267,6 +290,14 @@ void DG_Element_2d::computeMoments(string v, string m) {
   /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
 
+// Additional filter to set values less than 1e-8 to zero !!, Recheck /Temporary
+/*
+  for (int i=0; i <(N+1)*(N+1); ++i) {
+      if (abs(variable[m][i]) <= 1e-7) {
+          variable[m][i] = 0.0;
+      }
+  }
+*/
   return ;
 }
 
@@ -286,7 +317,12 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 
  //if (*variable[cm])
   { // Checking if cell marker is not equal to zero
+  //cout << "Calling :: convertMomentToVariable()\n";
+  
+  
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
+  
+
   }
 
   return ;
@@ -305,49 +341,55 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
- //if (*variable[cm]) 
+//if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
-    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
+    //AlphaN = sqrt((2.0*N)/(2.0*N+1));
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+    //AlphaN = 0.5/sqrt(4.0*N*N - 1.0);        // Too diffusive
+    //AlphaN = (2.0*N-0.5)/sqrt(4.0*N*N-1.0);  // Too diffusive
+    //AlphaN = 1.0;                           // Do not work for HO polynomials
+    //AlphaN = 1.0/(2.0*N-1.0);               // Do not work for HO polynomials
 
     for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
      --count;
+     AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
      for(j=0; j < count; ++j) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
+       // Original minmod detector
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else if(Temp1 != 0.0 && Temp2 != 0.0){
+       else if( Temp1 !=0 && Temp2 !=0) 
+       {
          return ; // Need to exit both loops
        }
      }
      // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
        Tempi = i-j;
        Tempj = i - j*(N+1);
-       // Temporarily avoiding limiting lowest three modes.
-       /*
-       if (Tempi == 1.0 || Tempj == 1.0) {
-           return ;
-       }
-       */
+       
+       // Original Detector
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
-      
-       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+       
+       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else if(Temp1 != 0.0 && Temp2 != 0.0){
+       else if( Temp1 !=0 && Temp2 !=0)
+       {
          return ; // Need to exit both loops
        }
     }
+
  }
 
   return ;
