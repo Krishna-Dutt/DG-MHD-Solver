@@ -78,22 +78,14 @@ int main() {
     double dt = 1e-2;
     int time_steps = 100;
     AdvectionSolver* a;
-<<<<<<< HEAD
-    a = new AdvectionSolver(30, 1, 2);
-=======
     a = new AdvectionSolver(30, 1, 1);
->>>>>>> BCAdvection
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
 
     a->setVelocity(U, V);
     a->setInitialConditions(initial);
     a->setBoundaryCondtions("periodic");
-<<<<<<< HEAD
-    /*a->setInitialDensity(IDensity);
-=======
     
    /* a->setInitialDensity(IDensity);
->>>>>>> BCAdvection
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
