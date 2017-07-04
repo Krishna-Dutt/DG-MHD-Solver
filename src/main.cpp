@@ -115,7 +115,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 500;
     EulerSolver* a;
-    a = new EulerSolver(40, 1, 2);
+    a = new EulerSolver(80, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -126,7 +126,7 @@ int main() {
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
-    a->setBoundaryCondtions("periodic");
+    a->setBoundaryCondtions("periodicY");
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
