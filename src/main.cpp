@@ -76,7 +76,7 @@ double Sound( double D, double P) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-2;
-    int time_steps = 80;
+    int time_steps = 10;
     AdvectionSolver* a;
     a = new AdvectionSolver(30, 1, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
