@@ -380,6 +380,33 @@ void DG_Field_2d::setBoundaryNeighbours(string v) {
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the given Variable at the Boundary .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::updateBoundaryVariables(string v) {
+        // Setting the boundary for the top elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->updateBoundaryVariables(v);
+
+
+        // Setting the boundary for the bottom elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][0]->updateBoundaryVariables(v);
+
+        // Setting the boundary for the right elements.
+        for(int j=0; j < (ne_y); j++)
+            elements[ne_x-1][j]->updateBoundaryVariables(v);
+
+        // Setting the boundary for the left elements..
+        for(int j=0; j < ne_y; j++)
+            elements[0][j]->updateBoundaryVariables(v);
+
+    return ;
+}
 
 /* ----------------------------------------------------------------------------*/
 /**
