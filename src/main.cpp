@@ -19,7 +19,7 @@ double V(double x, double y) {
 }
 
 double initial(double x, double y) {
-    if (x<= 0) {
+    if (abs(x)<= 0.5) {
       return 1.0 ;
     }
     else {
@@ -76,7 +76,7 @@ double Sound( double D, double P) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-2;
-    int time_steps = 10;
+    int time_steps = 100;
     AdvectionSolver* a;
     a = new AdvectionSolver(30, 1, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);

@@ -36,7 +36,7 @@ void AdvectionSolver::setInitialConditions(function<double(double, double)> I) {
 
 void AdvectionSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
-    setBoundary("q", type, "neumann", type, "dirichlet");
+    setBoundary("q", type, "dirichlet", type, "dirichlet");
     return ;
 }
 
