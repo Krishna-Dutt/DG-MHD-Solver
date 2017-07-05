@@ -29,7 +29,7 @@
 
 using namespace std;
 
-class DG_BoundaryElement_2d;
+//class DG_BoundaryElement_2d;
 
 class DG_Element_2d {
 protected:
@@ -138,6 +138,7 @@ public:
 
     virtual void updateDirichlet(string v, double *Matrix);
     virtual void updateNeumann(string v, double *Matrix);
+    virtual void updateBoundaryVariables(string v);
 
     virtual double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
 

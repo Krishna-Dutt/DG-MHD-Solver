@@ -415,4 +415,40 @@ double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, 
 }
 
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates Variables at the Boundary.
+ *
+ * @Param v This is the variable ,whose boundary values are to be fixed.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
+    // Update only for Neumann/Outflow/Zero Gradient ,right now !!
+    if (TopBoundary.count(v)) {
+        if (TopBoundary[v] == "neumann") {
+            for(int i=0; i<=N; ++i)
+                variable[v][N*(N+1) + i] = variable[v][N*(N+1) + i -(N+1)];
+        } 
+    }
+    if (BottomBoundary.count(v)) {
+        if (BottomBoundary[v] == "neumann") {
+            for(int i=0; i<=N; ++i)
+                variable[v][0 + i] = variable[v][0 + i +(N+1)];
+        } 
+    }
+    if (RightBoundary.count(v)) {
+        if (RightBoundary[v] == "neumann") {
+            for(int i=0; i<=N; ++i)
+                variable[v][N + i*(N+1)] = variable[v][N + i*(N+1) -1];
+        } 
+    }
+    if (LeftBoundary.count(v)) {
+        if (LeftBoundary[v] == "neumann"){
+            for(int i=0; i<=N; ++i)
+                variable[v][0 + i*(N+1)] = variable[v][0 + i*(N+1) +1];
+        } 
+    }
+
+    return ;
+}
 

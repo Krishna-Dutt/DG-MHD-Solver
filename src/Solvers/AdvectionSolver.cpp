@@ -35,8 +35,8 @@ void AdvectionSolver::setInitialConditions(function<double(double, double)> I) {
 }
 
 void AdvectionSolver::setBoundaryCondtions(string type) {
-    setBoundary("q", type, "neumann", type, "dirichlet");
-   // field->setBoundaryConditions(type);
+    //field->setBoundaryConditions(type);
+    setBoundary("q", type, "dirichlet", type, "dirichlet");
     return ;
 }
 
@@ -77,6 +77,7 @@ void AdvectionSolver::solve() {
         field->scal(0.0, "k1");
         field->axpy(-1.0, "duqdx", "k1");
         field->axpy(-1.0, "dvqdy", "k1");
+        //field->updateBoundaryVariables("q");
         
         field->axpy(0.5*dt, "k1", "q");
         
@@ -90,6 +91,7 @@ void AdvectionSolver::solve() {
         field->scal(0.0, "k2");
         field->axpy(-1.0, "duqdx", "k2");
         field->axpy(-1.0, "dvqdy", "k2");
+        //field->updateBoundaryVariables("q");
         
         field->axpy(-1.5*dt, "k1", "q");
         field->axpy( 2.0*dt, "k2", "q");
@@ -104,6 +106,7 @@ void AdvectionSolver::solve() {
         field->scal(0.0, "k3");
         field->axpy(-1.0, "duqdx", "k3");
         field->axpy(-1.0, "dvqdy", "k3");
+        //field->updateBoundaryVariables("q");
         
         field->axpy( (7.0/6.0)*dt, "k1", "q");
         field->axpy(-(4.0/3.0)*dt, "k2", "q");

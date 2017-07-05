@@ -47,6 +47,7 @@ public:
     void setLeftBoundary(string v, string type);
     void setRightBoundary(string v, string type);
     void setBoundaryNeighbours(string v);
+    void updateBoundaryVariables(string v);
 
     // Functions to create output file in VTK format
     void writeVTK(string fileName);

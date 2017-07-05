@@ -983,6 +983,17 @@ void DG_Element_2d::updateDirichlet(string v, double *Matrix) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This function updates Variables at the Boundary.
+ *
+ * @Param v This is the variable ,whose boundary values are to be fixed.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateBoundaryVariables(string v) {
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This function performs MinMod for Boundary elements, eliminating all non-existing 
  * neighbouring cells.
  *

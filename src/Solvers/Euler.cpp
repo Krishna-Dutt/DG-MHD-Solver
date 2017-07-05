@@ -256,6 +256,7 @@ void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
   field->scal(0.0, K);
   field->axpy(-1.0, "dqudx", K);
   field->axpy(-1.0, "dqvdy", K);
+  field->updateBoundaryVariables(Var);
   
   field->axpy(0.5*dt, K, Var);
   return;
@@ -267,7 +268,8 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dqudx", K2);
- field->axpy(-1.0, "dqvdy", K2);
+  field->axpy(-1.0, "dqvdy", K2);
+  field->updateBoundaryVariables(Var);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
@@ -281,6 +283,7 @@ void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, st
   field->scal(0.0, K3);
   field->axpy(-1.0, "dqudx", K3);
   field->axpy(-1.0, "dqvdy", K3);
+  field->updateBoundaryVariables(Var);
   
   field->axpy((7.0/6.0)*dt, K1, Var);
   field->axpy(-(4.0/3.0)*dt, K2, Var);
