@@ -46,25 +46,57 @@ DG_BoundaryElement_2d::~DG_BoundaryElement_2d() {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
-    switch(b) {
+     switch(b) {
         case 't' : // `t` or `T` for top 
         case 'T' :
             TopBoundary[v] = type;
+            if (type == "dirichlet") {
+                DirichletTop[v] = new double [N+1];
+                //DirichletTop[v].resize(N+1);
+                //DirichletTop[v] = type;
+                for(int i=0; i<=N; i++){
+                    DirichletTop[v][i] = *boundaryTop[v][i];
+                }
+            }
             break;
         case 'r' : // `r` or `R` for right
         case 'R' :
             RightBoundary[v] = type;
+            if (type == "dirichlet") {
+                DirichletRight[v] = new double [N+1];
+                //DirichletRight[v].resize(N+1);
+                 //DirichletRight[v] = type;
+                for(int i=0; i<=N; i++){
+                    DirichletRight[v][i] = *boundaryRight[v][i];
+                }
+            }
             break;
         case 'b' : // `b` or `B` for bottom
         case 'B' :
             BottomBoundary[v] = type;
+            if (type == "dirichlet") {
+                DirichletBottom[v] = new double [N+1];
+                //DirichletBottom[v].resize(N+1);
+                //DirichletBottom[v] = type;
+                for(int i=0; i<=N; i++){
+                    DirichletBottom[v][i] = *boundaryBottom[v][i];
+                }
+            }
             break;
         case 'l' : // `l` or `L` for left
         case 'L' :
             LeftBoundary[v] = type;
+            if (type == "dirichlet") {
+                DirichletLeft[v] = new double [N+1];
+               //DirichletLeft[v].resize(N+1);
+               //DirichletLeft[v] = type;
+                for(int i=0; i<=N; i++){
+                    DirichletLeft[v][i] = *boundaryLeft[v][i];
+                }
+            }
             break;
         default:
-            cout << "ERROR!. No such neighbor type " << type << endl;
+            cout << "WARNING!. No such neighbor type " << type << endl;
     }
 
     return ;
