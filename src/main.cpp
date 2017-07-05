@@ -115,7 +115,7 @@ int main() {
     double dt = 1e-3;
     int time_steps = 500;
     EulerSolver* a;
-    a = new EulerSolver(80, 1, 1);
+    a = new EulerSolver(50, 1, 2);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
