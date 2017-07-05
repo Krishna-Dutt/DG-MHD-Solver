@@ -35,8 +35,11 @@ protected:
         map<string, string > BottomBoundary;
         map<string, string > LeftBoundary;
         map<string, string > RightBoundary;
-        // function objects, should I use Variadic functions ??
-        // Use Initializer_list !!
+        
+        map<string, double*> DirichletTop;
+        map<string, double*> DirichletBottom;
+        map<string, double*> DirichletRight;
+        map<string, double*> DirichletLeft;
 
 public:
 

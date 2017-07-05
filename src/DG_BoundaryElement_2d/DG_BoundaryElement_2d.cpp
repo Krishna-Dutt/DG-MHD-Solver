@@ -394,7 +394,8 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else if(Temp1 != 0.0 && Temp2 != 0.0){
+       else //if(Temp1 == 0.0 && Temp2 == 0.0)
+       {
          return ; // Need to exit both loops
        }
      }
@@ -411,7 +412,8 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else if(Temp1 != 0.0 && Temp2 != 0.0){
+       else //if(Temp1 == 0.0 && Temp2 == 0.0)
+       {
          return ; // Need to exit both loops
        }
     }

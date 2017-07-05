@@ -57,7 +57,8 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             if ( i == 0 || i == ne_x-1 || j == 0 || j == ne_y-1) {
                 elements[i].push_back( new DG_BoundaryElement_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
             }
-            else {
+            else
+             {
                 elements[i].push_back( new DG_Element_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
             }
 
