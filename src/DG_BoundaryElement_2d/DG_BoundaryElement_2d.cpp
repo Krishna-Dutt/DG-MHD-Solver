@@ -460,12 +460,20 @@ void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
         if (TopBoundary[v] == "neumann") {
             for(int i=0; i<=N; ++i)
                 variable[v][N*(N+1) + i] = variable[v][N*(N+1) + i -(N+1)];
-        } 
+        }
+        else if (TopBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                 *boundaryTop[v][i] = DirichletTop[v][i];
+        }  
     }
     if (BottomBoundary.count(v)) {
         if (BottomBoundary[v] == "neumann") {
             for(int i=0; i<=N; ++i)
                 variable[v][0 + i] = variable[v][0 + i +(N+1)];
+        } 
+        else if (BottomBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                *boundaryBottom[v][i] = DirichletBottom[v][i];
         } 
     }
     if (RightBoundary.count(v)) {
@@ -473,12 +481,20 @@ void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
             for(int i=0; i<=N; ++i)
                 variable[v][N + i*(N+1)] = variable[v][N + i*(N+1) -1];
         } 
+        else if (RightBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                *boundaryRight[v][i] = DirichletRight[v][i];
+        }
     }
     if (LeftBoundary.count(v)) {
         if (LeftBoundary[v] == "neumann"){
             for(int i=0; i<=N; ++i)
                 variable[v][0 + i*(N+1)] = variable[v][0 + i*(N+1) +1];
         } 
+        else if (LeftBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                *boundaryLeft[v][i] = DirichletLeft[v][i];
+        }
     }
 
     return ;
