@@ -241,6 +241,14 @@ void DG_Field_2d::setTopBoundary(string v, string type) {
        
     }
 
+    else if(type == "reflective") {
+        for(int i = 0; i < ne_x; i++)
+            for(int j=0; j<=N; ++j) {
+                *(elements[i][ne_y-1]->neighboringTop[v][j]) = -*(elements[i][ne_y-1]->boundaryTop[v][j]);
+            }
+
+    }
+
     for(int i = 0; i < ne_x; i++)
             elements[i][ne_y-1]->assignBoundary(v, type,'T');
 
@@ -275,6 +283,14 @@ void DG_Field_2d::setBottomBoundary(string v, string type) {
     else if(type == "dirichlet") {
         // Keep the neighbour cell pointer as this pointer
        
+    }
+
+    else if(type == "reflective") {
+        for(int i = 0; i < ne_x; i++)
+            for(int j=0; j<=N; ++j) {
+                *(elements[i][0]->neighboringBottom[v][j]) = -*(elements[i][0]->boundaryBottom[v][j]);
+            }
+
     }
 
     for(int i = 0; i < ne_x; i++)
@@ -312,6 +328,14 @@ void DG_Field_2d::setLeftBoundary(string v, string type) {
        
     }
 
+    else if(type == "reflective") {
+        for(int i = 0; i < ne_y; i++)
+            for(int j=0; j<=N; ++j) {
+                *(elements[0][i]->neighboringLeft[v][j]) = -*(elements[0][i]->boundaryLeft[v][j]);
+            }
+
+    }
+
     for(int i = 0; i < ne_y; i++)
             elements[0][i]->assignBoundary(v, type,'L');
 
@@ -345,6 +369,14 @@ void DG_Field_2d::setRightBoundary(string v, string type) {
     else if(type == "dirichlet") {
         // Keep the neighbour cell pointer as this pointer
        
+    }
+
+    else if(type == "reflective") {
+        for(int i = 0; i < ne_y; i++)
+            for(int j=0; j<=N; ++j) {
+                *(elements[ne_x-1][i]->neighboringRight[v][j]) = -*(elements[ne_x-1][i]->boundaryRight[v][j]);
+            }
+
     }
 
     for(int i = 0; i < ne_y; i++)
