@@ -394,7 +394,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else //if(Temp1 == 0.0 && Temp2 == 0.0)
+       else //if(Temp1 != 0.0 && Temp2 != 0.0)
        {
          return ; // Need to exit both loops
        }
@@ -412,7 +412,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else //if(Temp1 == 0.0 && Temp2 == 0.0)
+       else //if(Temp1 != 0.0 && Temp2 != 0.0)
        {
          return ; // Need to exit both loops
        }
@@ -463,42 +463,114 @@ void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
             for(int i=0; i<=N; ++i)
                 variable[v][N*(N+1) + i] = variable[v][N*(N+1) + i -(N+1)];
         }
-        else if (TopBoundary[v] == "dirichlet") {
+        /*else if (TopBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
                  *boundaryTop[v][i] = DirichletTop[v][i];
-        }  
+        } */ 
     }
     if (BottomBoundary.count(v)) {
         if (BottomBoundary[v] == "neumann") {
             for(int i=0; i<=N; ++i)
                 variable[v][0 + i] = variable[v][0 + i +(N+1)];
         } 
-        else if (BottomBoundary[v] == "dirichlet") {
+       /* else if (BottomBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
                 *boundaryBottom[v][i] = DirichletBottom[v][i];
-        } 
+        } */
     }
     if (RightBoundary.count(v)) {
         if (RightBoundary[v] == "neumann") {
             for(int i=0; i<=N; ++i)
                 variable[v][N + i*(N+1)] = variable[v][N + i*(N+1) -1];
         } 
-        else if (RightBoundary[v] == "dirichlet") {
+        /*else if (RightBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
                 *boundaryRight[v][i] = DirichletRight[v][i];
-        }
+        }*/
     }
     if (LeftBoundary.count(v)) {
         if (LeftBoundary[v] == "neumann"){
             for(int i=0; i<=N; ++i)
                 variable[v][0 + i*(N+1)] = variable[v][0 + i*(N+1) +1];
         } 
-        else if (LeftBoundary[v] == "dirichlet") {
+        /*else if (LeftBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
                 *boundaryLeft[v][i] = DirichletLeft[v][i];
-        }
+        }*/
     }
 
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function computes the nodals values of the variable given its moments
+ * using VandeMandMatrix with Legendre Basis.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param v This is the variable whose nodal values are to be computed.
+ * @Param cm This is the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string cm) {
+  /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
+
+ //if (*variable[cm])
+  { 
+      double *AuxVariable = new double[(N+1)*(N+1)];
+
+      cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,AuxVariable,1);
+
+      if (TopBoundary.count(v)) {
+        if (TopBoundary[v] == "neumann") {
+           /* for(int i=0; i<=N; ++i)
+                AuxVariable[N*(N+1) + i] = AuxVariable[N*(N+1) + i -(N+1)];*/
+        }
+        else if (TopBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                 AuxVariable[N*(N+1) + i] = variable[v][N*(N+1) + i] ;
+        }  
+    }
+    if (BottomBoundary.count(v)) {
+        if (BottomBoundary[v] == "neumann") {
+            /*for(int i=0; i<=N; ++i)
+                AuxVariable[0 + i] = AuxVariable[0 + i +(N+1)];*/
+        } 
+        else if (BottomBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                AuxVariable[0 + i] = variable[v][0 + i] ;
+        } 
+    }
+    if (RightBoundary.count(v)) {
+        if (RightBoundary[v] == "neumann") {
+            /*for(int i=0; i<=N; ++i)
+                AuxVariable[N + i*(N+1)] = AuxVariable[N + i*(N+1) -1];*/
+        } 
+        else if (RightBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+                AuxVariable[N + i*(N+1) ] = variable[v][N + i*(N+1)] ;
+        }
+    }
+    if (LeftBoundary.count(v)) {
+        if (LeftBoundary[v] == "neumann"){
+            /*for(int i=0; i<=N; ++i)
+                AuxVariable[0 + i*(N+1)] = AuxVariable[0 + i*(N+1) +1];*/
+        } 
+        else if (LeftBoundary[v] == "dirichlet") {
+            for(int i=0; i<=N; ++i)
+               AuxVariable[0 + i*(N+1)] = variable[v][0 + i*(N+1)] ;
+        }
+    }
+
+    cblas_dcopy((N+1)*(N+1), AuxVariable, 1, variable[v], 1);
+    
+    delete[] AuxVariable;
+  
+
+  }
+
+  return ;
+}
+
+
 

@@ -315,7 +315,7 @@ void DG_Element_2d::computeMoments(string v, string m) {
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- if (*variable[cm])
+ //if (*variable[cm])
   { // Checking if cell marker is not equal to zero
   //cout << "Calling :: convertMomentToVariable()\n";
   
@@ -341,7 +341,7 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(string m, string modm, string cm) {
 
-if (*variable[cm]) 
+//if (*variable[cm]) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
@@ -367,7 +367,7 @@ if (*variable[cm])
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else if( Temp1 !=0 && Temp2 !=0) 
+       else //if( Temp1 !=0 && Temp2 !=0) 
        {
          return ; // Need to exit both loops
        }
@@ -384,7 +384,7 @@ if (*variable[cm])
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else if( Temp1 !=0 && Temp2 !=0)
+       else //if( Temp1 !=0 && Temp2 !=0)
        {
          return ; // Need to exit both loops
        }

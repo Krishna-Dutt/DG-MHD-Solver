@@ -63,10 +63,14 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "periodic", "outflow", "periodic", "outflow");
+    setBoundary("q", "periodic", "neumann", "periodic", "neumann");
     setBoundary("qu", "periodic", "dirichlet", "periodic", "dirichlet");
     setBoundary("qv", "periodic", "neumann", "periodic", "neumann");
-    setBoundary("qE", "periodic", "outflow", "periodic", "outflow");
+    setBoundary("qE", "periodic", "neuamnn", "periodic", "neumann");
+    /*setBoundary("u", "periodic", "dirichlet", "periodic", "dirichlet");
+    setBoundary("v", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("P", "periodic", "neuamnn", "periodic", "neumann");*/
+
     return ;
 }
 
@@ -250,50 +254,50 @@ void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) 
 }
 
 void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K);
   field->axpy(-1.0, "dqudx", K);
   field->axpy(-1.0, "dqvdy", K);
-  
+  field->updateBoundaryVariables(Var);
   
   field->axpy(0.5*dt, K, Var);
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   return;
 }
 
 void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dqudx", K2);
   field->axpy(-1.0, "dqvdy", K2);
-  
+  field->updateBoundaryVariables(Var);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   return;
 }
 
 void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K3);
   field->axpy(-1.0, "dqudx", K3);
   field->axpy(-1.0, "dqvdy", K3);
-  
+  field->updateBoundaryVariables(Var);
   
   field->axpy((7.0/6.0)*dt, K1, Var);
   field->axpy(-(4.0/3.0)*dt, K2, Var);
   field->axpy((1.0/6.0)*dt, K3, Var);
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   return;
 }
 
@@ -308,9 +312,12 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
   // For loop to march in time !!
   for(int i=0; i < no_of_time_steps; i++) {
     // First Step of RK3
-    RunShockDetector();
+    /*RunShockDetector();
     RunLimiter();
-    updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables(T, P);*/
+    /*RunShockDetector();
+    RunLimiter();
+    updateConservativeVariables(IE);*/
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
     
@@ -349,8 +356,8 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     updatePrimitiveVariables(T, P);
     /*RunShockDetector();
     RunLimiter();
-    updateConservativeVariables(IE);
-    */
+    updateConservativeVariables(IE);*/
+    
     
 
    // Third (Final) Step of RK3
@@ -367,9 +374,9 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
  
     
-   /*RunShockDetector();
+   RunShockDetector();
    RunLimiter();
-   updatePrimitiveVariables(T, P); */
+   updatePrimitiveVariables(T, P); 
    /*RunShockDetector();
    RunLimiter();
    updateConservativeVariables(IE);*/
@@ -454,10 +461,10 @@ void EulerSolver::SetLimiterVariables() {
 
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
-    Run_LiliaMomentLimiter("q");
-    Run_LiliaMomentLimiter("qv");
     Run_LiliaMomentLimiter("qu");
+    Run_LiliaMomentLimiter("qv");
     Run_LiliaMomentLimiter("qE");
+    Run_LiliaMomentLimiter("q");
     //Run_LiliaMomentLimiter("T"); // If needed, else compute it later using q and P ..
   }
 

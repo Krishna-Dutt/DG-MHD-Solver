@@ -93,7 +93,7 @@ public:
     // Functions to support Moment Limiters.
     void computeMoments(string v, string m);
     virtual void limitMoments(string m, string modm, string cm);
-    void convertMomentToVariable(string m, string v, string cm);
+    virtual void convertMomentToVariable(string m, string v, string cm);
 
     // Functions to manipulate Cell Centered Variables.
     void ResetVariables_CellCentered(string v, double value = 0.0);
