@@ -64,8 +64,8 @@ void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
     setBoundary("q", "periodic", "outflow", "periodic", "outflow");
-    setBoundary("qu", "periodic", "reflective", "periodic", "reflective");
-    setBoundary("qv", "periodic", "reflective", "periodic", "reflective");
+    setBoundary("qu", "periodic", "dirichlet", "periodic", "dirichlet");
+    setBoundary("qv", "periodic", "neumann", "periodic", "neumann");
     setBoundary("qE", "periodic", "outflow", "periodic", "outflow");
     return ;
 }
@@ -347,10 +347,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RunShockDetector();
     RunLimiter();
     updatePrimitiveVariables(T, P);
-    RunShockDetector();
+    /*RunShockDetector();
     RunLimiter();
     updateConservativeVariables(IE);
-    
+    */
     
 
    // Third (Final) Step of RK3
