@@ -523,8 +523,8 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
 
       if (TopBoundary.count(v)) {
         if (TopBoundary[v] == "neumann") {
-           /* for(int i=0; i<=N; ++i)
-                AuxVariable[N*(N+1) + i] = AuxVariable[N*(N+1) + i -(N+1)];*/
+            for(int i=0; i<=N; ++i)
+                AuxVariable[N*(N+1) + i] = AuxVariable[N*(N+1) + i -(N+1)];
         }
         else if (TopBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
@@ -533,8 +533,8 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
     }
     if (BottomBoundary.count(v)) {
         if (BottomBoundary[v] == "neumann") {
-            /*for(int i=0; i<=N; ++i)
-                AuxVariable[0 + i] = AuxVariable[0 + i +(N+1)];*/
+            for(int i=0; i<=N; ++i)
+                AuxVariable[0 + i] = AuxVariable[0 + i +(N+1)];
         } 
         else if (BottomBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
@@ -543,8 +543,8 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
     }
     if (RightBoundary.count(v)) {
         if (RightBoundary[v] == "neumann") {
-            /*for(int i=0; i<=N; ++i)
-                AuxVariable[N + i*(N+1)] = AuxVariable[N + i*(N+1) -1];*/
+            for(int i=0; i<=N; ++i)
+                AuxVariable[N + i*(N+1)] = AuxVariable[N + i*(N+1) -1];
         } 
         else if (RightBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
@@ -553,8 +553,8 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
     }
     if (LeftBoundary.count(v)) {
         if (LeftBoundary[v] == "neumann"){
-            /*for(int i=0; i<=N; ++i)
-                AuxVariable[0 + i*(N+1)] = AuxVariable[0 + i*(N+1) +1];*/
+            for(int i=0; i<=N; ++i)
+                AuxVariable[0 + i*(N+1)] = AuxVariable[0 + i*(N+1) +1];
         } 
         else if (LeftBoundary[v] == "dirichlet") {
             for(int i=0; i<=N; ++i)
