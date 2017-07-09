@@ -69,6 +69,8 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
     vanderMandMatrix    =   NULL;
     inverseVanderMandMatrix = NULL;
 
+    PositivityMarker   = true;
+
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -277,6 +279,47 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
  return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions checks the positivity of data stored in cell.
+ *
+ * @Param v  This is the name of the variable whose positivity is to be checked.
+ * @Param cm This is the cell marker used to identify troubled cells.
+ *v@Param level This string is used to identify the level of limiting required.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::checkPositivity(string v, string cm, string level) {
+    if (*variable[cm]) {
+        for (int i=0; i< (N+1)*(N+1); ++i) {
+            if (variable[v][i] < 0.0) {
+                PositivityMarker = true;
+                return ;
+            }
+        }
+
+        if (level == "One"){
+            PositivityMarker = false;
+        }
+               
+    }
+
+    // Switching off the PositivityMarker
+    
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function resets the positivity markers in cell.
+ *
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::resetPositivity() {
+    PositivityMarker = true;
+         
+    return;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -309,13 +352,13 @@ void DG_Element_2d::computeMoments(string v, string m) {
  *
  * @Param m This gives the moments of the variable
  * @Param v This is the variable whose nodal values are to be computed.
- * @Param cm This is the cell marker used to identified troubled cells.
+ * @Param cm This is the cell marker used to identify troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- //if (*variable[cm])
+ if (*variable[cm] && PositivityMarker)
   { // Checking if cell marker is not equal to zero
   //cout << "Calling :: convertMomentToVariable()\n";
   
@@ -337,23 +380,23 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
  * @Param m This gives the moments of the variable
  * @Param modm This is the variable to store modified moments.
  * @Param cm This is the cell marker used to identified troubled cells.
+ * @Param Index This is the index to start the limiting process.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::limitMoments(string m, string modm, string cm) {
+void DG_Element_2d::limitMoments(string m, string modm, string cm, unsigned Index) {
 
-//if (*variable[cm]) 
+if (*variable[cm] && PositivityMarker) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
-    //AlphaN = sqrt((2.0*N)/(2.0*N+1));
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
-    //AlphaN = 0.5/sqrt(4.0*N*N - 1.0);        // Too diffusive
-    //AlphaN = (2.0*N-0.5)/sqrt(4.0*N*N-1.0);  // Too diffusive
-    //AlphaN = 1.0;                           // Do not work for HO polynomials
-    //AlphaN = 1.0/(2.0*N-1.0);               // Do not work for HO polynomials
 
-    for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
+    
+    // Ensuring that Cell avergae remains the  same after limiting !!
+    variable[modm][0] = variable[m][0];
+
+    for(i=Index; i > 0; i = i - (N+2)) {
      --count;
      AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
      for(j=0; j < count; ++j) {

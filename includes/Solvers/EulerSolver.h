@@ -349,6 +349,32 @@ public:
     void Run_LiliaMomentLimiter(string v);
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis  This function Runs the required Positivity Limiter Method.
+     *
+     * @Param functionT This is the function to obtain Temperature, given Internal Energy and Density.
+     * @Param functionP This is the function to obtain Pressure, given Density and Temperature, using Equation of state.
+     */
+    /* ----------------------------------------------------------------------------*/
+    void RunPositivityLimiter(function<double(double,double)> T, function<double(double,double)> P);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function runs  Positivity Limiter, using the Lilia Moment Limiter.
+     *
+     * @Param v The variable on which the the limiter is to be performed
+     * @Param Index This is the index at which to start the limiting process. 
+     */
+    /* ----------------------------------------------------------------------------*/
+    void Run_PositivityMomentLimiter(string v, unsigned Index);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis  This function performs the positivity check.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void checkPositivity();
+    
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis   This function is set the Boundary conditions for a given variable.
      *
      * @Param Var String corresponding to the Variable.

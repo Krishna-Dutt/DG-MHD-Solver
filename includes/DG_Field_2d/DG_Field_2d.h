@@ -60,7 +60,7 @@ public:
 
     // Functions to handle Moment Limiter
     void computeMoments(string v, string m);
-    void limitMoments(string m, string modifiedm, string cm);
+    void limitMoments(string m, string modifiedm, string cm, unsigned Index);
     void convertMomentToVariable(string m, string v, string cm);
 
     // Function to Reset Cell Centered Variables 
@@ -82,6 +82,10 @@ public:
 
     // Functions to give the information about the error.
     double l2Norm(string v1, string v2);
+
+    // Function to check Positivity of data stored in cell .
+    void checkPositivity(string v, string cm, string level);
+    void resetPositivity();
 };
 
 #endif

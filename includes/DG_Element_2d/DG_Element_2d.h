@@ -72,7 +72,9 @@ public:
     vector<string> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
 
     map<string, bool> OutFlow; /// Map to flag outflow boundaries of each cell.
-    
+
+    bool PositivityMarker;
+   
 
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
     virtual ~DG_Element_2d();
@@ -90,9 +92,13 @@ public:
     void updateOutFlowBoundary(string u, string v);
     void updateCellMarker(string v, string m);
 
+    // Function to check Positivity of data stored in cell .
+    void checkPositivity(string v, string cm, string level);
+    void resetPositivity();
+
     // Functions to support Moment Limiters.
     void computeMoments(string v, string m);
-    virtual void limitMoments(string m, string modm, string cm);
+    virtual void limitMoments(string m, string modm, string cm, unsigned Index);
     virtual void convertMomentToVariable(string m, string v, string cm);
 
     // Functions to manipulate Cell Centered Variables.

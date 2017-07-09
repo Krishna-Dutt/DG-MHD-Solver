@@ -369,18 +369,22 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
  * @Param m This gives the moments of the variable
  * @Param modm This is the variable to store modified moments.
  * @Param cm This is the cell marker used to identified troubled cells.
+ * @Param Index This is the index to start the limiting process.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm) {
+void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsigned Index) {
 
- //if (*variable[cm]) 
+ if (*variable[cm] && PositivityMarker) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
 
-    for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
+    // Ensuring that Cell avergae remains the  same after limiting !!
+    variable[modm][0] = variable[m][0];
+
+    for(i=Index; i > 0; i = i - (N+2)) {
      --count;
      AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
      for(j=0; j < count; ++j) {
@@ -516,7 +520,7 @@ void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
 void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- //if (*variable[cm])
+ if (*variable[cm] && PositivityMarker)
   { 
       double *AuxVariable = new double[(N+1)*(N+1)];
 

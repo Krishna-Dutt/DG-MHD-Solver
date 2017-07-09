@@ -312,7 +312,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
   // For loop to march in time !!
   for(int i=0; i < no_of_time_steps; i++) {
     // First Step of RK3
-    /*
+    
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
     
@@ -328,6 +328,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RunShockDetector();
     RunLimiter();
     updatePrimitiveVariables(T, P);
+    RunPositivityLimiter(T, P);
         
     
     // Second Step of RK3
@@ -345,7 +346,8 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
     RunShockDetector();
     RunLimiter();
-    updatePrimitiveVariables(T, P); 
+    updatePrimitiveVariables(T, P);
+    RunPositivityLimiter(T, P); 
     
 
    // Third (Final) Step of RK3
@@ -361,10 +363,11 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Energy
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
  
-    */
+    
    RunShockDetector();
    RunLimiter();
-   updatePrimitiveVariables(T, P); 
+   updatePrimitiveVariables(T, P);
+   RunPositivityLimiter(T, P); 
    
     
     //updateInviscidFlux();
@@ -436,6 +439,9 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
+    field->addVariable_CellCentered("CellMarker");
+    field->ResetVariables_CellCentered("CellMarker", 1.5);
+
     field->addVariable_withBounary("Moment");
     field->addVariable_withBounary("ModifiedMoment");
     field->setVanderMandMatrix();
@@ -459,7 +465,38 @@ void EulerSolver::RunLimiter() {
 void EulerSolver::Run_LiliaMomentLimiter(string v) {
   field->computeMoments(v, "Moment");
   field->computeMoments(v, "ModifiedMoment");
-  field->limitMoments("Moment", "ModifiedMoment", "CellMarker");
+  field->limitMoments("Moment", "ModifiedMoment", "CellMarker", (N+1)*(N+1)-1);
+  field->convertMomentToVariable("ModifiedMoment", v, "CellMarker");
+
+  return ;
+}
+
+void EulerSolver::RunPositivityLimiter(function<double(double,double)> T ,function<double(double,double)> P) {
+  field->resetPositivity();
+  if ( Limiter == "LiliaMoment") {
+    updatePrimitiveVariables(T, P);
+    checkPositivity();
+    Run_PositivityMomentLimiter("qu", N+2);
+    Run_PositivityMomentLimiter("qv", N+2);
+    Run_PositivityMomentLimiter("qE", N+2);
+    Run_PositivityMomentLimiter("q", N+2);
+
+    updatePrimitiveVariables(T, P);
+    checkPositivity();
+    Run_PositivityMomentLimiter("qu", 0);
+    Run_PositivityMomentLimiter("qv", 0);
+    Run_PositivityMomentLimiter("qE", 0);
+    Run_PositivityMomentLimiter("q", 0);
+    //Run_PositivityMomentLimiter("T", N+2); // If needed, else compute it later using q and P ..
+  }
+
+  return ;
+}
+
+void EulerSolver::Run_PositivityMomentLimiter(string v, unsigned Index) {
+  field->computeMoments(v, "Moment");
+  field->scal(0.0, "ModifiedMoment");
+  field->limitMoments("Moment", "ModifiedMoment", "CellMarker", Index);
   field->convertMomentToVariable("ModifiedMoment", v, "CellMarker");
 
   return ;
@@ -498,4 +535,10 @@ void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double
   cout << "L2norms :\n  Density : " <<qNorm <<" : L2 Norm : "<< qNorm/qAnalytic <<"\n";
   cout <<" u Velocity : " <<uNorm << " : L2 Norm :  " << uNorm/uAnalytic <<"\n";
   return ;
+}
+
+void EulerSolver::checkPositivity() {
+  field->checkPositivity("q", "CellMarker", "One");
+  field->checkPositivity("P", "CellMarker", "Two");
+
 }

@@ -640,12 +640,13 @@ void DG_Field_2d::computeMoments(string v, string m) {
  * @Param m This is gives the moments to be limited.
  * @Param modifiedm This is the variable to store the modified moments.
  * @Param cm This the cell marker used to identified troubled cells.
+ * @Param Index This is the index at which to start limiting .
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::limitMoments(string m, string modifiedm, string cm) {
+void DG_Field_2d::limitMoments(string m, string modifiedm, string cm, unsigned Index) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
-      elements[i][j]->limitMoments(m, modifiedm, cm);
+      elements[i][j]->limitMoments(m, modifiedm, cm, Index);
     }
 
   return ;
@@ -901,3 +902,33 @@ double DG_Field_2d::l2Norm(string v1, string v2) {
     norm = sqrt(norm/(ne_x*ne_y));    
     return norm;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function checks the positivity of data stored in cell.
+ *
+ * @Param v  This is the name of the variable whose positivity is to be checked.
+ * @Param cm This is the cell marker used to identify troubled cells.
+ * @Param level This string is used to identify the level of limiting rquired.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::checkPositivity(string v, string cm, string level) {
+     for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->checkPositivity(v, cm, level);
+    return;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function resets the positivity markers in cell.
+ *
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::resetPositivity() {
+     for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->resetPositivity();
+    return;
+}
+
