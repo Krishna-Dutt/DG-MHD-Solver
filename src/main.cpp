@@ -11,41 +11,63 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if (x <= 0.5) {
-      return 0.0 ;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939;//-0.7259 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.8939;//-0.7259;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
   }
   else {
-      return 0.0 ;
+    return 0.0 ;
   }
 }
 
 double V(double x, double y) {
-  if (x <= 0.5) {
-      return 0.0 ;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939;//-0.7259 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.0;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
   }
   else {
-      return 0.0 ;
+    return 0.8939;//-0.7259 ;
   }
 }
 
 
 double IDensity(double x, double y) {
-  if ((x-0.5) <= 0.25*(y-0.5)) 
-  {
-      return 1.0 ;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.1; //1.0 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.5065; //0.5197;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 1.1 ;//1.0 ;
   }
   else {
-      return 0.125 ;
+    return 0.5065; //0.5197 ;
   }
 }
 
 double IPressure(double x, double y) {
-  if ((x-0.5) <= 0.25*(y-0.5)) 
-  {
-      return 1.0 ;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.1; //1.0 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.35; //0.4;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 1.1; //1.0 ;
   }
   else {
-      return 0.1 ;
+    return 0.35; //0.4 ;
   }
 }
 
@@ -54,12 +76,17 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  if ((x-0.5) <= 0.25*(y-0.5))
-   {
-      return 1.0/(R*1.0) ;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.1/(R*1.1); //1.0/(R*1.0) ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.35/(R*0.5065);//0.4/(R*0.5197) ;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 1.1/(R*1.1);//1.0/(R*1.0) ;
   }
   else {
-      return 0.1/(R*0.125) ;
+    return 0.35/(R*0.5065);//0.4/(R*0.5197) ;
   }
 }
 
@@ -116,9 +143,9 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 0.5e-3;
-    int time_steps = 200;
+    int time_steps = 500;
     EulerSolver* a;
-    a = new EulerSolver(30, 30, 2);
+    a = new EulerSolver(80, 80, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
