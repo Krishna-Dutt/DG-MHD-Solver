@@ -20,6 +20,11 @@ void legendrePolynomial(double *LegPolyn, unsigned int n)
     if(n==0)
     {
         LegPolyn[0] =   1;
+
+        delete[] LegPolyn_1;
+        delete[] LegPolyn_2;
+        delete[] temp;
+
         return ;
     }
 
@@ -31,6 +36,11 @@ void legendrePolynomial(double *LegPolyn, unsigned int n)
     {
         LegPolyn[0] =   0.0;
         LegPolyn[1] =   1.0;
+
+        delete[] LegPolyn_1;
+        delete[] LegPolyn_2;
+        delete[] temp;
+
         return ;
     }
 
@@ -47,8 +57,8 @@ void legendrePolynomial(double *LegPolyn, unsigned int n)
         memcpy(LegPolyn_2,temp,(i)*sizeof(double));
     }
 
-    delete [] LegPolyn_1;
-    delete [] LegPolyn_2;
-    delete [] temp;
+    delete[] LegPolyn_1;
+    delete[] LegPolyn_2;
+    delete[] temp;
     return ;
 }

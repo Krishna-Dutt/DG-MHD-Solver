@@ -24,4 +24,9 @@ void lobattoWeights(double *Weights, unsigned N)
 	for(int i=1;i<N-1;i++)
 		Weights[i]    =   2/((N*(N-1))*(Eval(Nodes[i]))*(Eval(Nodes[i])));
 	Weights[N-1] = (2.0/((N)*(N-1)));
+
+    delete[] Nodes;
+    delete[] Poly;
+
+    return ;
 }

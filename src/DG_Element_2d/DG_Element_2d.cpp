@@ -87,6 +87,32 @@ DG_Element_2d::~DG_Element_2d() {
       delete[] (itr->second);
     }
     // Do I need to delete other maps pointing to Boundary elements, since no new memory is dynamically allocated for them ??
+
+    for ( map<string, double**>::iterator itr = boundaryTop.begin() ;itr != boundaryTop.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double**>::iterator itr = boundaryBottom.begin() ;itr != boundaryBottom.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double**>::iterator itr = boundaryRight.begin() ;itr != boundaryRight.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double**>::iterator itr = boundaryLeft.begin() ;itr != boundaryLeft.end(); itr++){
+      delete[] (itr->second);
+    }
+
+    for ( map<string, double**>::iterator itr = neighboringTop.begin() ;itr != neighboringTop.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double**>::iterator itr = neighboringBottom.begin() ;itr != neighboringBottom.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double**>::iterator itr = neighboringRight.begin() ;itr != neighboringRight.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double**>::iterator itr = neighboringLeft.begin() ;itr != neighboringLeft.end(); itr++){
+      delete[] (itr->second);
+    }
 }
 
 
@@ -140,7 +166,7 @@ void DG_Element_2d::addVariable_withoutBoundary(string v) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::addVariable_CellCentered(string v) {
-    double * newVariable = new double ;/// Allocating the space for the new variable which is to be created.
+    double * newVariable = new double[1] ;/// Allocating the space for the new variable which is to be created.
     variable[v] = newVariable; /// Now assigning the same to the map.
 
     return ;

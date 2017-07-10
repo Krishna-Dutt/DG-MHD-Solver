@@ -33,6 +33,18 @@ DG_BoundaryElement_2d::DG_BoundaryElement_2d(int _N, double x1, double y1, doubl
 */
 /* ----------------------------------------------------------------------------*/
 DG_BoundaryElement_2d::~DG_BoundaryElement_2d() {
+    for ( map<string, double*>::iterator itr = DirichletTop.begin() ;itr != DirichletTop.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double*>::iterator itr = DirichletBottom.begin() ;itr != DirichletBottom.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double*>::iterator itr = DirichletRight.begin() ;itr != DirichletRight.end(); itr++){
+      delete[] (itr->second);
+    }
+    for ( map<string, double*>::iterator itr = DirichletLeft.begin() ;itr != DirichletLeft.end(); itr++){
+      delete[] (itr->second);
+    }
 
 }
 
