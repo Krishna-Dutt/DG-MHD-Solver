@@ -327,9 +327,13 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
     RunShockDetector();
     RunLimiter();
-    updatePrimitiveVariables(T, P);
+    //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P);
-        
+    updatePrimitiveVariables(T, P);
+    /*RunShockDetector();
+    RunLimiter();
+    RunPositivityLimiter(T, P); 
+    updateConservativeVariables(IE);   */ 
     
     // Second Step of RK3
     updateInviscidFlux();
@@ -346,9 +350,13 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
     RunShockDetector();
     RunLimiter();
-    updatePrimitiveVariables(T, P);
+    //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P); 
-    
+    updatePrimitiveVariables(T, P);
+    /*RunShockDetector();
+    RunLimiter();
+    RunPositivityLimiter(T, P); 
+    updateConservativeVariables(IE);*/
 
    // Third (Final) Step of RK3
     updateInviscidFlux();
@@ -366,8 +374,13 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
    RunShockDetector();
    RunLimiter();
-   updatePrimitiveVariables(T, P);
+   //updatePrimitiveVariables(T, P);
    RunPositivityLimiter(T, P); 
+   /*RunShockDetector();
+   RunLimiter();
+   RunPositivityLimiter(T, P); 
+   updateConservativeVariables(IE);*/
+   updatePrimitiveVariables(T, P);
    
     
     //updateInviscidFlux();
@@ -441,6 +454,9 @@ void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
     field->addVariable_CellCentered("CellMarker");
     field->ResetVariables_CellCentered("CellMarker", 1.5);
+    field->addVariable_withBounary("CellMarkerGlobal");
+    field->scal(0.0, "CellMarkerGlobal");
+
 
     field->addVariable_withBounary("Moment");
     field->addVariable_withBounary("ModifiedMoment");
@@ -452,6 +468,7 @@ void EulerSolver::SetLimiterVariables() {
 
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
+    field->resetPositivity();
     Run_LiliaMomentLimiter("qu");
     Run_LiliaMomentLimiter("qv");
     Run_LiliaMomentLimiter("qE");

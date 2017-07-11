@@ -316,6 +316,19 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::checkPositivity(string v, string cm, string level) {
     if (*variable[cm]) {
+        if (PositivityMarker) {
+            for(int x=0; x<(N+1)*(N+1); ++x) {
+                variable["CellMarkerGlobal"][x] = 1.0;
+            }
+        }
+        else {
+            for(int x=0; x<(N+1)*(N+1); ++x) {
+                variable["CellMarkerGlobal"][x] = 0.0;
+            }
+
+        }
+
+
         for (int i=0; i< (N+1)*(N+1); ++i) {
             if (variable[v][i] < 0.0) {
                 PositivityMarker = true;
