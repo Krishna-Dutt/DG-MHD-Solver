@@ -118,10 +118,10 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-6;
-    int time_steps = 38000;
+    double dt = 0.25e-4;
+    int time_steps = 4*380;
     EulerSolver* a;
-    a = new EulerSolver(600, 1, 1);
+    a = new EulerSolver(200, 1, 2);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -138,7 +138,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DCollela_N1_600.vtk");
+    a->plot("1DCollela_N2_200_RK3.vtk");
     
 
     delete a;
