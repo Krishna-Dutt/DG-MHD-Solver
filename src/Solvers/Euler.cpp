@@ -330,10 +330,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P);
     updatePrimitiveVariables(T, P);
-    /*RunShockDetector();
-    RunLimiter();
-    RunPositivityLimiter(T, P); 
-    updateConservativeVariables(IE);   */ 
+   
     
     // Second Step of RK3
     updateInviscidFlux();
@@ -353,11 +350,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P); 
     updatePrimitiveVariables(T, P);
-    /*RunShockDetector();
-    RunLimiter();
-    RunPositivityLimiter(T, P); 
-    updateConservativeVariables(IE);*/
-
+    
    // Third (Final) Step of RK3
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
@@ -376,18 +369,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    RunLimiter();
    //updatePrimitiveVariables(T, P);
    RunPositivityLimiter(T, P); 
-   /*RunShockDetector();
-   RunLimiter();
-   RunPositivityLimiter(T, P); 
-   updateConservativeVariables(IE);*/
    updatePrimitiveVariables(T, P);
    
     
-    //updateInviscidFlux();
-
-   /// RK3 is done, incrementing the time step. 
-   // Updating the Primitive Variables !!
-   // updatePrimitiveVariables(T, P);
+  
    time += dt;        
     }
 }
@@ -452,10 +437,10 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_CellCentered("CellMarker");
+    /*field->addVariable_CellCentered("CellMarker");
     field->ResetVariables_CellCentered("CellMarker", 1.5);
     field->addVariable_withBounary("CellMarkerGlobal");
-    field->scal(0.0, "CellMarkerGlobal");
+    field->scal(0.0, "CellMarkerGlobal");*/
 
 
     field->addVariable_withBounary("Moment");
@@ -491,12 +476,12 @@ void EulerSolver::Run_LiliaMomentLimiter(string v) {
 void EulerSolver::RunPositivityLimiter(function<double(double,double)> T ,function<double(double,double)> P) {
   field->resetPositivity();
   if ( Limiter == "LiliaMoment") {
-    updatePrimitiveVariables(T, P);
+    /*updatePrimitiveVariables(T, P);
     checkPositivity();
     Run_PositivityMomentLimiter("qu", N+2);
     Run_PositivityMomentLimiter("qv", N+2);
     Run_PositivityMomentLimiter("qE", N+2);
-    Run_PositivityMomentLimiter("q", N+2);
+    Run_PositivityMomentLimiter("q", N+2);*/
 
     updatePrimitiveVariables(T, P);
     checkPositivity();

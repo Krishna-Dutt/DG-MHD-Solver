@@ -118,10 +118,10 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 5.0e-6;
-    int time_steps = 7600;
+    double dt = 0.5e-5;
+    int time_steps = 3800*2;
     EulerSolver* a;
-    a = new EulerSolver(600, 1, 2);
+    a = new EulerSolver(400, 1, 2);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -133,12 +133,12 @@ int main() {
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("periodicY");
-    //a->SetShockDetector("KXRCF");
+    a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DCollela_N2_600_RK3_t7600.vtk");
+    a->plot("1DCollela_N2_400_RK3_t7600_NeumannBC_KXRCF.vtk");
     
 
     delete a;
