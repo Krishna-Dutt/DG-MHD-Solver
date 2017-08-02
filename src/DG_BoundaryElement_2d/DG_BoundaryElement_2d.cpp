@@ -254,7 +254,8 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
     
     zeros(numericalFlux, (N+1)*(N+1));
     
-    if(fluxType == "central") {                                          
+    if(fluxType == "central") {    
+                                              
         for(int i=0; i<=N; i++){
             numericalFlux[i*(N+1)+N]    = 0.5*( *boundaryRight[v][i]    + *neighboringRight[v][i] ) ;   
             numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
@@ -269,6 +270,24 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
             numericalFlux[i*(N+1)]   = 0.5*(*boundaryLeft[v][i]  + *neighboringLeft[v][i]  - MAX(fabs(*boundaryLeft[fluxVariable][i]), fabs(*neighboringLeft[fluxVariable][i]))*(*boundaryLeft[conserVar][i] - *neighboringLeft[conserVar][i])  ) ;   
         }
 
+    }
+
+    
+    if (RightBoundary.count(v)) {
+        if (RightBoundary[v] == "outflow") {
+            for(int i=0; i<=N; i++){
+          // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
+            numericalFlux[i*(N+1)+N] = 0.0 ;      
+        }
+        }
+    }
+    if (LeftBoundary.count(v)) {
+        if (LeftBoundary[v] == "outflow") {
+            for(int i=0; i<=N; i++){
+          // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
+            numericalFlux[i*(N+1)]   = 0.0 ;   
+        }
+        }
     }
 
     // Derivative Matrix
@@ -339,6 +358,21 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
             numericalFlux[i]        = 0.5*(*boundaryBottom[v][i] + *neighboringBottom[v][i] - MAX(fabs(*boundaryBottom[fluxVariable][i]), fabs(*neighboringBottom[fluxVariable][i]))*(*boundaryBottom[conserVar][i] - *neighboringBottom[conserVar][i])); 
         }
       
+    }
+
+    if (TopBoundary.count(conserVar)) {
+        if (TopBoundary[v] == "outflow") {
+            for(int i=0; i<=N; i++){
+            numericalFlux[N*(N+1)+i]    = 0.0 ;    
+            }
+        }
+    }
+    if (BottomBoundary.count(v)) {
+        if (BottomBoundary[v] == "outflow") {
+            for(int i=0; i<=N; i++){ 
+            numericalFlux[i]            = 0.0 ;  
+           }
+        }
     }
 
     // Derivative Matrix
