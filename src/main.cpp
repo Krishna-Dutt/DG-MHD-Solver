@@ -121,7 +121,7 @@ int main() {
     double dt = 1e-5;
     int time_steps = 3800*1;
     EulerSolver* a;
-    a = new EulerSolver(400, 1, 1);
+    a = new EulerSolver(200, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -138,7 +138,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DCollela_N1_400_RK3_t3800_NeumannBC.vtk");
+    a->plot("1DCollela_N1_200_RK3_t3800_OutflowBC_ModMinMod.vtk");
     
 
     delete a;
