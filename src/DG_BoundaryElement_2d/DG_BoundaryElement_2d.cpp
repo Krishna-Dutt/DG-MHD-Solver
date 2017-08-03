@@ -273,7 +273,7 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
     }
 
     
-    if (RightBoundary.count(v)) {
+    /*if (RightBoundary.count(v)) {
         if (RightBoundary[v] == "outflow") {
             for(int i=0; i<=N; i++){
           // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
@@ -288,7 +288,7 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
             numericalFlux[i*(N+1)]   = 0.0 ;   
         }
         }
-    }
+    }*/
 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
@@ -360,7 +360,7 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
       
     }
 
-    if (TopBoundary.count(conserVar)) {
+    /*if (TopBoundary.count(conserVar)) {
         if (TopBoundary[v] == "outflow") {
             for(int i=0; i<=N; i++){
             numericalFlux[N*(N+1)+i]    = 0.0 ;    
@@ -373,7 +373,7 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
             numericalFlux[i]            = 0.0 ;  
            }
         }
-    }
+    }*/
 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
@@ -436,10 +436,10 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
      for(j=0; j < count; ++j) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
-       Temp1 = BoundaryMinMod(m, Tempi, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
-       Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
-       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       //Temp1 = BoundaryMinMod(m, Tempi, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
+       //Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
+       Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
        if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
          variable[modm][Tempi] = Temp1;
@@ -454,10 +454,10 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
        Tempi = i-j;
        Tempj = i - j*(N+1);
        
-       Temp1 = BoundaryMinMod(m, Tempi, AlphaN, this, this, topNeighbor, bottomNeighbor);
-       Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, this, this);
-       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       //Temp1 = BoundaryMinMod(m, Tempi, AlphaN, this, this, topNeighbor, bottomNeighbor);
+       //Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, this, this);
+       Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
       
        if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
          variable[modm][Tempi] = Temp1;

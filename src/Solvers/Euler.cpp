@@ -437,10 +437,10 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_CellCentered("CellMarker");
+    /*field->addVariable_CellCentered("CellMarker");
     field->ResetVariables_CellCentered("CellMarker", 1.5);
     field->addVariable_withBounary("CellMarkerGlobal");
-    field->scal(0.0, "CellMarkerGlobal");
+    field->scal(0.0, "CellMarkerGlobal");*/
 
 
     field->addVariable_withBounary("Moment");
@@ -476,12 +476,12 @@ void EulerSolver::Run_LiliaMomentLimiter(string v) {
 void EulerSolver::RunPositivityLimiter(function<double(double,double)> T ,function<double(double,double)> P) {
   field->resetPositivity();
   if ( Limiter == "LiliaMoment") {
-    /*updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables(T, P);
     checkPositivity();
     Run_PositivityMomentLimiter("qu", N+2);
     Run_PositivityMomentLimiter("qv", N+2);
     Run_PositivityMomentLimiter("qE", N+2);
-    Run_PositivityMomentLimiter("q", N+2);*/
+    Run_PositivityMomentLimiter("q", N+2);
 
     updatePrimitiveVariables(T, P);
     checkPositivity();
