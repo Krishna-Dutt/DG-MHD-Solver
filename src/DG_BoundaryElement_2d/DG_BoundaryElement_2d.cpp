@@ -273,11 +273,11 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
     }
 
     
-    /*if (RightBoundary.count(v)) {
+    if (RightBoundary.count(v)) {
         if (RightBoundary[v] == "outflow") {
             for(int i=0; i<=N; i++){
           // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
-            numericalFlux[i*(N+1)+N] = 0.0 ;      
+            numericalFlux[i*(N+1)+N] = 0.5*(*boundaryRight[v][i] + *neighboringRight[v][i] + 2.0*fabs(*boundaryRight[fluxVariable][i])*(*boundaryRight[conserVar][i])  ) ;      
         }
         }
     }
@@ -285,10 +285,10 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
         if (LeftBoundary[v] == "outflow") {
             for(int i=0; i<=N; i++){
           // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
-            numericalFlux[i*(N+1)]   = 0.0 ;   
+            numericalFlux[i*(N+1)]   = 0.5*(*boundaryLeft[v][i]  + *neighboringLeft[v][i]  - 2.0*fabs(*boundaryLeft[fluxVariable][i])*(*boundaryLeft[conserVar][i])  ) ;   
         }
         }
-    }*/
+    }
 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
@@ -360,20 +360,20 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
       
     }
 
-    /*if (TopBoundary.count(conserVar)) {
+    if (TopBoundary.count(conserVar)) {
         if (TopBoundary[v] == "outflow") {
             for(int i=0; i<=N; i++){
-            numericalFlux[N*(N+1)+i]    = 0.0 ;    
+            numericalFlux[N*(N+1)+i]    = 0.5*(*boundaryTop[v][i] + *neighboringTop[v][i]) + fabs(*boundaryTop[fluxVariable][i])*(*boundaryTop[conserVar][i]) ;    
             }
         }
     }
     if (BottomBoundary.count(v)) {
         if (BottomBoundary[v] == "outflow") {
             for(int i=0; i<=N; i++){ 
-            numericalFlux[i]            = 0.0 ;  
+            numericalFlux[i]            = 0.5*(*boundaryBottom[v][i] + *neighboringBottom[v][i] - 2.0*fabs(*boundaryBottom[fluxVariable][i])*(*boundaryBottom[conserVar][i])) ;  
            }
         }
-    }*/
+    }
 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
