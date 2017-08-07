@@ -138,7 +138,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DCollela_N1_400_RK3_t1x3800_OutflowBC_Modified2.vtk");
+    a->plot("1DCollela_N1_400_RK3_t1x3800_OutflowBC_Modified_RuntimeTest.vtk");
     
 
     delete a;
