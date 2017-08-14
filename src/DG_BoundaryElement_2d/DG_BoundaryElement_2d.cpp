@@ -440,11 +440,11 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string fluxType) {
 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), transposeDerivativeMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), transposeDerivateMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
-    updateDirichlet(conserVar, RMatrix);
-    updateNeumann(conserVar, RMatrix);
+    //updateDirichlet(conserVar, RMatrix);
+    //updateNeumann(conserVar, RMatrix);
         
     cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
 
@@ -453,15 +453,15 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string fluxType) {
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_right, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
-    updateDirichlet(conserVar, RMatrix);
-    updateNeumann(conserVar, RMatrix);
+    //updateDirichlet(conserVar, RMatrix);
+    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_left, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
-    updateDirichlet(conserVar, RMatrix);
-    updateNeumann(conserVar, RMatrix);
+    //updateDirichlet(conserVar, RMatrix);
+    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     delete[] numericalFlux;
@@ -501,11 +501,11 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
     
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), transposeDerivativeMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), transposeDerivateMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
-    updateDirichlet(conserVar, RMatrix);
-    updateNeumann(conserVar, RMatrix);
+    //updateDirichlet(conserVar, RMatrix);
+    //updateNeumann(conserVar, RMatrix);
         
     cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
 
@@ -514,15 +514,15 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_top, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
-    updateDirichlet(conserVar, RMatrix);
-    updateNeumann(conserVar, RMatrix);
+    //updateDirichlet(conserVar, RMatrix);
+    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_bottom, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
-    updateDirichlet(conserVar, RMatrix);
-    updateNeumann(conserVar, RMatrix);
+    //updateDirichlet(conserVar, RMatrix);
+    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     delete[] numericalFlux;

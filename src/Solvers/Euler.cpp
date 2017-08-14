@@ -160,6 +160,14 @@ double EnergyViscous(double u, double uTau, double v, double vTau) {
   return (u * uTau + v * vTau) ;
 }
 
+double ArtificialViscosity( double x , double y) {
+  double Beta = 1.5;
+  double B1 = 6.0;
+  double B2 = 20.5;
+
+  return (Beta - 1.0)*(B1/B2)* x * (1.0/100) ;
+}
+
 void EulerSolver::setXMomentum() {
   field->setFunctionsForVariables("q", "u", Product, "qu");
   return ;
@@ -304,9 +312,9 @@ void EulerSolver::setAuxillaryVariables() {
 
 void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
  // cout << "Calling setEigenValues " << endl;
-  field->addVariable_onlyBounary("c");
-  field->addVariable_onlyBounary("u_plus_c");
-  field->addVariable_onlyBounary("v_plus_c");// Recheck formulation of eigen value !!
+  field->addVariable_withBounary("c");
+  field->addVariable_withBounary("u_plus_c");
+  field->addVariable_withBounary("v_plus_c");// Recheck formulation of eigen value !!
 
   updateEigenValues(SoundSpeed);
   return ;
@@ -314,9 +322,9 @@ void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
 
 void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) {
  // cout << " Calling updateEigenValues " << endl;
-  field->setFunctionsForBoundaryVariables("q", "P", SoundSpeed, "c");
-  field->setFunctionsForBoundaryVariables("u", "c", ModulusAdd, "u_plus_c");
-  field->setFunctionsForBoundaryVariables("v", "c", ModulusAdd, "v_plus_c");
+  field->setFunctionsForVariables("q", "P", SoundSpeed, "c");
+  field->setFunctionsForVariables("u", "c", ModulusAdd, "u_plus_c");
+  field->setFunctionsForVariables("v", "c", ModulusAdd, "v_plus_c");
   return ;
 }
 
@@ -374,6 +382,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
   setAuxillaryVariables();
   setInviscidFlux();
   setEigenValues(SoundSpeed);
+  setViscousFlux();
 
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
@@ -382,6 +391,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
+
+    field->setFunctionsForVariables("u_plus_c", "u_plus_c", ArtificialViscosity, "meu");
+    updatePrimitiveGradient();
+    updateViscousFlux();
     
     // Mass
     RK_Step1("q", "qu", "qv", "k1q");
@@ -409,6 +422,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
 
+    field->setFunctionsForVariables("u_plus_c", "u_plus_c", ArtificialViscosity, "meu");
+    updatePrimitiveGradient();
+    updateViscousFlux();
+
     // Mass
     RK_Step2("q", "qu", "qv", "k1q", "k2q");
     // X Momentum
@@ -433,6 +450,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    // Third (Final) Step of RK3
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
+
+    field->setFunctionsForVariables("u_plus_c", "u_plus_c", ArtificialViscosity, "meu");
+    updatePrimitiveGradient();
+    updateViscousFlux();
 
     // Mass
     RK_Step3("q", "qu", "qv", "k1q", "k2q", "k3q");

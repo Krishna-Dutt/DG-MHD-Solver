@@ -134,7 +134,7 @@ int main() {
 
     a->setBoundaryCondtions("periodicY");
     //a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);

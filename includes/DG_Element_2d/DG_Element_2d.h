@@ -125,8 +125,8 @@ public:
     void setBottomFluxMatrix(double* f);
     void setVanderMandMatrix(double* vm);
     void setInverseVanderMandMatrix(double* ivm);
-    void setTransposederivativeMatrix_x(double* id);
-    void setTransposederivativeMatrix_y(double* id);
+    void setTransposederivateMatrix_x(double* id);
+    void setTransposederivateMatrix_y(double* id);
 
     // Functions to apply linear operations on the variables.
     void axpy(double a, string x, string y);

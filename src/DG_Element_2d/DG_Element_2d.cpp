@@ -795,7 +795,7 @@ void DG_Element_2d::delByDelX(string v, string vDash, string fluxType) {
             numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
         }
         /// vDash = -0.5*dy*D*v
-        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, transposeDerivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, transposeDerivateMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
         /// Adding the numeical Flux terms as necessary.
         cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, fluxMatrix_right,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
@@ -835,7 +835,7 @@ void DG_Element_2d::delByDelY(string v, string vDash, string fluxType) {
             numericalFlux[i]            = 0.5*( *boundaryBottom[v][i]     + *neighboringBottom[v][i] ) ;  
         }
         /// vDash = -0.5*dy*D*v
-        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, transposeDerivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, transposeDerivateMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
         /// Adding the numeical Flux terms as necessary.
         cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, fluxMatrix_top,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
@@ -919,7 +919,7 @@ void DG_Element_2d::setderivateMatrix_y(double *d) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setTransposederivateMatrix_x(double *id) {
-    transposeDerivativeMatrix_x = id;
+    transposeDerivateMatrix_x = id;
     return ;
 }
 
@@ -932,7 +932,7 @@ void DG_Element_2d::setTransposederivateMatrix_x(double *id) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setTransposederivateMatrix_y(double *id) {
-    transposeDerivativeMatrix_y = id;
+    transposeDerivateMatrix_y = id;
     return ;
 }
 
@@ -1030,7 +1030,7 @@ void DG_Element_2d::setFunctionsForVariables(string w, string x, string y, funct
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)> f, string z) {
     for(int i = 0 ; i < (N+1)*(N+1); i++)
         variable[z][i] = f(variable[a][i],variable[b][i],variable[c][i], variable[d][i]);
     return ;

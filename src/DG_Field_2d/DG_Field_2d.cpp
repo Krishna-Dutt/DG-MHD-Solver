@@ -115,8 +115,8 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     inverse(massMatrix,massInverse,(N+1)*(N+1));
     twoDDerivativeMatrixX(derivativeMatrix_x, N);
     twoDDerivativeMatrixY(derivativeMatrix_y, N);
-    transpose(derivativeMatrix_x, TransposeDerivateMatrix_x, (N+1)*(N+1));
-    transpose(derivativeMatrix_y, TransposeDerivateMatrix_y, (N+1)*(N+1));
+    transpose(derivativeMatrix_x, TansposederivativeMatrix_x, (N+1)*(N+1));
+    transpose(derivativeMatrix_y, TransposederivativeMatrix_y, (N+1)*(N+1));
     
     twoDFluxMatrix3(fluxMatrix_top, N);
     twoDFluxMatrix2(fluxMatrix_right, N);
@@ -135,7 +135,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             elements[i][j]->setLeftFluxMatrix(fluxMatrix_left);
             elements[i][j]->setBottomFluxMatrix(fluxMatrix_bottom);
 
-            elements[i][j]->setTransposederivateMatrix_x(TransposederivativeMatrix_x);
+            elements[i][j]->setTransposederivateMatrix_x(TansposederivativeMatrix_x);
             elements[i][j]->setTransposederivateMatrix_y(TransposederivativeMatrix_y);
 
         }
@@ -791,6 +791,41 @@ void DG_Field_2d::delByDelY(string v, string vDash, string conserVar, string flu
 
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to operate the partial derivative of the variable w.r.t. x.
+ *
+ * @Param v The variable which is to be differentiated
+ * @Param vDash The variable in which the differentiated value is to be stored.
+ * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::delByDelX(string v, string vDash, string fluxType) {
+    for(int i = 0; i < ne_x; i++ )
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->delByDelX(v, vDash, fluxType);
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to operate the partial derivative of the variable w.r.t. y.
+ *
+ * @Param v The variable which is to be differentiated
+ * @Param vDash The variable in which the differentiated value is to be stored.
+ * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::delByDelY(string v, string vDash, string fluxType) {
+    for(int i = 0; i < ne_x; i++ )
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->delByDelY(v, vDash, fluxType);
+
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
