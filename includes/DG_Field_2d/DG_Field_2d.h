@@ -71,6 +71,10 @@ public:
 
     void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
 
+    void delByDelX(string v, string vDash, string fluxType);
+
+    void delByDelY(string v, string vDash, string fluxType);
+
     // Functions to apply linear operations on the variables.
     void axpy(double a, string x, string y);
     void scal(double a, string x);

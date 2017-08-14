@@ -44,7 +44,8 @@ protected:
     double* fluxMatrix_bottom; /// This would be the flux term for the the bottom edge.
     double* fluxMatrix_left; /// The Flux matrix for the left edge.
     double* inverseMassMatrix; /// The inverse of the mass matrix is also created only once in the field function. And just passed to each element.
-
+    double* transposeDerivateMatrix_x;
+    double* transposeDerivateMatrix_y;
     double* vanderMandMatrix; /// Both VanderMadn and its Inverse are created once in the DG Field and passed to each element.
     double* inverseVanderMandMatrix;
      
@@ -108,6 +109,10 @@ public:
     virtual void delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
 
     virtual void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+    
+    virtual void delByDelX(string v, string vDash, string fluxType);
+
+    virtual void delByDelY(string v, string vDash, string fluxType);
 
     // Functions to set the various operator matrices.
     void setMassMatrix(double* m);
@@ -120,6 +125,8 @@ public:
     void setBottomFluxMatrix(double* f);
     void setVanderMandMatrix(double* vm);
     void setInverseVanderMandMatrix(double* ivm);
+    void setTransposederivativeMatrix_x(double* id);
+    void setTransposederivativeMatrix_y(double* id);
 
     // Functions to apply linear operations on the variables.
     void axpy(double a, string x, string y);

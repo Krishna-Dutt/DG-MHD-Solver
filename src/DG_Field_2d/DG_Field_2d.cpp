@@ -11,6 +11,7 @@
 #include "../../includes/DG_BoundaryElement_2d/DG_BoundaryElement_2d.h"
 
 #include "../../includes/Utilities/Inverse.h"
+#include "../../includes/Utilities/Transpose.h"
 #include "../../includes/Utilities/DerivativeMatrix.h"
 #include "../../includes/Utilities/MassMatrix.h"
 #include "../../includes/Utilities/FluxMatrix.h"
@@ -104,6 +105,9 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     double* fluxMatrix_bottom = new double[(N+1)*(N+1)*(N+1)*(N+1)] ; /// This would be the flux term for the the bottom edge.
     double* fluxMatrix_left = new double[(N+1)*(N+1)*(N+1)*(N+1)] ; /// The Flux matrix for the left edge.
     double* massInverse = new double[(N+1)*(N+1)*(N+1)*(N+1)] ;
+    double *TansposederivativeMatrix_x = new double[(N+1)*(N+1)*(N+1)*(N+1)] ;  
+    double *TransposederivativeMatrix_y = new double[(N+1)*(N+1)*(N+1)*(N+1)] ;
+
     
     /// Calling functions to compute the entries of the matrix.
     
@@ -111,6 +115,8 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     inverse(massMatrix,massInverse,(N+1)*(N+1));
     twoDDerivativeMatrixX(derivativeMatrix_x, N);
     twoDDerivativeMatrixY(derivativeMatrix_y, N);
+    transpose(derivativeMatrix_x, TransposeDerivateMatrix_x, (N+1)*(N+1));
+    transpose(derivativeMatrix_y, TransposeDerivateMatrix_y, (N+1)*(N+1));
     
     twoDFluxMatrix3(fluxMatrix_top, N);
     twoDFluxMatrix2(fluxMatrix_right, N);
@@ -128,6 +134,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             elements[i][j]->setRightFluxMatrix(fluxMatrix_right);
             elements[i][j]->setLeftFluxMatrix(fluxMatrix_left);
             elements[i][j]->setBottomFluxMatrix(fluxMatrix_bottom);
+
+            elements[i][j]->setTransposederivateMatrix_x(TransposederivativeMatrix_x);
+            elements[i][j]->setTransposederivateMatrix_y(TransposederivativeMatrix_y);
+
         }
 
     
