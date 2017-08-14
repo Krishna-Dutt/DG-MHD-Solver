@@ -62,6 +62,10 @@ public:
 
         void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
 
+        void delByDelX(string v, string vDash, string fluxType);
+
+        void delByDelY(string v, string vDash, string fluxType);
+
         // Methods for handling Moment Limiter !!
         void limitMoments(string m, string modm, string cm, unsigned Index);
         double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);

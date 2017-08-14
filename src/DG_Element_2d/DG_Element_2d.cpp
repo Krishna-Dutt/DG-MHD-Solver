@@ -652,6 +652,7 @@ void DG_Element_2d::setNeighboringElement(char type, DG_Element_2d* neighbor) {
  *
  * @Param v         Variable which is to be differentiated.
  * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param conserVar Corresponding Conservative variable.
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
@@ -715,6 +716,7 @@ void DG_Element_2d::delByDelX(string v, string vDash, string conserVar, string f
  *
  * @Param v         Variable which is to be differentiated.
  * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param conserVar Corresponding Conservative variable.
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
@@ -768,6 +770,87 @@ void DG_Element_2d::delByDelY(string v, string vDash, string conserVar, string f
     }
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `x` and then store it in the
+ * variable `vDash`. The function also takes `fluxType` as an input which would describe the numerical scheme that
+ * should be used in order to obtain the derivative.
+ *
+ * @Param v         Variable which is to be differentiated.
+ * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param fluxType  The type of flux that is to be used. eg "central"
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::delByDelX(string v, string vDash, string fluxType) {
+    double dy = (y_end - y_start);
+    double dx = (x_end - x_start);
+    
+    if(fluxType == "central") {
+        double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+        double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
+        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        for(int i=0; i<=N; i++){
+            numericalFlux[i*(N+1)+N]    = 0.5*( *boundaryRight[v][i]    + *neighboringRight[v][i] ) ;   
+            numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
+        }
+        /// vDash = -0.5*dy*D*v
+        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, transposeDerivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+
+        /// Adding the numeical Flux terms as necessary.
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, fluxMatrix_right,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, fluxMatrix_left,    (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+
+        /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
+
+        delete[] numericalFlux;
+        delete[] auxillaryVariable;
+    }
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `y` and then store it in the
+ * variable `vDash`. The function also takes `fluxType` as an input which would describe the numerical scheme that
+ * should be used in order to obtain the derivative.
+ *
+ * @Param v         Variable which is to be differentiated.
+ * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param fluxType  The type of flux that is to be used. eg "central"
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::delByDelY(string v, string vDash, string fluxType) {
+    double dy = (y_end - y_start);
+    double dx = (x_end - x_start);
+
+    if(fluxType == "central") {
+        double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+        double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
+        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        for(int i=0; i<=N; i++){
+            numericalFlux[N*(N+1)+i]    = 0.5*( *boundaryTop[v][i]    + *neighboringTop[v][i] ) ;   
+            numericalFlux[i]            = 0.5*( *boundaryBottom[v][i]     + *neighboringBottom[v][i] ) ;  
+        }
+        /// vDash = -0.5*dy*D*v
+        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, transposeDerivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+
+        /// Adding the numeical Flux terms as necessary.
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, fluxMatrix_top,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, fluxMatrix_bottom,    (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+
+        /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
+        cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
+
+        delete[] numericalFlux;
+        delete[] auxillaryVariable;
+    }
+    
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -825,6 +908,31 @@ void DG_Element_2d::setderivateMatrix_x(double *d) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setderivateMatrix_y(double *d) {
     derivativeMatrix_y = d;
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to set the transpose of x-derivative matrix.
+ *
+ * @Param d The array of transpose of x-derivative matrix which is given as an input.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setTransposederivateMatrix_x(double *id) {
+    transposeDerivativeMatrix_x = id;
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to set the transpose of y-derivative matrix.
+ *
+ * @Param d The array of transpose of y-derivative matrix which is given as an input.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setTransposederivateMatrix_y(double *id) {
+    transposeDerivativeMatrix_y = id;
     return ;
 }
 
