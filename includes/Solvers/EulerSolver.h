@@ -73,6 +73,18 @@ public:
     void setConservativeVariables();
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis This is the function used to setup Gradients of Primitive Variables in the domain.
+     
+    /* ----------------------------------------------------------------------------*/
+    void setGradientPrimitiveVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to setup material properites in the domain.
+     
+    /* ----------------------------------------------------------------------------*/
+    void setMaterialPropertyVariables();
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis This is the function used to initialize the density field of the domain  
      *
      * @Param functionRho This is the function used to initialize the `q` density as an input.
@@ -199,6 +211,24 @@ public:
     */
     /* ----------------------------------------------------------------------------*/
     void updateInviscidFlux();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  set up Viscous Flux Variables in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setViscousFlux();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Viscous Flux Variables in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateViscousFlux();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update gradients of primitive Variables in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updatePrimitiveGradient();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  set up all auxillary Variables needed for performing RK, Time stepping.

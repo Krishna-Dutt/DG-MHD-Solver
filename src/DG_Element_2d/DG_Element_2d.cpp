@@ -1018,6 +1018,24 @@ void DG_Element_2d::setFunctionsForVariables(string w, string x, string y, funct
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable z to f(a, b, c, d).
+ *
+ * @Param a The first parameter of the function
+ * @Param b The second parameter of the function.
+ * @Param c The third parameter of the function.
+ * @Param d The third parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double)> f, string z) {
+    for(int i = 0 ; i < (N+1)*(N+1); i++)
+        variable[z][i] = f(variable[a][i],variable[b][i],variable[c][i], variable[d][i]);
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**

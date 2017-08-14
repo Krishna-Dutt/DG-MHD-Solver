@@ -30,12 +30,33 @@ void EulerSolver::setPrimitiveVariables(){
   return ;
 }
 
+void EulerSolver::setGradientPrimitiveVariables(){
+  field->addVariable_withoutBounary("dqdx");
+  field->addVariable_withoutBounary("dudx");
+  field->addVariable_withoutBounary("dvdx");
+  field->addVariable_withoutBounary("dPdx");
+  field->addVariable_withoutBounary("dTdx");
+
+  field->addVariable_withoutBounary("dqdy");
+  field->addVariable_withoutBounary("dudy");
+  field->addVariable_withoutBounary("dvdy");
+  field->addVariable_withoutBounary("dPdy");
+  field->addVariable_withoutBounary("dTdy");
+  return ;
+}
+
+
 void EulerSolver::setConservativeVariables(){
   field->addVariable_withBounary("qu");
   field->addVariable_withBounary("qv");
   field->addVariable_withBounary("qE");
   field->addVariable_withBounary("qe"); // Internal Energy, added just for ease of manipulating Energy, Remove later if not required !!
   field->addVariable_withBounary("KE"); // Kinetic Energy , " "
+  return ;
+}
+
+void EulerSolver::setMaterialPropertyVariables(){
+  field->addVariable_withoutBounary("meu");
   return ;
 }
 
@@ -127,6 +148,18 @@ double PressureE(double D, double e) {
   return D*e*(1.4 -1.0) ;
 }
 
+double NormalViscousStress(double meu, double x, double y) {
+  return meu * ((4.0/3.0)*x - (2.0/3.0)*y) ;
+}
+
+double TangentialViscousStress(double meu, double x, double y) {
+  return meu * ( x + y) ;
+}
+
+double EnergyViscous(double u, double uTau, double v, double vTau) {
+  return (u * uTau + v * vTau) ;
+}
+
 void EulerSolver::setXMomentum() {
   field->setFunctionsForVariables("q", "u", Product, "qu");
   return ;
@@ -205,9 +238,6 @@ void EulerSolver::setInviscidFlux() {
 }
 
 void EulerSolver::updateInviscidFlux() {
-  // Mass flux qu and qv already accounted for in the conservative Variables.
-  // Assuming, Requiring all Conservative and Primitive Variables have been updated !!
- // cout << " Calling updateInviscidFlux " << endl;
   field->setFunctionsForVariables("qu", "u", "P", MomentumFluxPressure, "quu_plus_P");
   field->setFunctionsForVariables("qv", "v", "P", MomentumFluxPressure, "qvv_plus_P");
   field->setFunctionsForVariables("qu", "v", MomentumFlux, "quv");
@@ -216,11 +246,45 @@ void EulerSolver::updateInviscidFlux() {
   return ;
 }
 
+void EulerSolver::setViscousFlux() {
+  field->addVariable_withBounary("Tauxx");
+  field->addVariable_withBounary("Tauxy");
+  field->addVariable_withBounary("Tauyy");
+  field->addVariable_withBounary("Eviscousx");
+  field->addVariable_withBounary("Eviscousy");
+
+  updateInviscidFlux();
+  return ;
+}
+
+void EulerSolver::updateViscousFlux() {
+  field->setFunctionsForVariables("meu", "dudx", "dvdy", NormalViscousStress, "Tauxx");
+  field->setFunctionsForVariables("meu", "dvdy", "dudx", NormalViscousStress, "Tauyy");
+  field->setFunctionsForVariables("meu", "dudy", "dvdx", TangentialViscousStress, "Tauxy");
+  field->setFunctionsForVariables("u", "Tauxx", "v", "Tauxy", EnergyViscous, "Eviscousx");
+  field->setFunctionsForVariables("u", "Tauxy", "v", "Tauyy", EnergyViscous, "Eviscousy");
+  return ;
+}
+
+void EulerSolver::updatePrimitiveGradient() {
+  field->delByDelX("q", "dqdx", "central");
+  field->delByDelX("u", "dudx", "central");
+  field->delByDelX("v", "dvdx", "central");
+  field->delByDelX("P", "dPdx", "central");
+  field->delByDelX("T", "dTdx", "central");
+
+  field->delByDelX("q", "dqdy", "central");
+  field->delByDelX("u", "dudy", "central");
+  field->delByDelX("v", "dvdy", "central");
+  field->delByDelX("P", "dPdy", "central");
+  field->delByDelX("T", "dTdy", "central");
+}
+
 void EulerSolver::setAuxillaryVariables() {
  // cout << " Calling setAuxillaryVariables " << endl;
   field->addVariable_withoutBounary("k1q");
-  field->addVariable_withoutBounary("dqudx");
-  field->addVariable_withoutBounary("dqvdy");
+  field->addVariable_withoutBounary("dbydx");
+  field->addVariable_withoutBounary("dbydy");
   field->addVariable_withoutBounary("k1qu");
   field->addVariable_withoutBounary("k1qv");
   field->addVariable_withoutBounary("k1qE");
@@ -232,6 +296,9 @@ void EulerSolver::setAuxillaryVariables() {
   field->addVariable_withoutBounary("k3qu");
   field->addVariable_withoutBounary("k3qv");
   field->addVariable_withoutBounary("k3qE");
+
+  field->addVariable_withBounary("xFlux");
+  field->addVariable_withBounary("yFlux");
   return ;
 }
 
@@ -255,12 +322,12 @@ void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) 
 
 void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
   //field->updateBoundaryVariables(Var);
-  field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
-  field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
+  field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K);
-  field->axpy(-1.0, "dqudx", K);
-  field->axpy(-1.0, "dqvdy", K);
+  field->axpy(-1.0, "dbydx", K);
+  field->axpy(-1.0, "dbydy", K);
   field->updateBoundaryVariables(Var);
   
   field->axpy(0.5*dt, K, Var);
@@ -270,12 +337,12 @@ void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
 
 void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
   //field->updateBoundaryVariables(Var);
-  field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
-  field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
+  field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K2);
-  field->axpy(-1.0, "dqudx", K2);
-  field->axpy(-1.0, "dqvdy", K2);
+  field->axpy(-1.0, "dbydx", K2);
+  field->axpy(-1.0, "dbydy", K2);
   field->updateBoundaryVariables(Var);
   
   field->axpy(-1.5*dt, K1, Var);
@@ -286,12 +353,12 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
 
 void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
   //field->updateBoundaryVariables(Var);
-  field->delByDelX(FluxX, "dqudx", Var, "rusanov", "u_plus_c");
-  field->delByDelY(FluxY, "dqvdy", Var, "rusanov", "v_plus_c");
+  field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
+  field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K3);
-  field->axpy(-1.0, "dqudx", K3);
-  field->axpy(-1.0, "dqvdy", K3);
+  field->axpy(-1.0, "dbydx", K3);
+  field->axpy(-1.0, "dbydy", K3);
   field->updateBoundaryVariables(Var);
   
   field->axpy((7.0/6.0)*dt, K1, Var);
@@ -319,11 +386,17 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Mass
     RK_Step1("q", "qu", "qv", "k1q");
     // X Momentum
-    RK_Step1("qu","quu_plus_P","quv","k1qu");
+    field->setFunctionsForVariables("quu_plus_P", "Tauxx", Add, "xFlux");
+    field->setFunctionsForVariables("quv", "Tauxy", Add, "yFlux");
+    RK_Step1("qu","xFlux","yFlux","k1qu");
     // Y Momentum
-    RK_Step1("qv","quv","qvv_plus_P","k1qv");
+    field->setFunctionsForVariables("quv", "Tauxy", Add, "xFlux");
+    field->setFunctionsForVariables("qvv_plus_P", "Tauyy", Add, "yFlux");
+    RK_Step1("qv","xFlux","yFlux","k1qv");
     // Energy
-    RK_Step1("qE","qE_plus_P_u","qE_plus_P_v","k1qE");
+    field->setFunctionsForVariables("qE_plus_P_u", "Eviscousx", Add, "xFlux");
+    field->setFunctionsForVariables("qE_plus_P_v", "Eviscousy", Add, "yFlux");
+    RK_Step1("qE","xFlux","yFlux","k1qE");
     
     RunShockDetector();
     RunLimiter();
@@ -339,11 +412,17 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Mass
     RK_Step2("q", "qu", "qv", "k1q", "k2q");
     // X Momentum
-    RK_Step2("qu","quu_plus_P","quv","k1qu", "k2qu");
+    field->setFunctionsForVariables("quu_plus_P", "Tauxx", Add, "xFlux");
+    field->setFunctionsForVariables("quv", "Tauxy", Add, "yFlux");
+    RK_Step2("qu","xFlux","yFlux","k1qu", "k2qu");
     // Y Momentum
-    RK_Step2("qv","quv","qvv_plus_P","k1qv", "k2qv");
+    field->setFunctionsForVariables("quv", "Tauxy", Add, "xFlux");
+    field->setFunctionsForVariables("qvv_plus_P", "Tauyy", Add, "yFlux");
+    RK_Step2("qv","xFlux","yFlux","k1qv", "k2qv");
     // Energy
-    RK_Step2("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE");
+    field->setFunctionsForVariables("qE_plus_P_u", "Eviscousx", Add, "xFlux");
+    field->setFunctionsForVariables("qE_plus_P_v", "Eviscousy", Add, "yFlux");
+    RK_Step2("qE","xFlux","yFlux","k1qE", "k2qE");
     
     RunShockDetector();
     RunLimiter();
@@ -358,11 +437,17 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Mass
     RK_Step3("q", "qu", "qv", "k1q", "k2q", "k3q");
     // X Momentum
-    RK_Step3("qu","quu_plus_P","quv","k1qu", "k2qu", "k3qu");
+    field->setFunctionsForVariables("quu_plus_P", "Tauxx", Add, "xFlux");
+    field->setFunctionsForVariables("quv", "Tauxy", Add, "yFlux");
+    RK_Step3("qu","xFlux","yFlux","k1qu", "k2qu", "k3qu");
     // Y Momentum
-    RK_Step3("qv","quv","qvv_plus_P","k1qv", "k2qv", "k3qv");
+    field->setFunctionsForVariables("quv", "Tauxy", Add, "xFlux");
+    field->setFunctionsForVariables("qvv_plus_P", "Tauyy", Add, "yFlux");
+    RK_Step3("qv","xFlux","yFlux","k1qv", "k2qv", "k3qv");
     // Energy
-    RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
+    field->setFunctionsForVariables("qE_plus_P_u", "Eviscousx", Add, "xFlux");
+    field->setFunctionsForVariables("qE_plus_P_v", "Eviscousy", Add, "yFlux");
+    RK_Step3("qE","xFlux","yFlux","k1qE", "k2qE", "k3qE");
  
     
    RunShockDetector();

@@ -862,6 +862,25 @@ void DG_Field_2d::setFunctionsForVariables(string w, string x, string y, functio
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable z to f(a, b, c, d).
+ *
+ * @Param a The first parameter of the function
+ * @Param b The second parameter of the function.
+ * @Param c The third parameter of the function.
+ * @Param d The third parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)> f, string z) {
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->setFunctionsForVariables(a, b, c, d, f, z);
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**

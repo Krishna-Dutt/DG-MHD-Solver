@@ -133,6 +133,7 @@ public:
     void scal(double a, string x);
     void setFunctionsForVariables(string x, string y, function<double(double, double)>, string z);
     void setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)>, string z);
+    void setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)>, string z);
 
     // Function to apply linear operation on variables stored only on Boundary points.
     void setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)>, string z);
