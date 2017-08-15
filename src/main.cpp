@@ -34,16 +34,19 @@ double IDensity(double x, double y) {
     return 1.0 ;
   }
   else {
-    return 0.125 ;
+    return 1.0 ;
   }
 }
 
 double IPressure(double x, double y) {
- if (x < 0.5) {
-    return 1.0 ;
+  if (x< 0.1) {
+      return 1000.0 ;
+  }
+  else if(x > 0.9) {
+      return 100.0 ;
   }
   else {
-    return 0.1 ;
+    return 0.01 ;
   }
 }
 
@@ -52,11 +55,14 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-   if (x < 0.5) {
-    return 1.0/R ;
+   if (x< 0.1) {
+      return 1000.0/R ;
+  }
+  else if(x > 0.9) {
+      return 100.0/R ;
   }
   else {
-    return 0.1/(R*0.125) ;
+    return 0.01/R ;
   }
 }
 
@@ -112,8 +118,8 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 0.5e-3;
-    int time_steps = 400;
+    double dt = 1e-5;
+    int time_steps = 1500;
     EulerSolver* a;
     a = new EulerSolver(200, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
@@ -130,11 +136,11 @@ int main() {
 
     a->setBoundaryCondtions("periodicY");
     //a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DSods_AV_Test.vtk");
+    a->plot("1DColella_AV_Test.vtk");
     
 
     delete a;

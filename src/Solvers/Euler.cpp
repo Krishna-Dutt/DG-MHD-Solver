@@ -170,7 +170,7 @@ double ArtificialViscosity( double x , double y) {
   double B1 = 6.0;
   double B2 = 20.5;
 
-  return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
+  return (Beta - 1.0)*(B1/B2)* x * (1.0/200) ;
   //return 0.0;
 }
 
@@ -418,7 +418,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step1("qE","xFlux","yFlux","k1qE");
     
     RunShockDetector();
-    RunLimiter();
+    //RunLimiter();
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P);
     updatePrimitiveVariables(T, P);
@@ -448,7 +448,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step2("qE","xFlux","yFlux","k1qE", "k2qE");
     
     RunShockDetector();
-    RunLimiter();
+    //RunLimiter();
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P); 
     updatePrimitiveVariables(T, P);
@@ -478,7 +478,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
  
     
    RunShockDetector();
-   RunLimiter();
+   //RunLimiter();
    //updatePrimitiveVariables(T, P);
    RunPositivityLimiter(T, P); 
    updatePrimitiveVariables(T, P);
