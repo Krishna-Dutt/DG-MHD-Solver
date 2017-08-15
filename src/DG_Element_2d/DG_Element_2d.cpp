@@ -127,6 +127,8 @@ void DG_Element_2d::Destroy_Matrices() {
     delete[] massMatrix;
     delete[] derivativeMatrix_x;
     delete[] derivativeMatrix_y;
+    delete[] transposeDerivateMatrix_x;
+    delete[] transposeDerivateMatrix_y;
     delete[] fluxMatrix_top;
     delete[] fluxMatrix_right;
     delete[] fluxMatrix_bottom;
@@ -795,7 +797,7 @@ void DG_Element_2d::delByDelX(string v, string vDash, string fluxType) {
             numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
         }
         /// vDash = -0.5*dy*D*v
-        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, transposeDerivateMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
         /// Adding the numeical Flux terms as necessary.
         cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, fluxMatrix_right,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
@@ -835,7 +837,7 @@ void DG_Element_2d::delByDelY(string v, string vDash, string fluxType) {
             numericalFlux[i]            = 0.5*( *boundaryBottom[v][i]     + *neighboringBottom[v][i] ) ;  
         }
         /// vDash = -0.5*dy*D*v
-        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, transposeDerivateMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+        cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
         /// Adding the numeical Flux terms as necessary.
         cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, fluxMatrix_top,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);

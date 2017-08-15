@@ -34,19 +34,16 @@ double IDensity(double x, double y) {
     return 1.0 ;
   }
   else {
-    return 1.0 ;
+    return 0.125 ;
   }
 }
 
 double IPressure(double x, double y) {
-  if (x< 0.1) {
-      return 1000.0 ;
-  }
-  else if(x > 0.9) {
-      return 100.0 ;
+ if (x < 0.5) {
+    return 1.0 ;
   }
   else {
-    return 0.01 ;
+    return 0.1 ;
   }
 }
 
@@ -55,14 +52,11 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-   if (x< 0.1) {
-      return 1000.0/R ;
-  }
-  else if(x > 0.9) {
-      return 100.0/R ;
+   if (x < 0.5) {
+    return 1.0/R ;
   }
   else {
-    return 0.01/R ;
+    return 0.1/(R*0.125) ;
   }
 }
 
@@ -118,13 +112,15 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-5;
-    int time_steps = 3800*1;
+    double dt = 0.5e-3;
+    int time_steps = 400;
     EulerSolver* a;
-    a = new EulerSolver(400, 1, 1);
+    a = new EulerSolver(200, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
+    a->setGradientPrimitiveVariables();
+    a->setMaterialPropertyVariables();
 
     a->setInitialVelocity(U, V);
     a->setInitialDensity(IDensity);
@@ -138,7 +134,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DCollela_N1_400_RK3_t1x3800_OutflowBC_Modified_RuntimeTest.vtk");
+    a->plot("1DSods_AV_Test.vtk");
     
 
     delete a;

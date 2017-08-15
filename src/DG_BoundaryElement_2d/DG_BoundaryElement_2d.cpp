@@ -440,7 +440,7 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string fluxType) {
 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), transposeDerivateMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
     //updateDirichlet(conserVar, RMatrix);
@@ -501,7 +501,7 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
     
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), transposeDerivateMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
+    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
     // Implementing Boundary Condition
     //updateDirichlet(conserVar, RMatrix);
