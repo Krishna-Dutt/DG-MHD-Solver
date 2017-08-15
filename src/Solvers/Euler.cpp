@@ -84,13 +84,13 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "periodic", "neumann", "periodic", "neumann");
-    setBoundary("qu", "periodic", "dirichlet", "periodic", "dirichlet");
-    setBoundary("qv", "periodic", "neumann", "periodic", "neumann");
-    setBoundary("qE", "periodic", "neumann", "periodic", "neumann");
-    setBoundary("u", "periodic", "dirichlet", "periodic", "dirichlet");
-    setBoundary("v", "periodic", "neumann", "periodic", "neumann");
-    setBoundary("P", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("q", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("qu", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("qv", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("qE", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("u", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("v", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("P", "neumann", "neumann", "neumann", "neumann");
 
     return ;
 }
@@ -167,10 +167,10 @@ double EnergyViscous(double u, double uTau, double v, double vTau) {
 
 double ArtificialViscosity( double x , double y) {
   double Beta = 1.5;
-  double B1 = 6.0;
-  double B2 = 20.5;
+  double B1 = 11.8;
+  double B2 = 74.0;
 
-  return (Beta - 1.0)*(B1/B2)* x * (1.0/200) ;
+  return (Beta - 1.0)*(B1/B2)* x * (1.0/400) ;
   //return 0.0;
 }
 
