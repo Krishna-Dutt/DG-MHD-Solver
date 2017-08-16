@@ -147,7 +147,7 @@ int main() {
     double dt = 0.5e-3;
     int time_steps = 500;
     EulerSolver* a;
-    a = new EulerSolver(100, 100, 2);
+    a = new EulerSolver(200, 200, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -166,7 +166,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("2DRP12_N2_AV_Test.vtk");
+    a->plot("2DRP12_N1_200_AV_Test.vtk");
     
 
     delete a;

@@ -31,17 +31,17 @@ void EulerSolver::setPrimitiveVariables(){
 }
 
 void EulerSolver::setGradientPrimitiveVariables(){
-  field->addVariable_withBounary("dqdx");
-  field->addVariable_withBounary("dudx");
-  field->addVariable_withBounary("dvdx");
-  field->addVariable_withBounary("dPdx");
-  field->addVariable_withBounary("dTdx");
+  field->addVariable_withoutBounary("dqdx");
+  field->addVariable_withoutBounary("dudx");
+  field->addVariable_withoutBounary("dvdx");
+  field->addVariable_withoutBounary("dPdx");
+  field->addVariable_withoutBounary("dTdx");
 
-  field->addVariable_withBounary("dqdy");
-  field->addVariable_withBounary("dudy");
-  field->addVariable_withBounary("dvdy");
-  field->addVariable_withBounary("dPdy");
-  field->addVariable_withBounary("dTdy");
+  field->addVariable_withoutBounary("dqdy");
+  field->addVariable_withoutBounary("dudy");
+  field->addVariable_withoutBounary("dvdy");
+  field->addVariable_withoutBounary("dPdy");
+  field->addVariable_withoutBounary("dTdy");
   return ;
 }
 
@@ -167,10 +167,10 @@ double EnergyViscous(double u, double uTau, double v, double vTau) {
 
 double ArtificialViscosity( double x , double y) {
   double Beta = 1.5;
-  double B1 = 11.8;
-  double B2 = 74.0;
+  double B1 = 6.0;
+  double B2 = 20.5;
 
-  return (Beta - 1.0)*(B1/B2)* x * (1.0/400) ;
+  return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
   //return 0.0;
 }
 
