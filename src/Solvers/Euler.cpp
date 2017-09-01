@@ -63,10 +63,10 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "periodic", "outflow", "periodic", "outflow");
+    setBoundary("q", "periodic", "neumann", "periodic", "neumann");
     setBoundary("qu", "periodic", "dirichlet", "periodic", "dirichlet");
-    setBoundary("qv", "periodic", "outflow", "periodic", "outflow");
-    setBoundary("qE", "periodic", "outflow", "periodic", "outflow");
+    setBoundary("qv", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("qE", "periodic", "neumann", "periodic", "neumann");
     /*setBoundary("u", "periodic", "dirichlet", "periodic", "dirichlet");
     setBoundary("v", "periodic", "neumann", "periodic", "neumann");
     setBoundary("P", "periodic", "neuamnn", "periodic", "neumann");*/
@@ -392,12 +392,6 @@ void EulerSolver::SetShockDetectorVariables() {
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered("CellMarker");
     field->addVariable_withBounary("CellMarkerGlobal");
-    /*
-    field->addVariable_CellCentered("VariableMax");
-    field->addVariable_CellCentered("OutFlowSize");
-    field->addVariable_CellCentered("OutFlowFlux");
-    field->addVariable_CellCentered("Radius");
-    */
   }
 
   return ;

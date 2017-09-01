@@ -323,6 +323,9 @@ void DG_Element_2d::checkPositivity(string v, string cm, string level) {
             if (variable[v][i] < 0.0) {
                 PositivityMarker = true;
                 *variable[cm] = 2.0;
+                for(int b=0; b <(N+1)*(N+1); ++b) {
+                    variable["CellMarkerGlobal"][b] = *variable[cm];
+                }
                 return ;
             }
         }
@@ -420,6 +423,7 @@ if (*variable[cm] && PositivityMarker)
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
+    double epsilon = 1e-13;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
 
     
@@ -428,7 +432,7 @@ if (*variable[cm] && PositivityMarker)
 
     for(i=Index; i > 0; i = i - (N+2)) {
      --count;
-     AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+     //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
      for(j=0; j < count; ++j) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
@@ -436,7 +440,7 @@ if (*variable[cm] && PositivityMarker)
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
+       if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -453,7 +457,7 @@ if (*variable[cm] && PositivityMarker)
        Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
        
-       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
+       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }

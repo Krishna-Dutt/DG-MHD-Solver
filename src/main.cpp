@@ -11,43 +11,74 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if (x < 0.5) {
-    return 0.0;
-  }
-  else {
-    return 0.0;
-  }
+  return 0.0 ;
 }
 
 double V(double x, double y) {
-  if (x < 0.5) {
-    return 0.0;
-  }
-  else {
-    return 0.0;
-  }
+  return 0.0 ;
 }
 
 
 double IDensity(double x, double y) {
-  if (x < 0.5) {
+  if (x <= 0.5) {
     return 1.0 ;
   }
   else {
     return 1.0 ;
   }
+
+  /*
+  if (x < 0.2) {
+    return 3.0 ;
+  }
+  else if ( x > 0.75) {
+    return 0.125 ;
+  }
+  else {
+    return 3.0 + (1.0-3.0)*(x - 0.2)/(0.3) ;
+  }
+  */
+
+  /*
+  if ( abs(x) <= 0.5 && abs(y) <= 0.5) {
+    return 5.0 ;
+  }
+  else {
+    return 1.0 ;
+  }
+  */
 }
 
 double IPressure(double x, double y) {
-  if (x< 0.1) {
-      return 1000.0 ;
+  if (x <= 0.1) {
+    return 1000.0 ;
   }
-  else if(x > 0.9) {
-      return 100.0 ;
+  else if (x > 0.9) {
+    return 100.0 ;
   }
   else {
     return 0.01 ;
   }
+  /*
+  if (x < 0.2) {
+    return 3.0 ;
+  }
+  else if ( x > 0.75) {
+    return 0.1 ;
+  }
+  else {
+    return 3.0 + (1.0-3.0)*(x - 0.2)/(0.3) ;
+  }
+  */
+
+  /*
+  if ( abs(x) <= 0.5 && abs(y) <= 0.5) {
+    return 1.0 ;
+  }
+  else {
+    return 1.0 ;
+  }
+  */
 }
 
 double StateEq(double D, double T) {
@@ -119,9 +150,9 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 1e-5;
-    int time_steps = 3800*1;
+    int time_steps = 2*1900;
     EulerSolver* a;
-    a = new EulerSolver(400, 1, 1);
+    a = new EulerSolver(200, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -138,7 +169,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("1DCollela_N1_400_RK3_t1x3800_OutflowBC_Modified_RuntimeTest.vtk");
+    a->plot("LiliaMomentLimiter_Test.vtk");
     
 
     delete a;
