@@ -24,40 +24,47 @@ double IDensity(double x, double y) {
     return 1.0 ;
   }
   else {
-    return 1.0 ;
+    return 0.125 ;
   }
 
-  /*
-  if (x < 0.2) {
+  
+  /*if (x < 0.2) {
     return 3.0 ;
   }
   else if ( x > 0.75) {
-    return 0.125 ;
+    return 0.00125 ;
+  }
+  else if ( x > 0.5 ) {
+    return 1.0 ;
   }
   else {
     return 3.0 + (1.0-3.0)*(x - 0.2)/(0.3) ;
-  }
-  */
+  }*/
+  
 
-  /*
-  if ( abs(x) <= 0.5 && abs(y) <= 0.5) {
+  
+  /*if ( abs(x) <= 0.5 && abs(y) <= 0.5) {
     return 5.0 ;
   }
   else {
     return 1.0 ;
+  }*/
+
+  /*if ( x >= 0.25*y) {
+    return 1.0 ;
   }
-  */
+  else {
+    return 0.125;
+  }*/
+  
 }
 
 double IPressure(double x, double y) {
-  if (x <= 0.1) {
-    return 1000.0 ;
-  }
-  else if (x > 0.9) {
-    return 100.0 ;
+  if (x <= 0.5) {
+    return 1.0;
   }
   else {
-    return 0.01 ;
+    return 0.1;
   }
   /*
   if (x < 0.2) {
@@ -66,19 +73,29 @@ double IPressure(double x, double y) {
   else if ( x > 0.75) {
     return 0.1 ;
   }
+  else if ( x > 0.5 ) {
+    return 1.0 ;
+  }
   else {
     return 3.0 + (1.0-3.0)*(x - 0.2)/(0.3) ;
-  }
-  */
+  }*/
+  
 
-  /*
-  if ( abs(x) <= 0.5 && abs(y) <= 0.5) {
+  
+  /*if ( abs(x) <= 0.5 && abs(y) <= 0.5) {
     return 1.0 ;
   }
   else {
     return 1.0 ;
+  }*/
+  /* if ( x >= 0.25*y) {
+    return 1.0 ;
   }
-  */
+  else {
+    return 0.125;
+  }*/
+
+  
 }
 
 double StateEq(double D, double T) {
@@ -149,8 +166,8 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 1e-5;
-    int time_steps = 2*1900;
+    double dt = 0.5e-3;
+    int time_steps = 2*200;
     EulerSolver* a;
     a = new EulerSolver(200, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
@@ -168,7 +185,7 @@ int main() {
     a->SetLimiter("LiliaMoment");
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
-    a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
+    a->FindL2Norm(AnalyticalDensity, IPressure);
     a->plot("LiliaMomentLimiter_Test.vtk");
     
 

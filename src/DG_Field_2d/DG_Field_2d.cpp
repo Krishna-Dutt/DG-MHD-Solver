@@ -146,6 +146,23 @@ void DG_Field_2d::setVanderMandMatrix() {
   twoDVanderMandLegendre(vanderMand, N);
   inverse(vanderMand, inverseVanderMand, (N+1)*(N+1));
 
+  // Printing both matrices 
+ /* cout << "Vander Mand Matrix  :: \n";
+  for ( int i=0; i < (N+1)*(N+1) ; ++i) {
+      for (int j=0; j < (N+1)*(N+1); ++j) {
+          cout << vanderMand[i*(N+1)*(N+1) + j] << " : ";
+      }
+      cout << "\n";
+  }
+
+  cout << "Inverse Vander Mand Matrix  :: \n";
+  for ( int i=0; i < (N+1)*(N+1) ; ++i) {
+      for (int j=0; j < (N+1)*(N+1); ++j) {
+          cout << inverseVanderMand[i*(N+1)*(N+1) + j] << " : ";
+      }
+      cout << "\n";
+  }*/
+
   for (int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
      elements[i][j]->setVanderMandMatrix(vanderMand);

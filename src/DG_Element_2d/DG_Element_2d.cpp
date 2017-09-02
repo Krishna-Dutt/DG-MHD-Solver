@@ -430,6 +430,13 @@ if (*variable[cm] && PositivityMarker)
     // Ensuring that Cell avergae remains the  same after limiting !!
     variable[modm][0] = variable[m][0];
 
+    if ( N == 1) {
+        epsilon = 0.0 ;
+    }
+    else {
+        epsilon = 1e-13;
+    }
+
     for(i=Index; i > 0; i = i - (N+2)) {
      --count;
      //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
