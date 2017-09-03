@@ -36,7 +36,7 @@ double MinMod(vector<double> A) {
   double Min = abs(A[0]);
   for(int i=1; i<A.size(); ++i) {
     Min = min(abs(A[i]), Min);
-    //if (Signum(A[i]) != Sign) return 0.0 ;
+    if (Signum(A[i]) != Sign) return 0.0 ;
   }
 
   return Min*Sign;

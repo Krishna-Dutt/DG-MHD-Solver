@@ -434,7 +434,7 @@ if (*variable[cm] && PositivityMarker)
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-13;
+        epsilon = 1e-16;
     }
 
     for(i=Index; i > 0; i = i - (N+2)) {

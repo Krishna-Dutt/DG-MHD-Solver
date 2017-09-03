@@ -436,7 +436,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-13;
+        epsilon = 1e-16;
     }
 
     for(i=Index; i > 0; i = i - (N+2)) {
@@ -502,21 +502,25 @@ double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, 
     double epsilon = 1e-13;
 
     Elements.push_back(variable[m][Index]);
-    if (R != this)// && abs(R->variable[m][Index-1]) > epsilon ) 
+    if (R != this ) //&& abs(R->variable[m][Index]) > epsilon ) 
     {
         Elements.push_back(Alpha*(R->variable[m][Index-1] -variable[m][Index-1]));
+       // Elements.push_back((R->variable[m][Index]));
     } 
-    if (L != this )// && abs(L->variable[m][Index-1]) > epsilon )
+    if (L != this  ) //&& abs(L->variable[m][Index]) > epsilon )
      {
         Elements.push_back(Alpha*(variable[m][Index-1] - L->variable[m][Index-1]));
+       // Elements.push_back((L->variable[m][Index]));
     } 
-    if (T != this )// && abs(T->variable[m][Index -(N+1)]) > epsilon )
+    if (T != this ) //&& abs(T->variable[m][Index]) > epsilon )
      {
         Elements.push_back(Alpha*(T->variable[m][Index-(N+1)] -variable[m][Index-(N+1)]));
+        //Elements.push_back((T->variable[m][Index]));
     } 
-    if (B != this )// && abs(B->variable[m][Index -(N+1)]) > epsilon )
+    if (B != this ) //&& abs(B->variable[m][Index]) > epsilon )
      {
         Elements.push_back(Alpha*(variable[m][Index-(N+1)] - B->variable[m][Index-(N+1)]));
+        // Elements.push_back((B->variable[m][Index]));
     } 
     
     return MinMod(Elements);
