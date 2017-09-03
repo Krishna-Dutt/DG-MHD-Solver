@@ -11,7 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
-  return 0.0 ;
+  return 1.0 ;
 }
 
 double V(double x, double y) {
@@ -167,10 +167,10 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 0.5e-3;
-    int time_steps = 1*1;
+    int time_steps = 1*1000;
     EulerSolver* a;
-    a = new EulerSolver(5, 5, 2);
-    a->setDomain(0.0, 0.0, 1.0, 1.0);
+    a = new EulerSolver(10, 10, 2);
+    a->setDomain(-1.0, -1.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
 

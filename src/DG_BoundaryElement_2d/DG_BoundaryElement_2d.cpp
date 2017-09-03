@@ -515,7 +515,7 @@ double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, 
     if (T != this ) //&& abs(T->variable[m][Index]) > epsilon )
      {
         Elements.push_back(Alpha*(T->variable[m][Index-(N+1)] -variable[m][Index-(N+1)]));
-        //Elements.push_back((T->variable[m][Index]));
+       // Elements.push_back((T->variable[m][Index]));
     } 
     if (B != this ) //&& abs(B->variable[m][Index]) > epsilon )
      {

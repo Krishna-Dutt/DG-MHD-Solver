@@ -16,14 +16,14 @@ double Signum(double x) {
 }
 
 double MinMod(double a, double b, double c) {
-  if ( Signum(a) == Signum(b) && Signum(b) == Signum(c) ) 
+ // if ( Signum(a) == Signum(b) && Signum(b) == Signum(c) ) 
   return (MIN(fabs(a), fabs(b), fabs(c))) * Signum(a);
   
   return 0.0 ;
 }
 
 double MinMod(double a, double b, double c, double d, double e) {
-  if ( Signum(a) == Signum(b) && Signum(b) == Signum(c) && Signum(c) == Signum(d) && Signum(d) == Signum(e) ) 
+ // if ( Signum(a) == Signum(b) && Signum(b) == Signum(c) && Signum(c) == Signum(d) && Signum(d) == Signum(e) ) 
     return (MIN(fabs(a), fabs(b), fabs(c), fabs(d), fabs(e))) * Signum(a);
 
   return 0.0 ;
@@ -36,7 +36,7 @@ double MinMod(vector<double> A) {
   double Min = abs(A[0]);
   for(int i=1; i<A.size(); ++i) {
     Min = min(abs(A[i]), Min);
-    if (Signum(A[i]) != Sign) return 0.0 ;
+   // if (Signum(A[i]) != Sign) return 0.0 ;
   }
 
   return Min*Sign;

@@ -63,13 +63,13 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qu", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qv", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qE", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("q", "periodic", "periodic", "periodic", "periodic");
+    setBoundary("qu", "periodic", "periodic", "periodic", "periodic");
+    setBoundary("qv", "periodic", "periodic", "periodic", "periodic");
+    setBoundary("qE", "periodic", "periodic", "periodic", "periodic");
     /*setBoundary("u", "periodic", "dirichlet", "periodic", "dirichlet");
-    setBoundary("v", "periodic", "neumann", "neumann", "neumann");
-    setBoundary("P", "neumann", "neuamnn", "neumann", "neumann");*/
+    setBoundary("v", "periodic", "periodic", "periodic", "periodic");
+    setBoundary("P", "periodic", "neuamnn", "periodic", "periodic");*/
 
     return ;
 }
@@ -317,7 +317,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     updateEigenValues(SoundSpeed);
     
     // Mass
-   /* RK_Step1("q", "qu", "qv", "k1q");
+    RK_Step1("q", "qu", "qv", "k1q");
     // X Momentum
     RK_Step1("qu","quu_plus_P","quv","k1qu");
     // Y Momentum
@@ -363,12 +363,12 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RK_Step3("qv","quv","qvv_plus_P","k1qv", "k2qv", "k3qv");
     // Energy
     RK_Step3("qE","qE_plus_P_u","qE_plus_P_v","k1qE", "k2qE", "k3qE");
-*/
+
     
    RunShockDetector();
    RunLimiter();
    //updatePrimitiveVariables(T, P);
-  // RunPositivityLimiter(T, P); 
+   RunPositivityLimiter(T, P); 
    updatePrimitiveVariables(T, P);
    
     
