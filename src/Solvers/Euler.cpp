@@ -67,9 +67,9 @@ void EulerSolver::setBoundaryCondtions(string type) {
     setBoundary("qu", "neumann", "neumann", "neumann", "neumann");
     setBoundary("qv", "neumann", "neumann", "neumann", "neumann");
     setBoundary("qE", "neumann", "neumann", "neumann", "neumann");
-    /*setBoundary("u", "periodic", "dirichlet", "periodic", "dirichlet");
-    setBoundary("v", "periodic", "periodic", "periodic", "periodic");
-    setBoundary("P", "periodic", "neuamnn", "periodic", "periodic");*/
+    /*setBoundary("u", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("v", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("P", "neumann", "neumann", "neumann", "neumann");*/
 
     return ;
 }

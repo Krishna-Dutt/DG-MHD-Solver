@@ -499,10 +499,10 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
 /* ----------------------------------------------------------------------------*/
 double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
     vector<double> Elements;
-    double epsilon = 1e-13;
+    double epsilon = 1e-16;
 
     Elements.push_back(variable[m][Index]);
-    if (R != this )//&& abs(R->variable[m][Index]) > epsilon ) 
+    if (R != this)// && abs(R->variable[m][Index]) > epsilon ) 
     {
         Elements.push_back(Alpha*(R->variable[m][Index-1] -variable[m][Index-1]));
        // Elements.push_back((R->variable[m][Index]));
@@ -517,7 +517,7 @@ double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, 
         Elements.push_back(Alpha*(T->variable[m][Index-(N+1)] -variable[m][Index-(N+1)]));
        // Elements.push_back((T->variable[m][Index]));
     } 
-    if (B != this )//&& abs(B->variable[m][Index]) > epsilon )
+    if (B != this)// && abs(B->variable[m][Index]) > epsilon )
      {
         Elements.push_back(Alpha*(variable[m][Index-(N+1)] - B->variable[m][Index-(N+1)]));
         // Elements.push_back((B->variable[m][Index]));
@@ -642,14 +642,14 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
 
     cblas_dcopy((N+1)*(N+1), AuxVariable, 1, variable[v], 1);
 
-  /* for (int i=0; i< (N+1)*(N+1); ++i) {
+   for (int i=0; i< (N+1)*(N+1); ++i) {
       if (variable[v][i] < *variable["Min"]) {
           variable[v][i] = *variable["Min"] ;
       }
       else if (variable[v][i] > *variable["Max"]) {
           variable[v][i] = *variable["Max"] ;
       }
-  }*/
+  }
     
     delete[] AuxVariable;
   
