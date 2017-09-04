@@ -365,15 +365,16 @@ void DG_Element_2d::resetPositivity() {
 void DG_Element_2d::computeMoments(string v, string m) {
   /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
-
-// Additional filter to set values less than 1e-8 to zero !!, Recheck /Temporary
-/*
-  for (int i=0; i <(N+1)*(N+1); ++i) {
-      if (abs(variable[m][i]) <= 1e-7) {
-          variable[m][i] = 0.0;
-      }
+  
+  *variable["Min"] = variable[v][0];
+  *variable["Max"] = variable[v][0];
+  for (int i=1; i< (N+1)*(N+1); ++i) {
+      *variable["Min"] = min(*variable["Min"], variable[v][i]);
+      *variable["Max"] = max(*variable["Max"], variable[v][i]);
   }
-*/
+  /*for(int b=0; b <(N+1)*(N+1); ++b) {
+                    variable["CellMarkerGlobal"][b] = *variable["Min"];
+  }*/
   return ;
 }
 
@@ -392,12 +393,17 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
  if (*variable[cm] && PositivityMarker)
-  { // Checking if cell marker is not equal to zero
-  //cout << "Calling :: convertMomentToVariable()\n";
-  
-  
+  { 
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
   
+  for (int i=0; i< (N+1)*(N+1); ++i) {
+      if (variable[v][i] < *variable["Min"]) {
+          variable[v][i] = *variable["Min"] ;
+      }
+      else if (variable[v][i] > *variable["Max"]) {
+          variable[v][i] = *variable["Max"] ;
+      }
+  }
 
   }
 
