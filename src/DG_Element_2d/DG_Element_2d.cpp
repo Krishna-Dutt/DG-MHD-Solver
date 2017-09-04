@@ -396,14 +396,14 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   { 
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
   
-  for (int i=0; i< (N+1)*(N+1); ++i) {
+ /* for (int i=0; i< (N+1)*(N+1); ++i) {
       if (variable[v][i] < *variable["Min"]) {
           variable[v][i] = *variable["Min"] ;
       }
       else if (variable[v][i] > *variable["Max"]) {
           variable[v][i] = *variable["Max"] ;
       }
-  }
+  }*/
 
   }
 
