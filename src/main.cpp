@@ -20,12 +20,12 @@ double V(double x, double y) {
 
 
 double IDensity(double x, double y) {
-  /*if (x <= 0.5) {
+  if (x <= 0.5) {
     return 1.0 ;
   }
   else {
     return 0.125 ;
-  }*/
+  }
 
   
   /*if (x < 0.2) {
@@ -50,22 +50,22 @@ double IDensity(double x, double y) {
     return 1.0 ;
   }*/
 
-  if ( (x-0.5) >= 0.25*(y-0.5)) {
+ /* if ( (x-0.5) >= 0.25*(y-0.5)) {
     return 1.0 ;
   }
   else {
     return 0.125;
-  }
+  }*/
   
 }
 
 double IPressure(double x, double y) {
-  /*if (x <= 0.5) {
+  if (x <= 0.5) {
     return 1.0;
   }
   else {
     return 0.1;
-  }*/
+  }
   /*
   if (x < 0.2) {
     return 3.0 ;
@@ -88,12 +88,12 @@ double IPressure(double x, double y) {
   else {
     return 1.0 ;
   }*/
-   if ((x-0.5) >= 0.25*(y-0.5)) {
+  /* if ((x-0.5) >= 0.25*(y-0.5)) {
     return 1.0 ;
   }
   else {
     return 0.125;
-  }
+  }*/
 
   
 }
@@ -166,13 +166,13 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 0.5e-3;
-    int time_steps = 2*200;
+    //double dt = 0.5e-3;
+    //int time_steps = 2*200;
     double CFL = 0.2;
-    double time = 1.0;
+    double time = 0.2;
     EulerSolver* a;
-    a = new EulerSolver(100, 100, 2);
-    a->setDomain(0.0, 0.0, 2.0, 2.0);
+    a = new EulerSolver(200, 1, 1);
+    a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
 
@@ -188,7 +188,7 @@ int main() {
     a->setSolver(CFL, time);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(IDensity, AnalyticalVelocity);
-    a->plot("LiliaMomentLimiter_Test_N2.vtk");
+    a->plot("1D_AdaptiveTimeTest.vtk");
     
 
     delete a;

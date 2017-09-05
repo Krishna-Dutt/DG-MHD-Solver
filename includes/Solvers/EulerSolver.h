@@ -14,6 +14,7 @@ private:
     double time;
     double CFL;
     double dt;
+    double dx;
     int no_of_time_steps;
 
     string ShockDetector;
@@ -267,6 +268,13 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void setSolver(double _CFL, double _time);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is find the timestep.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void setTimeStep();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function does all the main functionalitites of the solver. This must be called in order to solve

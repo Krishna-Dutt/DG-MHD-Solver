@@ -56,6 +56,7 @@ protected:
 public:
 
     double *X, *Y;
+    double dxMin, dyMin ;
     map<string, double*> variable; /// This is the map which would contain all the variable that are needed by the problem.
 
     map<string, double**> boundaryTop;
@@ -134,6 +135,9 @@ public:
 
     // Functions to do various other operations on the elements.
     double l2Norm(string v1, string v2);
+
+    // Misc. Functions on for global field data 
+    double FindMax(string v);
 
     // Virtual Function for Polymorphic behaviour
     virtual void assignBoundary(string v, string type, char b);

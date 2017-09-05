@@ -50,6 +50,9 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
         }
     }
 
+    dxMin = abs(X[0]-X[1]);
+    dyMin = abs(Y[0]-Y[N+1]);
+
     delete[] nodes;
 
     massMatrix = NULL;
@@ -1031,7 +1034,19 @@ double DG_Element_2d::l2Norm(string v1, string v2) {
     delete[] diff;
     return norm2;
 }
-
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the maximum value in the Field .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Element_2d::FindMax(string v) {
+    double Max = variable[v][0]; 
+    for(int i = 0; i < (N+1)*(N+1); i++)
+            Max = max(variable[v][i], Max);
+    return Max;
+}
 /* ----------------------------------------------------------------------------*/
 //--------------------------VIRTUAL FUNCTIONS----------------------------------//
 /*-----------------------------------------------------------------------------*/

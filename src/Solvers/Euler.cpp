@@ -63,10 +63,10 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qu", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qv", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qE", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("q", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("qu", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("qv", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("qE", "periodic", "neumann", "periodic", "neumann");
     /*setBoundary("u", "neumann", "neumann", "neumann", "neumann");
     setBoundary("v", "neumann", "neumann", "neumann", "neumann");
     setBoundary("P", "neumann", "neumann", "neumann", "neumann");*/
@@ -75,8 +75,11 @@ void EulerSolver::setBoundaryCondtions(string type) {
 }
 
 void EulerSolver::setSolver(double _CFL, double _time) {
-   CFL = CFL;
+   CFL = _CFL;
    time = _time;
+   dx = field->FindMindx();
+  // cout << "dx : " << dx << "\n" << "CFL : " << CFL;
+
     return ;
 }
 
@@ -302,8 +305,10 @@ void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, st
 }
 
 void EulerSolver::setTimeStep() {
-  double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
-  
+  //double dx = field->FindMindx();
+  double speed;
+  speed = max(field->FindMax("u_plus_c"),field->FindMax("v_plus_c"));
+  dt = CFL * dx/speed;
   return ;
 }
 
@@ -325,6 +330,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     updateEigenValues(SoundSpeed);
     if ( count%20 == 0) {
       setTimeStep();
+      cout << "Time Step : " << dt << "\n"; 
       count = 0;
     }
     
@@ -383,8 +389,6 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    RunPositivityLimiter(T, P); 
    updatePrimitiveVariables(T, P);
    
-    
-  
    t += dt; 
    count += 1;       
     }

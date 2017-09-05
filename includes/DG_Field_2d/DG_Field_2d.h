@@ -86,6 +86,10 @@ public:
     // Function to check Positivity of data stored in cell .
     void checkPositivity(string v, string cm, string level);
     void resetPositivity();
+
+    // Misc. Functions on for global field data 
+    double FindMax(string v);
+    double FindMindx();
 };
 
 #endif

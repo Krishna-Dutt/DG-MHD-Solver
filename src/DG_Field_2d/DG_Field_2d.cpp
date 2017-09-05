@@ -949,3 +949,30 @@ void DG_Field_2d::resetPositivity() {
     return;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the maximum value in the Field .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Field_2d::FindMax(string v) {
+    double Max = elements[0][0]->FindMax(v); 
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            Max = max(elements[i][j]->FindMax(v), Max);
+    return Max;
+}
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dx in the field.
+ *
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Field_2d::FindMindx() {
+    double Min = min(elements[0][0]->dxMin, elements[0][0]->dyMin) ; 
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            Min = min(min(elements[i][j]->dxMin, elements[i][j]->dyMin), Min);
+    return Min;
+}
