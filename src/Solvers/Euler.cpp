@@ -74,9 +74,10 @@ void EulerSolver::setBoundaryCondtions(string type) {
     return ;
 }
 
-void EulerSolver::setSolver(double _CFL, double _time) {
+void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
    CFL = _CFL;
    time = _time;
+   no_of_time_steps = _no_of_time_steps;
    dx = field->FindMindx();
   // cout << "dx : " << dx << "\n" << "CFL : " << CFL;
 
@@ -328,9 +329,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
-    if ( count%20 == 0) {
+
+    if ( count%no_of_time_steps == 0) {
       setTimeStep();
-      cout << "Time Step : " << dt << "\n"; 
+      cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
       count = 0;
     }
     

@@ -167,11 +167,11 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    //int time_steps = 2*200;
+    int time_steps = 20;
     double CFL = 0.2;
     double time = 0.2;
     EulerSolver* a;
-    a = new EulerSolver(200, 1, 1);
+    a = new EulerSolver(100, 1, 2);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -185,7 +185,7 @@ int main() {
     a->setBoundaryCondtions("periodicY");
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
-    a->setSolver(CFL, time);
+    a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(IDensity, AnalyticalVelocity);
     a->plot("1D_AdaptiveTimeTest.vtk");

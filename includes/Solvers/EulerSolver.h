@@ -265,9 +265,10 @@ public:
      *
      * @Param _CFL CFL
      * @Param _time Evolution time.
+     * @Param _no_of_time_steps No of time steps to find dt
      */
     /* ----------------------------------------------------------------------------*/
-    void setSolver(double _CFL, double _time);
+    void setSolver(double _CFL, double _time, int _no_of_time_steps);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is find the timestep.
