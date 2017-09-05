@@ -168,6 +168,8 @@ int main() {
     clock_t tstart = clock();
     double dt = 0.5e-3;
     int time_steps = 2*200;
+    double CFL = 0.2;
+    double time = 1.0;
     EulerSolver* a;
     a = new EulerSolver(100, 100, 2);
     a->setDomain(0.0, 0.0, 2.0, 2.0);
@@ -183,7 +185,7 @@ int main() {
     a->setBoundaryCondtions("periodicY");
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
-    a->setSolver(dt, time_steps);
+    a->setSolver(CFL, time);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(IDensity, AnalyticalVelocity);
     a->plot("LiliaMomentLimiter_Test_N2.vtk");

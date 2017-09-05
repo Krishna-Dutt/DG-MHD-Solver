@@ -12,6 +12,7 @@ private:
     double x1, y1, x2, y2;
     DG_Field_2d* field;
     double time;
+    double CFL;
     double dt;
     int no_of_time_steps;
 
@@ -261,12 +262,11 @@ public:
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
      *
-     * @Param _dt The time step for each iteration.
-     * @Param _no_of_time_steps The number of time steps that must be used which is also the number of time iterations that must
-     * be performed
+     * @Param _CFL CFL
+     * @Param _time Evolution time.
      */
     /* ----------------------------------------------------------------------------*/
-    void setSolver(double _dt, double _no_of_time_steps);
+    void setSolver(double _CFL, double _time);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function does all the main functionalitites of the solver. This must be called in order to solve

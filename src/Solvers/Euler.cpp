@@ -74,9 +74,9 @@ void EulerSolver::setBoundaryCondtions(string type) {
     return ;
 }
 
-void EulerSolver::setSolver(double _dt, double _no_of_time_steps) {
-    dt = _dt;
-    no_of_time_steps = _no_of_time_steps;
+void EulerSolver::setSolver(double _CFL, double _time) {
+   CFL = CFL;
+   time = _time;
     return ;
 }
 
@@ -237,9 +237,9 @@ void EulerSolver::setAuxillaryVariables() {
 
 void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
  // cout << "Calling setEigenValues " << endl;
-  field->addVariable_onlyBounary("c");
-  field->addVariable_onlyBounary("u_plus_c");
-  field->addVariable_onlyBounary("v_plus_c");// Recheck formulation of eigen value !!
+  field->addVariable_withBounary("c");
+  field->addVariable_withBounary("u_plus_c");
+  field->addVariable_withBounary("v_plus_c");// Recheck formulation of eigen value !!
 
   updateEigenValues(SoundSpeed);
   return ;
@@ -247,9 +247,9 @@ void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
 
 void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) {
  // cout << " Calling updateEigenValues " << endl;
-  field->setFunctionsForBoundaryVariables("q", "P", SoundSpeed, "c");
-  field->setFunctionsForBoundaryVariables("u", "c", ModulusAdd, "u_plus_c");
-  field->setFunctionsForBoundaryVariables("v", "c", ModulusAdd, "v_plus_c");
+  field->setFunctionsForVariables("q", "P", SoundSpeed, "c");
+  field->setFunctionsForVariables("u", "c", ModulusAdd, "u_plus_c");
+  field->setFunctionsForVariables("v", "c", ModulusAdd, "v_plus_c");
   return ;
 }
 
@@ -301,20 +301,32 @@ void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, st
   return;
 }
 
+void EulerSolver::setTimeStep() {
+  double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
+  
+  return ;
+}
+
 
 void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<double(double,double)> T, function<double(double,double)> P, function<double(double,double,double)> IE) {
   // Requires all Primitive and Conservative Variables to be setup and initialised.
+  double t = 0.0;
+  int count = 0;
   setAuxillaryVariables();
   setInviscidFlux();
   setEigenValues(SoundSpeed);
 
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
-  for(int i=0; i < no_of_time_steps; i++) {
+  while(t <= time) {
     // First Step of RK3
     
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
+    if ( count%20 == 0) {
+      setTimeStep();
+      count = 0;
+    }
     
     // Mass
     RK_Step1("q", "qu", "qv", "k1q");
@@ -373,8 +385,11 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    
     
   
-   time += dt;        
+   t += dt; 
+   count += 1;       
     }
+
+  return ;
 }
 
 void EulerSolver::plot(string filename) {
