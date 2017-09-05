@@ -500,6 +500,9 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
 double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
     vector<double> Elements;
     double epsilon = 1e-16;
+    double M = 50.0;
+    double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
+    //Elements.push_back(M*min_dx*min_dx);
 
     Elements.push_back(variable[m][Index]);
     if (R != this)// && abs(R->variable[m][Index]) > epsilon ) 

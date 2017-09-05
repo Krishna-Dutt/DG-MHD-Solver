@@ -38,10 +38,21 @@ double MinMod(vector<double> A) {
   double Min = abs(A[0]);
   for(int i=1; i<A.size(); ++i) {
     Min = min(abs(A[i]), Min);
-    //if (Signum(A[i]) != Sign) return 0.0 ;
+    if (Signum(A[i]) != Sign) return 0.0 ;
   }
 
   return Min*Signum(A[0]);
+  /*// TVB Minmod 
+  double Sign =  Signum(A[1]);
+  if (abs(A[1]) <= abs(A[0])) return A[1];
+
+  double Min = abs(A[1]);
+  for(int i=1; i<A.size(); ++i) {
+    Min = min(abs(A[i]), Min);
+    //if (Signum(A[i]) != Sign) return 0.0 ;
+  }*/
+
+  return Min*Signum(A[1]);
   /*double Min = abs(A[0]);
   int Sign = Signum(A[0]);
   int size = A.size();

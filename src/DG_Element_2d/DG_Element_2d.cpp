@@ -432,6 +432,10 @@ if (*variable[cm] && PositivityMarker)
     double epsilon = 1e-13;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
     vector<double> Var1, Var2 ;
+    double M = 50.0;
+    double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
+    Var1.push_back(M*min_dx*min_dx);
+    Var2.push_back(M*min_dx*min_dx);
 
     
     // Ensuring that Cell avergae remains the  same after limiting !!
