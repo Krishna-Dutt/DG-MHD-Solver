@@ -64,7 +64,7 @@ void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
     setBoundary("q", "periodic", "neumann", "periodic", "neumann");
-    setBoundary("qu", "periodic", "neumann", "periodic", "neumann");
+    setBoundary("qu", "periodic", "dirichlet", "periodic", "dirichlet");
     setBoundary("qv", "periodic", "neumann", "periodic", "neumann");
     setBoundary("qE", "periodic", "neumann", "periodic", "neumann");
     /*setBoundary("u", "neumann", "neumann", "neumann", "neumann");

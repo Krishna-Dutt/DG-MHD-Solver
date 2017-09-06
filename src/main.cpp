@@ -20,12 +20,14 @@ double V(double x, double y) {
 
 
 double IDensity(double x, double y) {
-  if (x <= 0.5) {
+ /* if (x <= 0.5) {
     return 1.0 ;
   }
   else {
     return 0.125 ;
-  }
+  }*/
+
+  return 1.0;
 
   
   /*if (x < 0.2) {
@@ -60,12 +62,15 @@ double IDensity(double x, double y) {
 }
 
 double IPressure(double x, double y) {
-  if (x <= 0.5) {
+  /*if (x <= 0.5) {
     return 1.0;
   }
   else {
     return 0.1;
-  }
+  }*/
+  if(x <= 0.1) return 1000.0;
+  else if(x >= 0.9) return 100.0;
+  else return 0.01;
   /*
   if (x < 0.2) {
     return 3.0 ;
@@ -167,11 +172,11 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 20;
-    double CFL = 0.2;
-    double time = 0.2;
+    int time_steps = 50;
+    double CFL = 0.075;
+    double time = 0.01;
     EulerSolver* a;
-    a = new EulerSolver(100, 1, 2);
+    a = new EulerSolver(200, 1, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();

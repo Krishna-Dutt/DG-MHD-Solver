@@ -442,6 +442,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
     for(i=Index; i > 0; i = i - (N+2)) {
      --count;
      AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+     //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
      //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
      for(j=0; j < count; ++j) {
        Tempi = i-j;
