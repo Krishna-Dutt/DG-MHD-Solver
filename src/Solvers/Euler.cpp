@@ -84,7 +84,7 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("q", "neumann", "neumann", "neumann", "dirichlet");
     setBoundary("qu", "dirichlet", "neumann", "neumann", "dirichlet");
     setBoundary("qv", "dirichlet", "neumann", "neumann", "dirichlet");
     setBoundary("qE", "neumann", "dirichlet", "neumann", "neumann");

@@ -123,7 +123,7 @@ int main() {
     a->setSolver(dt, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("ViscousBL_test.vtk");
+    a->plot("ViscousBL_test2.vtk");
     
 
     delete a;
