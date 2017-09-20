@@ -11,64 +11,21 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if ( x <= 0.5 && y <= 0.5 ) {
-    return 0.0;//0.8939;//-0.7259 ;
-  }
-  else if ( x <= 0.5 && y > 0.5) {
-    return 0.7276;//0.8939;//-0.7259;
-  }
-  else if ( x > 0.5 && y > 0.5) {
-    return 0.0 ;
-  }
-  else {
-    return 0.0 ;
-  }
+  if ( x < 2e-3 && y > 2e-4) return 0.025;
+  return 0.0;
 }
 
 double V(double x, double y) {
-  if ( x <= 0.5 && y <= 0.5 ) {
-    return 0.0 ; //0.8939;//-0.7259 ;
-  }
-  else if ( x <= 0.5 && y > 0.5) {
-    return 0.0;
-  }
-  else if ( x > 0.5 && y > 0.5) {
-    return 0.0 ;
-  }
-  else {
-    return 0.7276 ;//0.8939;//-0.7259 ;
-  }
+  return 0.0;
 }
 
 
 double IDensity(double x, double y) {
-  if ( x <= 0.5 && y <= 0.5 ) {
-    return 0.8;//1.1; //1.0 ;
-  }
-  else if ( x <= 0.5 && y > 0.5) {
-    return 1.0;//0.5065; //0.5197;
-  }
-  else if ( x > 0.5 && y > 0.5) {
-    return 0.5313;//1.1 ;//1.0 ;
-  }
-  else {
-    return 1.0; //0.5065; //0.5197 ;
-  }
+  return 1.4;
 }
 
 double IPressure(double x, double y) {
-  if ( x <= 0.5 && y <= 0.5 ) {
-    return 1.0;//1.1; //1.0 ;
-  }
-  else if ( x <= 0.5 && y > 0.5) {
-    return 1.0;//0.35; //0.4;
-  }
-  else if ( x > 0.5 && y > 0.5) {
-    return 0.4;//1.1; //1.0 ;
-  }
-  else {
-    return 1.0;//0.35; //0.4 ;
-  }
+  return 1.0;
 }
 
 double StateEq(double D, double T) {
@@ -144,11 +101,11 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 0.5e-3;
-    int time_steps = 0;
+    double dt = 2.0e-5;
+    int time_steps = 5*500;
     EulerSolver* a;
     a = new EulerSolver(50, 50, 1);
-    a->setDomain(0.0, 0.0, 5.0, 1.0);
+    a->setDomain(0.0, 0.0, 1.0, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();

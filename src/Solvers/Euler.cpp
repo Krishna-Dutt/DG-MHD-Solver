@@ -85,12 +85,12 @@ void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
     setBoundary("q", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qu", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qv", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("qE", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("u", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("v", "neumann", "neumann", "neumann", "neumann");
-    setBoundary("P", "neumann", "neumann", "neumann", "neumann");
+    setBoundary("qu", "dirichlet", "neumann", "neumann", "dirichlet");
+    setBoundary("qv", "dirichlet", "neumann", "neumann", "dirichlet");
+    setBoundary("qE", "neumann", "dirichlet", "neumann", "neumann");
+    setBoundary("u", "dirichlet", "neumann", "neumann", "dirichlet");
+    setBoundary("v", "dirichlet", "neumann", "neumann", "dirichlet");
+    setBoundary("P", "neumann", "dirichlet", "neumann", "neumann");
 
     return ;
 }
@@ -170,8 +170,8 @@ double ArtificialViscosity( double x , double y) {
   double B1 = 6.0;
   double B2 = 20.5;
 
-  return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
-  //return 0.0;
+ // return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
+  return 0.55e-6;
 }
 
 void EulerSolver::setXMomentum() {
