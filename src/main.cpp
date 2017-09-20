@@ -102,10 +102,10 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 2.0e-5;
-    int time_steps = 5*500;
+    int time_steps = 20*5*500;
     EulerSolver* a;
-    a = new EulerSolver(50, 50, 1);
-    a->setDomain(0.0, 0.0, 1.0, 0.1);
+    a = new EulerSolver(10, 50, 1);
+    a->setDomain(0.0, 0.0, 0.1, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();
