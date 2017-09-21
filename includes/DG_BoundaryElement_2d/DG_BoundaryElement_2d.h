@@ -41,6 +41,14 @@ protected:
         map<string, double*> DirichletRight;
         map<string, double*> DirichletLeft;
 
+        string BoundaryTop;
+        string BoundaryBottom;
+        string BoundaryLeft;
+        string BoundaryRight;
+
+        vector<string> ConservativeVariables;
+
+
 public:
 
         DG_BoundaryElement_2d(int _N, double x1, double y1, double x2, double y2);
@@ -71,12 +79,22 @@ public:
         double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
         void convertMomentToVariable(string m, string v, string cm);
 
+        // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
 
+        void addConservativeVariables(string v);
+        void addConservativeVariables(vector<string> V);
 
+        void updateBoundary();
+        void setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B);
+        void updateTopBoundary();
+        void updateBottomBoundary();
+        void updateLeftBoundary();
+        void updateRightBoundary();
 
-
-
-
+        // For Euler or Navier Stokes system !!
+        void EulerCharacteristicInflowBoundary(int Index1, int Index2, char B);
+        void EulerCharacteristicOutflowBoundary(int Index1, int Index2, char B);
+        
 };
 
 #endif

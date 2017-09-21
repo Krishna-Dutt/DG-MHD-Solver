@@ -54,6 +54,8 @@ protected:
     DG_Element_2d* leftNeighbor;
     DG_Element_2d* bottomNeighbor;
 
+    string System; // System of Governing Equations being solved !!
+
 public:
 
     double *X, *Y;
@@ -80,6 +82,8 @@ public:
     DG_Element_2d(int _N, double x1, double y1, double x2, double y2);
     virtual ~DG_Element_2d();
     void Destroy_Matrices(); // Function to destroy all the allocated DG Matrices, once the solver is done.!!
+
+    void setSystem(string S); 
 
     void addVariable_withBoundary(string v);
     void addVariable_onlyBoundary( string v);
@@ -155,6 +159,14 @@ public:
     virtual void updateBoundaryVariables(string v);
 
     virtual double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
+
+    // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
+
+    virtual void addConservativeVariables(string v);
+    virtual void addConservativeVariables(vector<string> V);
+
+    virtual void updateBoundary();
+        
 
 };
 #endif

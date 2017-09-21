@@ -192,6 +192,23 @@ DG_Field_2d::~DG_Field_2d() {
     }
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the System of Governing Euqaitons ot be solved..
+ *
+ * @Param S The governing equations
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setSystem(string S) {
+    for(int i = 0; i < ne_x; i++)
+    for (int j = 0; j < ne_y; j++) {
+      elements[i][j]->setSystem(S);
+    }
+
+    return ;
+}
+
+
 void DG_Field_2d::setBoundaryConditions(string type) {
     if(type == "periodic") {
         // Setting the boundary for the top elements.
@@ -1007,4 +1024,45 @@ void DG_Field_2d::resetPositivity() {
             elements[i][j]->resetPositivity();
     return;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function adds Conservative Variables.
+ *
+ * @Param v The corresponding conservative variable in the system being solved
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::addConservativeVariables(string v) {
+    for(int i = 0; i < ne_x; i++)
+    for (int j = 0; j < ne_y; j++) {
+      elements[i][j]->addConservativeVariables(v);
+    }
+
+    return ;
+}
+
+void DG_Field_2d::addConservativeVariables(vector<string> V) {
+    for(int i = 0; i < ne_x; i++)
+    for (int j = 0; j < ne_y; j++) {
+      elements[i][j]->addConservativeVariables(V);
+    }
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function update Boundary values after every timestep.
+ *
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::updateBoundary() {
+    for(int i = 0; i < ne_x; i++)
+    for (int j = 0; j < ne_y; j++) {
+      elements[i][j]->updateBoundary();
+    }
+
+    return ;
+}
+
 

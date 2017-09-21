@@ -71,6 +71,8 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
 
     PositivityMarker   = true;
 
+    System = "EULER";
+
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -142,7 +144,19 @@ void DG_Element_2d::Destroy_Matrices() {
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions adds the name of the governing equation being solved
+ *
+ * @Param S  This is the name of system being solved.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setSystem(string S) {
+    System = S;
 
+    return ;
+}
+  
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1209,4 +1223,29 @@ void DG_Element_2d::updateBoundaryVariables(string v) {
 /* ----------------------------------------------------------------------------*/
 double DG_Element_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
     return 0.0 ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates Boundary values after a timestep.
+ *
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateBoundary() {
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function adds conservative variables.
+ *
+ * @Param v This is the conservative variable 
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::addConservativeVariables(string v) {
+    return ;
+}
+
+void DG_Element_2d::addConservativeVariables(vector<string> v) {
+    return ;
 }

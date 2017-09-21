@@ -6,6 +6,7 @@
 #include "../../includes/Utilities/DerivativeMatrix.h"
 #include "../../includes/Utilities/LobattoNodes.h"
 #include "../../includes/Utilities/MinMod.h"
+#include "../../includes/Utilities/BoundaryConditions.h"
 
 #define MAX(a, b)(a>b?a:b)
 #define MIN(a, b)(a<b?a:b)
@@ -23,7 +24,12 @@
  */
 /* ----------------------------------------------------------------------------*/
 DG_BoundaryElement_2d::DG_BoundaryElement_2d(int _N, double x1, double y1, double x2, double y2) : DG_Element_2d(_N, x1, y1, x2, y2) {
+        BoundaryTop = "NIL";
+        BoundaryBottom = "NIL";
+        BoundaryLeft = "NIL";
+        BoundaryRight = "NIL";
 
+        ConservativeVariables.resize(0);
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -719,6 +725,242 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
 
   return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function adds given string to the list of conservative variables.
+ *
+ * @Param v This is the conservative variable to be added
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::addConservativeVariables(string v) {
+    ConservativeVariables.push_back(v);
+
+    return;
+}
+
+void DG_BoundaryElement_2d::addConservativeVariables(vector<string> V) {
+    for(int t=0; t< V.size(); ++t) {
+        ConservativeVariables.push_back(V[t]);
+    }
+
+    return;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the Boundary values after each time step
+ *
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::updateBoundary() {
+
+    //if ( System == "EULER") 
+    {
+        setBoundary(BoundaryTop, 1, N*(N+1), (N-1)*(N+1), 'T');
+        setBoundary(BoundaryBottom, 1, 0, N+1, 'B');
+        setBoundary(BoundaryRight, N+1, N, N-1, 'R');
+        setBoundary(BoundaryLeft, N+1, 0, 1, 'L');
+    }
+
+    return;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function applies Characteristic Inflow conditions at the boundary
+ *
+ * @Param Index1 Index corresponding to boundary nodes.
+ * @Param Index2 Index corresponding to neighboring nodes.
+ * @Param B Position of boundary
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d:: EulerCharacteristicInflowBoundary(int Index1, int Index2, char B) {
+    double q, nx, ny, c, gamma, H, u, v, epsilon = 1e-13;
+    double LEigen[ConservativeVariables.size()], REigen[ConservativeVariables.size()], C1, C2 ;
+
+
+    if ( B == 'T' || B == 'B') {
+        nx = BoundaryU(X[Index1], Y[Index1])/ (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+        ny = (BoundaryV(X[Index1], Y[Index1]) + epsilon) / (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+    }
+    else if ( B == 'L' || B == 'R') {
+        nx = (BoundaryU(X[Index1], Y[Index1]) + epsilon)/ (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+        ny = (BoundaryV(X[Index1], Y[Index1])) / (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+    }
+
+    q = sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0));
+    c = BoundarySoundSpeed(X[Index1], Y[Index1]);
+    gamma = BoundaryGamma(X[Index1], Y[Index1]);
+    H = BoundarySpecificEnthalpy(X[Index1], Y[Index2]);
+    u = BoundaryU(X[Index1], Y[Index1]);
+    v = BoundaryV(X[Index1], Y[Index1]);
+
+    // Left Eigen Vector
+    LEigen[0] = 0.5 * ( 0.5 *(gamma-1.0)*pow(q/c, 2.0) + q/c);
+    LEigen[1] = -0.5 * (u*(gamma-1.0)/pow(c,2.0) + nx/c);
+    LEigen[2] = -0.5 * (v*(gamma-1.0)/pow(c,2.0) + ny/c);
+    LEigen[3] = 0.5 * (gamma -1.0)/pow(c, 2.0);
+
+    // Right Eigen Vector 
+    REigen[0] = 1.0;
+    REigen[1] = u - c*nx;
+    REigen[2] = v - c*ny;
+    REigen[3] = H - q*c;
+
+    C1 = C2 = 0.0;
+
+    for (int i=0; i<ConservativeVariables.size(); ++i) {
+        C1 += LEigen[i] * variable[ConservativeVariables[i]][Index1] ;
+        C2 += LEigen[i] * variable[ConservativeVariables[i]][Index2] ;
+    }
+
+    for (int i=0; i<ConservativeVariables.size(); ++i) {
+         variable[ConservativeVariables[i]][Index1] += REigen[i] * (C2 - C1);
+    }
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function applies Characteristic Outflow conditions at the boundary
+ *
+ * @Param Index1 Index corresponding to boundary nodes.
+ * @Param Index2 Index corresponding to neighboring nodes.
+ * @Param B Position of boundary
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d:: EulerCharacteristicOutflowBoundary(int Index1, int Index2, char B) {
+    double q, nx, ny, c, gamma, H, u, v, epsilon = 1e-13;
+    double LEigen[ConservativeVariables.size()], REigen[ConservativeVariables.size()], C1, C2 ;
+
+
+    if ( B == 'T' || B == 'B') {
+        nx = BoundaryU(X[Index1], Y[Index1])/ (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+        ny = (BoundaryV(X[Index1], Y[Index1]) + epsilon) / (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+    }
+    else if ( B == 'L' || B == 'R') {
+        nx = (BoundaryU(X[Index1], Y[Index1]) + epsilon)/ (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+        ny = (BoundaryV(X[Index1], Y[Index1])) / (sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0)) + epsilon);
+    }
+
+    q = sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0));
+    c = BoundarySoundSpeed(X[Index1], Y[Index1]);
+    gamma = BoundaryGamma(X[Index1], Y[Index1]);
+    H = BoundarySpecificEnthalpy(X[Index1], Y[Index2]);
+    u = BoundaryU(X[Index1], Y[Index1]);
+    v = BoundaryV(X[Index1], Y[Index1]);
+
+    // Left Eigen Vector
+    LEigen[0] = 0.5 * ( 0.5 *(gamma-1.0)*pow(q/c, 2.0) + q/c);
+    LEigen[1] = -0.5 * (u*(gamma-1.0)/pow(c,2.0) + nx/c);
+    LEigen[2] = -0.5 * (v*(gamma-1.0)/pow(c,2.0) + ny/c);
+    LEigen[3] = 0.5 * (gamma -1.0)/pow(c, 2.0);
+
+    // Right Eigen Vector 
+    REigen[0] = 1.0;
+    REigen[1] = u - c*nx;
+    REigen[2] = v - c*ny;
+    REigen[3] = H - q*c;
+
+    C1 = C2 = 0.0;
+
+    for (int i=0; i<ConservativeVariables.size(); ++i) {
+        C1 += LEigen[i] * variable[ConservativeVariables[i]][Index1] ;
+        C2 += LEigen[i] * variable[ConservativeVariables[i]][Index2] ;
+    }
+
+    for (int i=0; i<ConservativeVariables.size(); ++i) {
+         variable[ConservativeVariables[i]][Index1] = variable[ConservativeVariables[i]][Index2] + REigen[i] * (C1 - C2);
+    }
+
+    return ;
+}
+
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the respective Boundary values after each time step
+ *
+ * @Param BoundaryPosition Position of Boundary
+ * @Param ScaleI Scaling factor for index i
+ * @Param Index1 Index corresponding to boundary node
+ * @Param Index2 Index corresponding to neighboring node
+ * @Param B Boundary position 
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B) {
+    string D, Xmom, Ymom, Energy;
+    D = ConservativeVariables[0];
+    Xmom = ConservativeVariables[1];
+    Ymom = ConservativeVariables[2];
+    Energy = ConservativeVariables[3];
+
+    // add additional variables as required for other systems !!
+
+    if ( BoundaryPosition == "WALL" || BoundaryPosition == "SYMMETRIC") {
+        for(int i=0; i<N; ++i) {
+            variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
+            variable[Xmom][Index1 + ScaleI*i] = variable[Xmom][ScaleI*i + Index2];
+            variable[Ymom][Index1 + ScaleI*i] = 0.0;
+            variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
+        }
+    }
+    else if(BoundaryPosition == "INFLOW") {
+        for(int i=0; i<N; ++i) {
+            variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            
+            if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) < 1.0) {
+                EulerCharacteristicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+            }
+        }
+    }
+    else if(BoundaryPosition == "OUTFLOW") {
+        for(int i=0; i<N; ++i) {
+            if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) >= 1.0) {
+                 for(int j=0; j<ConservativeVariables.size(); ++j) {
+                     variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
+                }
+            }
+            else {
+                variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            
+                EulerCharacteristicOutflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+            }
+        }
+    }
+    else if(BoundaryPosition == "DIRICHLET") {
+        for(int i=0; i<N; ++i) {
+            variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+        }
+    }
+    else if(BoundaryPosition == "NEUMANN") {
+        for(int j=0; j<ConservativeVariables.size(); ++j) {
+            for(int i=0; i<N; ++i) {
+                variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
+            }
+        }
+    }
+    else if(BoundaryPosition == "PERIODIC") {
+        
+    }
+    else {
+        cout << "NO TOP BOUNDARY SPECIFIED !!" << endl;
+    }
+    return;
+}
+
 
 
 

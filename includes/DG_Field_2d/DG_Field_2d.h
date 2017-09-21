@@ -33,6 +33,8 @@ public:
     DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, double _x2, double _y2);
     ~DG_Field_2d();
 
+    void setSystem(string S);
+
     void addVariable_withBounary(string v);
     void addVariable_withoutBounary(string v);
     void addVariable_onlyBounary( string v);
@@ -91,6 +93,14 @@ public:
     // Function to check Positivity of data stored in cell .
     void checkPositivity(string v, string cm, string level);
     void resetPositivity();
+
+
+    // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
+
+    void addConservativeVariables(string v);
+    void addConservativeVariables(vector<string> V);
+
+    void updateBoundary();
 };
 
 #endif
