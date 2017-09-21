@@ -84,13 +84,13 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
 void EulerSolver::setBoundaryCondtions(string type) {
     //field->setBoundaryConditions(type);
     // Setting BC as Outflow type to test Methods
-    setBoundary("q", "neumann", "neumann", "neumann", "dirichlet");
-    setBoundary("qu", "dirichlet", "neumann", "neumann", "dirichlet");
-    setBoundary("qv", "dirichlet", "neumann", "neumann", "dirichlet");
-    setBoundary("qE", "neumann", "dirichlet", "neumann", "neumann");
-    setBoundary("u", "dirichlet", "neumann", "neumann", "dirichlet");
-    setBoundary("v", "dirichlet", "neumann", "neumann", "dirichlet");
-    setBoundary("P", "neumann", "dirichlet", "neumann", "neumann");
+    setBoundary("q", "neumann", "neumann", "outflow", "dirichlet");
+    setBoundary("qu", "dirichlet", "neumann", "outflow", "dirichlet");
+    setBoundary("qv", "dirichlet", "neumann", "outflow", "dirichlet");
+    setBoundary("qE", "neumann", "dirichlet", "outflow", "neumann");
+    setBoundary("u", "dirichlet", "neumann", "outflow", "dirichlet");
+    setBoundary("v", "dirichlet", "neumann", "outflow", "dirichlet");
+    setBoundary("P", "neumann", "dirichlet", "outflow", "neumann");
 
     return ;
 }
@@ -335,50 +335,50 @@ void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) 
 }
 
 void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
-  //field->updateBoundaryVariables(Var);
+  field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K);
   field->axpy(-1.0, "dbydx", K);
   field->axpy(-1.0, "dbydy", K);
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   
   field->axpy(0.5*dt, K, Var);
-  //field->updateBoundaryVariables(Var);
+  field->updateBoundaryVariables(Var);
   return;
 }
 
 void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
-  //field->updateBoundaryVariables(Var);
+  field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dbydx", K2);
   field->axpy(-1.0, "dbydy", K2);
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
-  //field->updateBoundaryVariables(Var);
+  field->updateBoundaryVariables(Var);
   return;
 }
 
 void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
-  //field->updateBoundaryVariables(Var);
+  field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K3);
   field->axpy(-1.0, "dbydx", K3);
   field->axpy(-1.0, "dbydy", K3);
-  field->updateBoundaryVariables(Var);
+  //field->updateBoundaryVariables(Var);
   
   field->axpy((7.0/6.0)*dt, K1, Var);
   field->axpy(-(4.0/3.0)*dt, K2, Var);
   field->axpy((1.0/6.0)*dt, K3, Var);
-  //field->updateBoundaryVariables(Var);
+  field->updateBoundaryVariables(Var);
   return;
 }
 

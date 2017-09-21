@@ -11,7 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if ( x < 2e-3 && y > 2e-4) return 0.025;
+  if ( x < 2e-3 && y > 2e-4) return 0.25;
   return 0.0;
 }
 
@@ -102,9 +102,9 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 2.0e-5;
-    int time_steps = 20*5*500;
+    int time_steps = 10*500;
     EulerSolver* a;
-    a = new EulerSolver(10, 50, 1);
+    a = new EulerSolver(10, 40, 1);
     a->setDomain(0.0, 0.0, 0.1, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
