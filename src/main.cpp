@@ -102,7 +102,7 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     double dt = 2.0e-5;
-    int time_steps = 10*500;
+    int time_steps = 2*10*500;
     EulerSolver* a;
     a = new EulerSolver(10, 40, 1);
     a->setDomain(0.0, 0.0, 0.1, 0.1);
