@@ -17,6 +17,7 @@ void EulerSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
     x2 = _x2;
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
+    field->setSystem("EULER");
 
    return ;
 }
@@ -52,6 +53,11 @@ void EulerSolver::setConservativeVariables(){
   field->addVariable_withBounary("qE");
   field->addVariable_withBounary("qe"); // Internal Energy, added just for ease of manipulating Energy, Remove later if not required !!
   field->addVariable_withBounary("KE"); // Kinetic Energy , " "
+
+  field->addConservativeVariables("q");
+  field->addConservativeVariables("qu");
+  field->addConservativeVariables("qv");
+  field->addConservativeVariables("qE");
   return ;
 }
 

@@ -76,6 +76,7 @@ void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
                     DirichletTop[v][i] = *boundaryTop[v][i];
                 }
             }
+            BoundaryTop = type;
             break;
         case 'r' : // `r` or `R` for right
         case 'R' :
@@ -88,6 +89,7 @@ void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
                     DirichletRight[v][i] = *boundaryRight[v][i];
                 }
             }
+            BoundaryRight = type;
             break;
         case 'b' : // `b` or `B` for bottom
         case 'B' :
@@ -100,6 +102,7 @@ void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
                     DirichletBottom[v][i] = *boundaryBottom[v][i];
                 }
             }
+            BoundaryBottom = type;
             break;
         case 'l' : // `l` or `L` for left
         case 'L' :
@@ -112,6 +115,7 @@ void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
                     DirichletLeft[v][i] = *boundaryLeft[v][i];
                 }
             }
+            BoundaryLeft = type;
             break;
         default:
             cout << "WARNING!. No such neighbor type " << type << endl;
