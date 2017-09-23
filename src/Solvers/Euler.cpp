@@ -43,6 +43,7 @@ void EulerSolver::setGradientPrimitiveVariables(){
   field->addVariable_withoutBounary("dvdy");
   field->addVariable_withoutBounary("dPdy");
   field->addVariable_withoutBounary("dTdy");
+
   return ;
 }
 
@@ -87,23 +88,23 @@ void EulerSolver::setInitialVelocity(function<double(double, double)> U, functio
     return ;
 }
 
-void EulerSolver::setBoundaryCondtions(string type) {
-    //field->setBoundaryConditions(type);
-    // Setting BC as Outflow type to test Methods
-    setBoundary("q", "neumann", "neumann", "outflow", "dirichlet");
-    setBoundary("qu", "dirichlet", "neumann", "outflow", "dirichlet");
-    setBoundary("qv", "dirichlet", "neumann", "outflow", "dirichlet");
-    setBoundary("qE", "neumann", "dirichlet", "outflow", "neumann");
-    setBoundary("u", "dirichlet", "neumann", "outflow", "dirichlet");
-    setBoundary("v", "dirichlet", "neumann", "outflow", "dirichlet");
-    setBoundary("P", "neumann", "dirichlet", "outflow", "neumann");
+void EulerSolver::setBoundaryCondtions(string type1, string type2, string type3, string type4) {
+      // Setting BC as Outflow type to test Methods
+    field->setBottomBoundary(type1);
+    field->setRightBoundary(type2);
+    field->setTopBoundary(type3);
+    field->setLeftBoundary(type4);
 
     return ;
 }
 
-void EulerSolver::setSolver(double _dt, double _no_of_time_steps) {
-    dt = _dt;
-    no_of_time_steps = _no_of_time_steps;
+void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
+   CFL = _CFL;
+   time = _time;
+   no_of_time_steps = _no_of_time_steps;
+   dx = field->FindMindx();
+  // cout << "dx : " << dx << "\n" << "CFL : " << CFL;
+
     return ;
 }
 
@@ -341,56 +342,59 @@ void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) 
 }
 
 void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
-  field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K);
   field->axpy(-1.0, "dbydx", K);
   field->axpy(-1.0, "dbydy", K);
-  //field->updateBoundaryVariables(Var);
   
   field->axpy(0.5*dt, K, Var);
-  field->updateBoundaryVariables(Var);
   return;
 }
 
 void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
-  field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K2);
   field->axpy(-1.0, "dbydx", K2);
   field->axpy(-1.0, "dbydy", K2);
-  //field->updateBoundaryVariables(Var);
   
   field->axpy(-1.5*dt, K1, Var);
   field->axpy(2.0*dt, K2, Var);
-  field->updateBoundaryVariables(Var);
   return;
 }
 
 void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
-  field->updateBoundaryVariables(Var);
   field->delByDelX(FluxX, "dbydx", Var, "rusanov", "u_plus_c");
   field->delByDelY(FluxY, "dbydy", Var, "rusanov", "v_plus_c");
 
   field->scal(0.0, K3);
   field->axpy(-1.0, "dbydx", K3);
   field->axpy(-1.0, "dbydy", K3);
-  //field->updateBoundaryVariables(Var);
   
   field->axpy((7.0/6.0)*dt, K1, Var);
   field->axpy(-(4.0/3.0)*dt, K2, Var);
   field->axpy((1.0/6.0)*dt, K3, Var);
-  field->updateBoundaryVariables(Var);
   return;
+}
+
+void EulerSolver::setTimeStep() {
+  //double dx = field->FindMindx();
+  double speed;
+  speed = max(field->FindMax("u_plus_c"),field->FindMax("v_plus_c"));
+  //cout << "Max Speed  :" << field->FindMax("u_plus_c") << " : " <<field->FindMax("v_plus_c") << endl;
+  //cout << "dx : " <<  dx << endl;
+  dt = CFL * dx/speed;
+  return ;
 }
 
 
 void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<double(double,double)> T, function<double(double,double)> P, function<double(double,double,double)> IE) {
   // Requires all Primitive and Conservative Variables to be setup and initialised.
+  double t = 0.0;
+  int count = 0;
   setAuxillaryVariables();
   setInviscidFlux();
   setEigenValues(SoundSpeed);
@@ -398,15 +402,22 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
 
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
-  for(int i=0; i < no_of_time_steps; i++) {
+  while(t <= time) {
     // First Step of RK3
     
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
 
+    if ( count%no_of_time_steps == 0) {
+      setTimeStep();
+      cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
+      count = 0;
+    }
+
     field->setFunctionsForVariables("u_plus_c", "u_plus_c", ArtificialViscosity, "meu");
     updatePrimitiveGradient();
     updateViscousFlux();
+    
     
     // Mass
     RK_Step1("q", "qu", "qv", "k1q");
@@ -427,6 +438,8 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RunLimiter();
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P);
+
+    field->updateBoundary();
     updatePrimitiveVariables(T, P);
    
     
@@ -457,8 +470,10 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     RunLimiter();
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P); 
-    updatePrimitiveVariables(T, P);
     
+    field->updateBoundary();
+    updatePrimitiveVariables(T, P);
+
    // Third (Final) Step of RK3
     updateInviscidFlux();
     updateEigenValues(SoundSpeed);
@@ -487,12 +502,15 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    RunLimiter();
    //updatePrimitiveVariables(T, P);
    RunPositivityLimiter(T, P); 
-   updatePrimitiveVariables(T, P);
    
-    
-  
-   time += dt;        
+    field->updateBoundary();
+    updatePrimitiveVariables(T, P);
+
+   t += dt; 
+   count += 1;       
     }
+
+  return ;
 }
 
 void EulerSolver::plot(string filename) {
@@ -510,12 +528,6 @@ void EulerSolver::SetShockDetectorVariables() {
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered("CellMarker");
     field->addVariable_withBounary("CellMarkerGlobal");
-    /*
-    field->addVariable_CellCentered("VariableMax");
-    field->addVariable_CellCentered("OutFlowSize");
-    field->addVariable_CellCentered("OutFlowFlux");
-    field->addVariable_CellCentered("Radius");
-    */
   }
 
   return ;
@@ -530,12 +542,7 @@ void EulerSolver::RunShockDetector() {
 }
 
 void EulerSolver::Run_KXRCF() {
-  /*
-  field->ResetVariables_CellCentered("VariableMax");
-  field->ResetVariables_CellCentered("OutFlowSize");
-  field->ResetVariables_CellCentered("OutFlowFlux");
-  field->ResetVariables_CellCentered("Radius");
-  */
+ 
   field->ResetVariables_CellCentered("CellMarker", 1.5);
   field->ResetMap_OutFlow();
 
@@ -559,6 +566,8 @@ void EulerSolver::SetLimiterVariables() {
     field->ResetVariables_CellCentered("CellMarker", 1.5);
     field->addVariable_withBounary("CellMarkerGlobal");
     field->scal(0.0, "CellMarkerGlobal");
+    field->addVariable_CellCentered("Max");
+    field->addVariable_CellCentered("Min");
 
 
     field->addVariable_withBounary("Moment");
@@ -622,15 +631,6 @@ void EulerSolver::Run_PositivityMomentLimiter(string v, unsigned Index) {
   return ;
 }
 
-void EulerSolver::setBoundary(string v, string Bottom, string Right, string Top, string Left) {
-  field->setTopBoundary(v, Top);
-  field->setBottomBoundary(v, Bottom);
-  field->setRightBoundary(v, Right);
-  field->setLeftBoundary(v, Left);
-
-  field->setBoundaryNeighbours(v);
-  return ;
-}
 
 void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double(double, double)> U ) {
   field->addVariable_withBounary("qAnalytical");

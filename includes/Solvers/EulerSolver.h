@@ -12,7 +12,9 @@ private:
     double x1, y1, x2, y2;
     DG_Field_2d* field;
     double time;
+    double CFL;
     double dt;
+    double dx;
     int no_of_time_steps;
 
     string ShockDetector;
@@ -48,17 +50,6 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void setDomain(double _x1, double _y1, double _x2, double _y2);
-    /* ----------------------------------------------------------------------------*/
-    /**
-     * @Synopsis  This is the function to set the type of the boundary condition.
-     *
-     * @Param type This will tell the type of boundary conditions:
-     *              - "periodic"  = Periodic Boundary Condition
-     *              - "dirichlet" = Dirichlet Boundary Condition
-     *              - "neumann"   = Neumann Boundary Condition.
-     */
-    /* ----------------------------------------------------------------------------*/
-    void setBoundaryCondtions(string type);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to setup Primitive Variables in the domain.
@@ -291,12 +282,19 @@ public:
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
      *
-     * @Param _dt The time step for each iteration.
-     * @Param _no_of_time_steps The number of time steps that must be used which is also the number of time iterations that must
-     * be performed
+     * @Param _CFL CFL
+     * @Param _time Evolution time.
+     * @Param _no_of_time_steps No of time steps to find dt
      */
     /* ----------------------------------------------------------------------------*/
-    void setSolver(double _dt, double _no_of_time_steps);
+    void setSolver(double _CFL, double _time, int _no_of_time_steps);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is find the timestep.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void setTimeStep();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function does all the main functionalitites of the solver. This must be called in order to solve
@@ -405,16 +403,19 @@ public:
     
     /* ----------------------------------------------------------------------------*/
     /**
-     * @Synopsis   This function is set the Boundary conditions for a given variable.
+     * @Synopsis   This function is set the Boundary conditions 
      *
-     * @Param Var String corresponding to the Variable.
      * @Param Bottom String corresponding to  Bottom Boundary type.
      * @Param Right String corresponding to Right Boundary type.
      * @Param Top String corresponding to Top Boundary type.
      * @Param Left String corresponding to Left Boundary type.
+                    This will tell the type of boundary conditions:
+     *              - "periodic"  = Periodic Boundary Condition
+     *              - "dirichlet" = Dirichlet Boundary Condition
+     *              - "neumann"   = Neumann Boundary Condition.
      */
     /* ----------------------------------------------------------------------------*/
-    void setBoundary(string Var, string Bottom, string Right, string Top, string Left);
+    void setBoundaryCondtions(string Bottom, string Right, string Top, string Left);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function finds the L2 norm of the converged solution ,

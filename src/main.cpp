@@ -5,13 +5,12 @@
 #include <ctime>
 
 #define R 285.0
-#define gamma 1.4
+
 
 using namespace std;
 
 
 double U(double x, double y) {
-  if ( x < 2e-3 && y > 2e-4) return 0.25;
   return 0.0;
 }
 
@@ -21,11 +20,13 @@ double V(double x, double y) {
 
 
 double IDensity(double x, double y) {
-  return 1.4;
+  if( x < 0.5) return 1.0;
+  return 0.125;
 }
 
 double IPressure(double x, double y) {
-  return 1.0;
+  if( x < 0.5) return 1.0;
+  return 0.1;
 }
 
 double StateEq(double D, double T) {
@@ -101,11 +102,13 @@ double AnalyticalVelocity(double x, double y) {
 
 int main() {
     clock_t tstart = clock();
-    double dt = 2.0e-5;
-    int time_steps = 2*10*500;
+    //double dt = 0.5e-3;
+    int time_steps = 100;
+    double CFL = 0.15;
+    double time = 0.2;
     EulerSolver* a;
-    a = new EulerSolver(10, 40, 1);
-    a->setDomain(0.0, 0.0, 0.1, 0.1);
+    a = new EulerSolver(200, 1, 1);
+    a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();
@@ -117,13 +120,13 @@ int main() {
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
-    a->setBoundaryCondtions("periodicY");
+    a->setBoundaryCondtions("periodic", "outflow", "periodic", "inflow");
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
-    a->setSolver(dt, time_steps);
+    a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
-    a->plot("ViscousBL_test2.vtk");
+    a->plot("ViscousBL_test.vtk");
     
 
     delete a;

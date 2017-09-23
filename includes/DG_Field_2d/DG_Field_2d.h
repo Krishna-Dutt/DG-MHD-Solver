@@ -44,11 +44,12 @@ public:
     // Functions to set Boundary Conditions
     void setBoundaryConditions(string type);
     void setBoundaryConditions(string v, string type, string b);
-    void setTopBoundary(string v, string type);
-    void setBottomBoundary(string v, string type);
-    void setLeftBoundary(string v, string type);
-    void setRightBoundary(string v, string type);
+    void setTopBoundary( string type);
+    void setBottomBoundary(string type);
+    void setLeftBoundary(string type);
+    void setRightBoundary(string type);
     void setBoundaryNeighbours(string v);
+    void setBoundaryNeighbours();
     void updateBoundaryVariables(string v);
 
     // Functions to create output file in VTK format
@@ -101,6 +102,10 @@ public:
     void addConservativeVariables(vector<string> V);
 
     void updateBoundary();
+    
+    // Misc. Functions on for global field data 
+    double FindMax(string v);
+    double FindMindx();
 };
 
 #endif

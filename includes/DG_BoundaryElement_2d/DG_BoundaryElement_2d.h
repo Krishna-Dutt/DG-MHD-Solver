@@ -54,7 +54,7 @@ public:
         DG_BoundaryElement_2d(int _N, double x1, double y1, double x2, double y2);
         ~DG_BoundaryElement_2d();
 
-        void assignBoundary(string v, string type, char b);
+        void assignBoundary(string type, char b);
         void setBoundaryValue(string v, string b);
         void DirichletBoundary(double *Matrix, initializer_list<int> I);
         void NeumannBoundary(double *Matrix, initializer_list<int> I);

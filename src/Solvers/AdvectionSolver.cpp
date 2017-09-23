@@ -123,10 +123,10 @@ void AdvectionSolver::plot(string filename) {
 }
 
 void AdvectionSolver::setBoundary(string v, string Bottom, string Right, string Top, string Left) {
-  field->setTopBoundary(v, Top);
-  field->setBottomBoundary(v, Bottom);
-  field->setRightBoundary(v, Right);
-  field->setLeftBoundary(v, Left);
+  field->setTopBoundary( Top);
+  field->setBottomBoundary( Bottom);
+  field->setRightBoundary( Right);
+  field->setLeftBoundary( Left);
 
   field->setBoundaryNeighbours(v);
 }

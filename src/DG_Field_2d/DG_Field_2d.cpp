@@ -55,11 +55,11 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up exponential grid (noo-uniform grid) along y direction
     double Beta_y, Beta_x, DeltaX, DeltaY, epsilon = 1e-10;
     DeltaY = (y2-y1);
-    Beta_y = 1.1;
+    Beta_y = 1.0;
 
     DeltaX = (x2-x1);
-    Beta_x = 1.2;
-    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
+    Beta_x = 1.0;
+    //dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){
         y_curr = y1;
@@ -152,7 +152,8 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
 
         }
 
-    
+    variableNames.resize(0);
+    variablesWithBoundaryInfo.resize(0);
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -167,6 +168,23 @@ void DG_Field_2d::setVanderMandMatrix() {
 
   twoDVanderMandLegendre(vanderMand, N);
   inverse(vanderMand, inverseVanderMand, (N+1)*(N+1));
+
+  // Printing both matrices 
+ /* cout << "Vander Mand Matrix  :: \n";
+  for ( int i=0; i < (N+1)*(N+1) ; ++i) {
+      for (int j=0; j < (N+1)*(N+1); ++j) {
+          cout << vanderMand[i*(N+1)*(N+1) + j] << " : ";
+      }
+      cout << "\n";
+  }
+
+  cout << "Inverse Vander Mand Matrix  :: \n";
+  for ( int i=0; i < (N+1)*(N+1) ; ++i) {
+      for (int j=0; j < (N+1)*(N+1); ++j) {
+          cout << inverseVanderMand[i*(N+1)*(N+1) + j] << " : ";
+      }
+      cout << "\n";
+  }*/
 
   for (int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
@@ -254,11 +272,10 @@ void DG_Field_2d::setBoundaryConditions(string type) {
 /**
  * @Synopsis  This function sets the boundary type for a variable at Top Boundary.
  *
- * @Param v This is a string which defines the variable name.
  * @Param type This is a string which defines the boundary type.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setTopBoundary(string v, string type) {
+void DG_Field_2d::setTopBoundary(string type) {
     if(type == "periodic") {
         // Setting the boundary for the top elements.
         for(int i = 0; i < ne_x; i++)
@@ -280,16 +297,10 @@ void DG_Field_2d::setTopBoundary(string v, string type) {
        
     }
 
-    else if(type == "reflective") {
-        for(int i = 0; i < ne_x; i++)
-            for(int j=0; j<=N; ++j) {
-                *(elements[i][ne_y-1]->neighboringTop[v][j]) = -*(elements[i][ne_y-1]->boundaryTop[v][j]);
-            }
-
-    }
+   
 
     for(int i = 0; i < ne_x; i++)
-            elements[i][ne_y-1]->assignBoundary(v, type,'T');
+            elements[i][ne_y-1]->assignBoundary(type,'T');
 
     return ;
 }
@@ -298,11 +309,10 @@ void DG_Field_2d::setTopBoundary(string v, string type) {
 /**
  * @Synopsis  This function sets the boundary type for a variable at Bottom Boundary.
  *
- * @Param v This is a string which defines the variable name.
  * @Param type This is a string which defines the boundary type.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setBottomBoundary(string v, string type) {
+void DG_Field_2d::setBottomBoundary(string type) {
     if(type == "periodic") {
         // Setting the boundary for the top elements.
         for(int i = 0; i < ne_x; i++)
@@ -324,16 +334,10 @@ void DG_Field_2d::setBottomBoundary(string v, string type) {
        
     }
 
-    else if(type == "reflective") {
-        for(int i = 0; i < ne_x; i++)
-            for(int j=0; j<=N; ++j) {
-                *(elements[i][0]->neighboringBottom[v][j]) = -*(elements[i][0]->boundaryBottom[v][j]);
-            }
-
-    }
+   
 
     for(int i = 0; i < ne_x; i++)
-            elements[i][0]->assignBoundary(v, type,'B');
+            elements[i][0]->assignBoundary( type,'B');
 
     return ;
 }
@@ -342,11 +346,11 @@ void DG_Field_2d::setBottomBoundary(string v, string type) {
 /**
  * @Synopsis  This function sets the boundary type for a variable at Left Boundary.
  *
- * @Param v This is a string which defines the variable name.
  * @Param type This is a string which defines the boundary type.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setLeftBoundary(string v, string type) {
+void DG_Field_2d::setLeftBoundary( string type) {
+     //cout << "Calling Left Boundary !!" << endl;
     if(type == "periodic") {
         // Setting the boundary for the right elements.
         for(int j=0; j < (ne_y); j++)
@@ -367,16 +371,10 @@ void DG_Field_2d::setLeftBoundary(string v, string type) {
        
     }
 
-    else if(type == "reflective") {
-        for(int i = 0; i < ne_y; i++)
-            for(int j=0; j<=N; ++j) {
-                *(elements[0][i]->neighboringLeft[v][j]) = -*(elements[0][i]->boundaryLeft[v][j]);
-            }
-
-    }
+    
 
     for(int i = 0; i < ne_y; i++)
-            elements[0][i]->assignBoundary(v, type,'L');
+            elements[0][i]->assignBoundary(type,'L');
 
     return ;
 }
@@ -385,11 +383,11 @@ void DG_Field_2d::setLeftBoundary(string v, string type) {
 /**
  * @Synopsis  This function sets the boundary type for a variable at Right Boundary.
  *
- * @Param v This is a string which defines the variable name.
  * @Param type This is a string which defines the boundary type.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setRightBoundary(string v, string type) {
+void DG_Field_2d::setRightBoundary( string type) {
+   // cout << "Calling Right Boundary !!" << endl;
     if(type == "periodic") {
         // Setting the boundary for the right elements.
         for(int j=0; j < (ne_y); j++)
@@ -410,16 +408,9 @@ void DG_Field_2d::setRightBoundary(string v, string type) {
        
     }
 
-    else if(type == "reflective") {
-        for(int i = 0; i < ne_y; i++)
-            for(int j=0; j<=N; ++j) {
-                *(elements[ne_x-1][i]->neighboringRight[v][j]) = -*(elements[ne_x-1][i]->boundaryRight[v][j]);
-            }
-
-    }
 
     for(int i = 0; i < ne_y; i++)
-            elements[ne_x-1][i]->assignBoundary(v, type,'R');
+            elements[ne_x-1][i]->assignBoundary(type,'R');
 
     return ;
 }
@@ -451,6 +442,37 @@ void DG_Field_2d::setBoundaryNeighbours(string v) {
 
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the boundary  for all boundary variable for Boundary Cells .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setBoundaryNeighbours() {
+    for(int k=0; k <variablesWithBoundaryInfo.size(); ++k) {
+        // Setting the boundary for the top elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][ne_y-1]->setVariableNeighbors(variablesWithBoundaryInfo[k]);
+
+
+        // Setting the boundary for the bottom elements.
+        for(int i = 0; i < ne_x; i++)
+            elements[i][0]->setVariableNeighbors(variablesWithBoundaryInfo[k]);
+
+        // Setting the boundary for the right elements.
+        for(int j=0; j < (ne_y); j++)
+            elements[ne_x-1][j]->setVariableNeighbors(variablesWithBoundaryInfo[k]);
+
+        // Setting the boundary for the left elements..
+        for(int j=0; j < ne_y; j++)
+            elements[0][j]->setVariableNeighbors(variablesWithBoundaryInfo[k]);
+    }
+
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -500,7 +522,8 @@ void DG_Field_2d::addVariable_withBounary(string v) {
            elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
        }
    }
-   variableNames.push_back(v);// What about vector variableWithBoundaryInfo, why is it there ??
+   variableNames.push_back(v);
+   variablesWithBoundaryInfo.push_back(v); // What about vector variableWithBoundaryInfo, why is it there ??
     return ;
 }
 
@@ -1065,4 +1088,30 @@ void DG_Field_2d::updateBoundary() {
     return ;
 }
 
-
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the maximum value in the Field .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Field_2d::FindMax(string v) {
+    double Max = elements[0][0]->FindMax(v); 
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            Max = max(elements[i][j]->FindMax(v), Max);
+    return Max;
+}
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dx in the field.
+ *
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Field_2d::FindMindx() {
+    double Min = min(elements[0][0]->dxMin, elements[0][0]->dyMin) ; 
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            Min = min(min(elements[i][j]->dxMin, elements[i][j]->dyMin), Min);
+    return Min;
+}

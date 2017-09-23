@@ -3,32 +3,41 @@
  
 
 double BoundaryDensity(double x, double y) {
-    return 1.0;
+     if( x < 0.5) return 1.0;
+     return 0.125;
 } 
+
 double BoundaryU(double x, double y){
-    return 1.0;
+    return 0.0;
 }
+
 double BoundaryV(double x, double y) {
-    return 1.0;
+    return 0.0;
 }
+
 double BoundaryPressure(double x, double y) {
-    return 1.0;
+     if( x < 0.5) return 1.0;
+     return 0.1;
 }
+
 double BoundaryGamma(double x, double y) {
-    return 1.0;
+    return gamma;
 }
     
 double BoundaryEnergy(double x, double y) {
-    return 1.0;
+    return BoundaryPressure(x,y)/(BoundaryGamma(x,y) -1.0) + 0.5 * BoundaryDensity(x,y) *(pow(BoundaryU(x,y),2) +pow(BoundaryV(x,y),2));
 }
+
 double BoundarySpecificEnthalpy(double x, double y) {
-    return 1.0;
+    return  BoundaryGamma(x,y)*BoundaryPressure(x,y)/((BoundaryGamma(x,y) -1.0)*BoundaryDensity(x,y)) + 0.5 *(pow(BoundaryU(x,y),2) +pow(BoundaryV(x,y),2));
 }
-double BoundaryMachNo(double x, double y) {
-    return 1.0;
-}
+
 double BoundarySoundSpeed(double x, double y) {
-    return 1.0;
+    return sqrt( BoundaryGamma(x,y) * BoundaryPressure(x,y) / BoundaryDensity(x,y) );
+}
+
+double BoundaryMachNo(double x, double y) {
+    return sqrt(pow(BoundaryU(x,y),2) +pow(BoundaryV(x,y),2))/BoundarySoundSpeed(x,y);
 }
 
 

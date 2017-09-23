@@ -58,63 +58,28 @@ DG_BoundaryElement_2d::~DG_BoundaryElement_2d() {
 /**
  * @Synopsis  This function updates maps from a variable to its corresponding Boundary Setting methods
  *
- * @Param v  This is the name of the variable whose map is to be set.
  * @Param type This is the type of the boundary.
  * @Param b This defines the location of the boundary element.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::assignBoundary(string v, string type, char b) {
+void DG_BoundaryElement_2d::assignBoundary(string type, char b) {
      switch(b) {
         case 't' : // `t` or `T` for top 
         case 'T' :
-            TopBoundary[v] = type;
-            if (type == "dirichlet") {
-                DirichletTop[v] = new double [N+1];
-                //DirichletTop[v].resize(N+1);
-                //DirichletTop[v] = type;
-                for(int i=0; i<=N; i++){
-                    DirichletTop[v][i] = *boundaryTop[v][i];
-                }
-            }
             BoundaryTop = type;
             break;
         case 'r' : // `r` or `R` for right
         case 'R' :
-            RightBoundary[v] = type;
-            if (type == "dirichlet") {
-                DirichletRight[v] = new double [N+1];
-                //DirichletRight[v].resize(N+1);
-                 //DirichletRight[v] = type;
-                for(int i=0; i<=N; i++){
-                    DirichletRight[v][i] = *boundaryRight[v][i];
-                }
-            }
+            // cout << "Calling assign Right Boundary !!" << endl;
             BoundaryRight = type;
             break;
         case 'b' : // `b` or `B` for bottom
         case 'B' :
-            BottomBoundary[v] = type;
-            if (type == "dirichlet") {
-                DirichletBottom[v] = new double [N+1];
-                //DirichletBottom[v].resize(N+1);
-                //DirichletBottom[v] = type;
-                for(int i=0; i<=N; i++){
-                    DirichletBottom[v][i] = *boundaryBottom[v][i];
-                }
-            }
             BoundaryBottom = type;
             break;
         case 'l' : // `l` or `L` for left
         case 'L' :
-            LeftBoundary[v] = type;
-            if (type == "dirichlet") {
-                DirichletLeft[v] = new double [N+1];
-               //DirichletLeft[v].resize(N+1);
-               //DirichletLeft[v] = type;
-                for(int i=0; i<=N; i++){
-                    DirichletLeft[v][i] = *boundaryLeft[v][i];
-                }
-            }
+         //cout << "Calling assign Left Boundary !!" << endl;
             BoundaryLeft = type;
             break;
         default:
@@ -289,10 +254,6 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
     // Derivative Matrix
     /// vDash = -0.5*dy*D*v
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
-
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
         
     cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
 
@@ -300,16 +261,10 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_right, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_left, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-  //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     delete[] numericalFlux;
@@ -363,26 +318,19 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
     /// vDash = -0.5*dy*D*v
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
-        
+    
     cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
 
     /// Adding the numeical Flux terms as necessary.
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_top, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
+   
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_bottom, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
+   
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     delete[] numericalFlux;
@@ -424,26 +372,17 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string fluxType) {
     /// vDash = -0.5*dy*D*v
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_x, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
-        
+       
     cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
 
     /// Adding the numeical Flux terms as necessary.
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_right, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
-
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
+    
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_left, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     delete[] numericalFlux;
@@ -485,9 +424,6 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
     /// vDash = -0.5*dy*D*v
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), derivativeMatrix_y, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
         
     cblas_dgemv(CblasRowMajor, CblasNoTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, RMatrix, (N+1)*(N+1), variable[v], 1, 0, variable[vDash], 1);
 
@@ -495,16 +431,10 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_top, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, (N+1)*(N+1), (N+1)*(N+1), (N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix, (N+1)*(N+1), fluxMatrix_bottom, (N+1)*(N+1), 0, RMatrix, (N+1)*(N+1));
 
-    // Implementing Boundary Condition
-    //updateDirichlet(conserVar, RMatrix);
-    //updateNeumann(conserVar, RMatrix);
     cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, RMatrix, (N+1)*(N+1), numericalFlux, 1, 1, variable[vDash], 1);
 
     delete[] numericalFlux;
@@ -532,14 +462,25 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
-    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
+    double epsilon = 1e-13;
+    //AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1)); // Similar to a diffusion coefficient
+    //AlphaN = 0.5/sqrt(4.0*N*N -1.0);
 
     // Ensuring that Cell avergae remains the  same after limiting !!
     variable[modm][0] = variable[m][0];
 
+    if ( N == 1) {
+        epsilon = 0.0 ;
+    }
+    else {
+        epsilon = 0.0;
+    }
+
     for(i=Index; i > 0; i = i - (N+2)) {
      --count;
      AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+     //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
+     //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
      for(j=0; j < count; ++j) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
@@ -548,7 +489,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -566,7 +507,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
       
-       if ( Temp1 != variable[modm][Tempi] || Temp2 != variable[modm][Tempj] ) {
+       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -596,12 +537,32 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
 /* ----------------------------------------------------------------------------*/
 double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
     vector<double> Elements;
+    double epsilon = 1e-16;
+    double M = 50.0;
+    double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
+    //Elements.push_back(M*min_dx*min_dx);
 
     Elements.push_back(variable[m][Index]);
-    if (R != this) Elements.push_back(Alpha*(R->variable[m][Index-1] -variable[m][Index-1]));
-    if (L != this) Elements.push_back(Alpha*(variable[m][Index-1] - L->variable[m][Index-1]));
-    if (T != this) Elements.push_back(Alpha*(T->variable[m][Index-(N+1)] -variable[m][Index-(N+1)]));
-    if (B != this) Elements.push_back(Alpha*(variable[m][Index-(N+1)] - B->variable[m][Index-(N+1)]));
+    if (R != this)// && abs(R->variable[m][Index]) > epsilon ) 
+    {
+        Elements.push_back(Alpha*(R->variable[m][Index-1] -variable[m][Index-1]));
+       // Elements.push_back((R->variable[m][Index]));
+    } 
+    if (L != this )//&& abs(L->variable[m][Index]) > epsilon )
+     {
+        Elements.push_back(Alpha*(variable[m][Index-1] - L->variable[m][Index-1]));
+       // Elements.push_back((L->variable[m][Index]));
+    } 
+    if (T != this )//&& abs(T->variable[m][Index]) > epsilon )
+     {
+        Elements.push_back(Alpha*(T->variable[m][Index-(N+1)] -variable[m][Index-(N+1)]));
+       // Elements.push_back((T->variable[m][Index]));
+    } 
+    if (B != this)// && abs(B->variable[m][Index]) > epsilon )
+     {
+        Elements.push_back(Alpha*(variable[m][Index-(N+1)] - B->variable[m][Index-(N+1)]));
+        // Elements.push_back((B->variable[m][Index]));
+    } 
     
     return MinMod(Elements);
 }
@@ -721,6 +682,15 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
     }
 */
     cblas_dcopy((N+1)*(N+1), AuxVariable, 1, variable[v], 1);
+
+  /* for (int i=0; i< (N+1)*(N+1); ++i) {
+      if (variable[v][i] < *variable["Min"]) {
+          variable[v][i] = *variable["Min"] ;
+      }
+      else if (variable[v][i] > *variable["Max"]) {
+          variable[v][i] = *variable["Max"] ;
+      }
+  }*/
     
     delete[] AuxVariable;
   
@@ -759,7 +729,7 @@ void DG_BoundaryElement_2d::addConservativeVariables(vector<string> V) {
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::updateBoundary() {
 
-    //if ( System == "EULER") 
+    if ( System == "EULER") 
     {
         setBoundary(BoundaryTop, 1, N*(N+1), (N-1)*(N+1), 'T');
         setBoundary(BoundaryBottom, 1, 0, N+1, 'B');
@@ -780,7 +750,7 @@ void DG_BoundaryElement_2d::updateBoundary() {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d:: EulerCharacteristicInflowBoundary(int Index1, int Index2, char B) {
-    double q, nx, ny, c, gamma, H, u, v, epsilon = 1e-13;
+    double q, nx, ny, c, Gamma, H, u, v, epsilon = 1e-13;
     double LEigen[ConservativeVariables.size()], REigen[ConservativeVariables.size()], C1, C2 ;
 
 
@@ -795,16 +765,16 @@ void DG_BoundaryElement_2d:: EulerCharacteristicInflowBoundary(int Index1, int I
 
     q = sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0));
     c = BoundarySoundSpeed(X[Index1], Y[Index1]);
-    gamma = BoundaryGamma(X[Index1], Y[Index1]);
+    Gamma = BoundaryGamma(X[Index1], Y[Index1]);
     H = BoundarySpecificEnthalpy(X[Index1], Y[Index2]);
     u = BoundaryU(X[Index1], Y[Index1]);
     v = BoundaryV(X[Index1], Y[Index1]);
 
     // Left Eigen Vector
-    LEigen[0] = 0.5 * ( 0.5 *(gamma-1.0)*pow(q/c, 2.0) + q/c);
-    LEigen[1] = -0.5 * (u*(gamma-1.0)/pow(c,2.0) + nx/c);
-    LEigen[2] = -0.5 * (v*(gamma-1.0)/pow(c,2.0) + ny/c);
-    LEigen[3] = 0.5 * (gamma -1.0)/pow(c, 2.0);
+    LEigen[0] = 0.5 * ( 0.5 *(Gamma-1.0)*pow(q/c, 2.0) + q/c);
+    LEigen[1] = -0.5 * (u*(Gamma-1.0)/pow(c,2.0) + nx/c);
+    LEigen[2] = -0.5 * (v*(Gamma-1.0)/pow(c,2.0) + ny/c);
+    LEigen[3] = 0.5 * (Gamma -1.0)/pow(c, 2.0);
 
     // Right Eigen Vector 
     REigen[0] = 1.0;
@@ -836,7 +806,7 @@ void DG_BoundaryElement_2d:: EulerCharacteristicInflowBoundary(int Index1, int I
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d:: EulerCharacteristicOutflowBoundary(int Index1, int Index2, char B) {
-    double q, nx, ny, c, gamma, H, u, v, epsilon = 1e-13;
+    double q, nx, ny, c, Gamma, H, u, v, epsilon = 1e-13;
     double LEigen[ConservativeVariables.size()], REigen[ConservativeVariables.size()], C1, C2 ;
 
 
@@ -851,16 +821,16 @@ void DG_BoundaryElement_2d:: EulerCharacteristicOutflowBoundary(int Index1, int 
 
     q = sqrt( pow(BoundaryU(X[Index1], Y[Index1]),2.0) + pow(BoundaryU(X[Index1], Y[Index1]),2.0));
     c = BoundarySoundSpeed(X[Index1], Y[Index1]);
-    gamma = BoundaryGamma(X[Index1], Y[Index1]);
+    Gamma = BoundaryGamma(X[Index1], Y[Index1]);
     H = BoundarySpecificEnthalpy(X[Index1], Y[Index2]);
     u = BoundaryU(X[Index1], Y[Index1]);
     v = BoundaryV(X[Index1], Y[Index1]);
 
     // Left Eigen Vector
-    LEigen[0] = 0.5 * ( 0.5 *(gamma-1.0)*pow(q/c, 2.0) + q/c);
-    LEigen[1] = -0.5 * (u*(gamma-1.0)/pow(c,2.0) + nx/c);
-    LEigen[2] = -0.5 * (v*(gamma-1.0)/pow(c,2.0) + ny/c);
-    LEigen[3] = 0.5 * (gamma -1.0)/pow(c, 2.0);
+    LEigen[0] = 0.5 * ( 0.5 *(Gamma-1.0)*pow(q/c, 2.0) + q/c);
+    LEigen[1] = -0.5 * (u*(Gamma-1.0)/pow(c,2.0) + nx/c);
+    LEigen[2] = -0.5 * (v*(Gamma-1.0)/pow(c,2.0) + ny/c);
+    LEigen[3] = 0.5 * (Gamma -1.0)/pow(c, 2.0);
 
     // Right Eigen Vector 
     REigen[0] = 1.0;
@@ -904,7 +874,7 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
 
     // add additional variables as required for other systems !!
 
-    if ( BoundaryPosition == "WALL" || BoundaryPosition == "SYMMETRIC") {
+    if ( BoundaryPosition == "wall" || BoundaryPosition == "symmetric") {
         for(int i=0; i<N; ++i) {
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
             variable[Xmom][Index1 + ScaleI*i] = variable[Xmom][ScaleI*i + Index2];
@@ -912,7 +882,7 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
         }
     }
-    else if(BoundaryPosition == "INFLOW") {
+    else if(BoundaryPosition == "inflow") {
         for(int i=0; i<N; ++i) {
             variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
@@ -924,7 +894,7 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
             }
         }
     }
-    else if(BoundaryPosition == "OUTFLOW") {
+    else if(BoundaryPosition == "outflow") {
         for(int i=0; i<N; ++i) {
             if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) >= 1.0) {
                  for(int j=0; j<ConservativeVariables.size(); ++j) {
@@ -941,7 +911,7 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
             }
         }
     }
-    else if(BoundaryPosition == "DIRICHLET") {
+    else if(BoundaryPosition == "dirichlet") {
         for(int i=0; i<N; ++i) {
             variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
@@ -949,18 +919,21 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
             variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
         }
     }
-    else if(BoundaryPosition == "NEUMANN") {
+    else if(BoundaryPosition == "neumann") {
         for(int j=0; j<ConservativeVariables.size(); ++j) {
             for(int i=0; i<N; ++i) {
                 variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
             }
         }
     }
-    else if(BoundaryPosition == "PERIODIC") {
+    else if(BoundaryPosition == "periodic" ) {
+        
+    }
+    else if(BoundaryPosition == "NIL" ) {
         
     }
     else {
-        cout << "NO TOP BOUNDARY SPECIFIED !!" << endl;
+        cout << "NO BOUNDARY SPECIFIED !!" << BoundaryPosition << " : " << B << endl;
     }
     return;
 }

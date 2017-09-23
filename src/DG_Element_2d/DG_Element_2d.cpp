@@ -50,6 +50,9 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
         }
     }
 
+    dxMin = abs(X[0]-X[1]);
+    dyMin = abs(Y[0]-Y[N+1]);
+
     delete[] nodes;
 
     massMatrix = NULL;
@@ -339,6 +342,9 @@ void DG_Element_2d::checkPositivity(string v, string cm, string level) {
             if (variable[v][i] < 0.0) {
                 PositivityMarker = true;
                 *variable[cm] = 2.0;
+                for(int b=0; b <(N+1)*(N+1); ++b) {
+                    variable["CellMarkerGlobal"][b] = *variable[cm];
+                }
                 return ;
             }
         }
@@ -378,15 +384,16 @@ void DG_Element_2d::resetPositivity() {
 void DG_Element_2d::computeMoments(string v, string m) {
   /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
-
-// Additional filter to set values less than 1e-8 to zero !!, Recheck /Temporary
-/*
-  for (int i=0; i <(N+1)*(N+1); ++i) {
-      if (abs(variable[m][i]) <= 1e-7) {
-          variable[m][i] = 0.0;
-      }
+  
+  *variable["Min"] = variable[v][0];
+  *variable["Max"] = variable[v][0];
+  for (int i=1; i< (N+1)*(N+1); ++i) {
+      *variable["Min"] = min(*variable["Min"], variable[v][i]);
+      *variable["Max"] = max(*variable["Max"], variable[v][i]);
   }
-*/
+  /*for(int b=0; b <(N+1)*(N+1); ++b) {
+                    variable["CellMarkerGlobal"][b] = *variable["Min"];
+  }*/
   return ;
 }
 
@@ -405,12 +412,17 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
  if (*variable[cm] && PositivityMarker)
-  { // Checking if cell marker is not equal to zero
-  //cout << "Calling :: convertMomentToVariable()\n";
-  
-  
+  { 
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
   
+  for (int i=0; i< (N+1)*(N+1); ++i) {
+      if (variable[v][i] < *variable["Min"]) {
+          variable[v][i] = *variable["Min"] ;
+      }
+      else if (variable[v][i] > *variable["Max"]) {
+          variable[v][i] = *variable["Max"] ;
+      }
+  }
 
   }
 
@@ -436,23 +448,63 @@ if (*variable[cm] && PositivityMarker)
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
+    double epsilon = 1e-13;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+    vector<double> Var1, Var2 ;
+    double M = 50.0;
+    double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
+    Var1.push_back(M*min_dx*min_dx);
+    Var2.push_back(M*min_dx*min_dx);
 
     
     // Ensuring that Cell avergae remains the  same after limiting !!
     variable[modm][0] = variable[m][0];
 
+    if ( N == 1) {
+        epsilon = 0.0 ;
+    }
+    else {
+        epsilon = 1e-16;
+    }
+
     for(i=Index; i > 0; i = i - (N+2)) {
      --count;
-     AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+     //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
      for(j=0; j < count; ++j) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
-       // Original minmod detector
-       Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+
+       Var1.resize(0);
+       Var2.resize(0);
+       Var1.push_back(variable[m][Tempi]);
+       Var2.push_back(variable[m][Tempj]);
+
+       //if (abs(rightNeighbor->variable[m][Tempi]) > epsilon ) 
+       Var1.push_back(AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]));
+       //if (abs(leftNeighbor->variable[m][Tempi]) > epsilon) 
+       Var1.push_back(AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]));
+       //if (abs(topNeighbor->variable[m][Tempi]) > epsilon ) 
+       Var1.push_back(AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]));
+       //if (abs(bottomNeighbor->variable[m][Tempi]) > epsilon) 
+       Var1.push_back(AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)])); 
        
-       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
+       //if (abs(rightNeighbor->variable[m][Tempj]) > epsilon ) 
+       Var2.push_back(AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]));
+       //if (abs(leftNeighbor->variable[m][Tempj]) > epsilon) 
+       Var2.push_back(AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       //if (abs(topNeighbor->variable[m][Tempj]) > epsilon ) 
+       Var2.push_back(AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]));
+       //if (abs(bottomNeighbor->variable[m][Tempj]) > epsilon) 
+       Var2.push_back(AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)])); 
+
+       Temp1 = MinMod(Var1);
+       Temp2 = MinMod(Var2);
+
+       // Original minmod detector
+       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       
+       if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -464,12 +516,31 @@ if (*variable[cm] && PositivityMarker)
      // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
        Tempi = i-j;
        Tempj = i - j*(N+1);
+
+
+       Var1.resize(0);
+       Var2.resize(0);
+       Var1.push_back(variable[m][Tempi]);
+       Var2.push_back(variable[m][Tempj]);
+
+       //if (abs(topNeighbor->variable[m][Tempi]) > epsilon ) 
+       Var1.push_back(AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]));
+       //if (abs(bottomNeighbor->variable[m][Tempi]) > epsilon) 
+       Var1.push_back(AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)])); 
+       
+       //if (abs(rightNeighbor->variable[m][Tempj]) > epsilon ) 
+       Var2.push_back(AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]));
+       //if (abs(leftNeighbor->variable[m][Tempj]) > epsilon) 
+       Var2.push_back(AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       
+       Temp1 = MinMod(Var1);
+       Temp2 = MinMod(Var2);
        
        // Original Detector
-       Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+       //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
        
-       if ( Temp1 != variable[m][Tempi] || Temp2 != variable[m][Tempj] ) {
+       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -1105,7 +1176,19 @@ double DG_Element_2d::l2Norm(string v1, string v2) {
     delete[] diff;
     return norm2;
 }
-
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the maximum value in the Field .
+ *
+ * @Param v This is a string which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Element_2d::FindMax(string v) {
+    double Max = variable[v][0]; 
+    for(int i = 0; i < (N+1)*(N+1); i++)
+            Max = max(variable[v][i], Max);
+    return Max;
+}
 /* ----------------------------------------------------------------------------*/
 //--------------------------VIRTUAL FUNCTIONS----------------------------------//
 /*-----------------------------------------------------------------------------*/
@@ -1114,12 +1197,11 @@ double DG_Element_2d::l2Norm(string v1, string v2) {
 /**
  * @Synopsis  This function updates maps from a variable to its corresponding Boundary Setting methods
  *
- * @Param v  This is the name of the variable whose map is to be set.
  * @Param type This is the type of the boundary.
  * @Param b This defines the location of the boundary element.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::assignBoundary(string v, string type, char b) {
+void DG_Element_2d::assignBoundary( string type, char b) {
     return ;
 }
 
