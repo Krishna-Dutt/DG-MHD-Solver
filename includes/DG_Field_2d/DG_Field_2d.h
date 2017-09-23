@@ -101,7 +101,7 @@ public:
     void addConservativeVariables(string v);
     void addConservativeVariables(vector<string> V);
 
-    void updateBoundary();
+    void updateBoundary(double time);
     
     // Misc. Functions on for global field data 
     double FindMax(string v);

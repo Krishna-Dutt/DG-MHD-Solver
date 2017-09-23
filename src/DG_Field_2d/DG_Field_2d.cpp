@@ -55,11 +55,11 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up exponential grid (noo-uniform grid) along y direction
     double Beta_y, Beta_x, DeltaX, DeltaY, epsilon = 1e-10;
     DeltaY = (y2-y1);
-    Beta_y = 1.0;
+    Beta_y = 1.075;
 
     DeltaX = (x2-x1);
-    Beta_x = 1.0;
-    //dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
+    Beta_x = 1.1;
+    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){
         y_curr = y1;
@@ -1077,12 +1077,13 @@ void DG_Field_2d::addConservativeVariables(vector<string> V) {
 /**
  * @Synopsis  This function update Boundary values after every timestep.
  *
+ * @Param time the solution time.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::updateBoundary() {
+void DG_Field_2d::updateBoundary(double time) {
     for(int i = 0; i < ne_x; i++)
     for (int j = 0; j < ne_y; j++) {
-      elements[i][j]->updateBoundary();
+      elements[i][j]->updateBoundary(time);
     }
 
     return ;

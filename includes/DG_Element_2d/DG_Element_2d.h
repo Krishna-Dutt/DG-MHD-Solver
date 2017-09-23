@@ -169,7 +169,7 @@ public:
     virtual void addConservativeVariables(string v);
     virtual void addConservativeVariables(vector<string> V);
 
-    virtual void updateBoundary();
+    virtual void updateBoundary(double time);
         
 
 };

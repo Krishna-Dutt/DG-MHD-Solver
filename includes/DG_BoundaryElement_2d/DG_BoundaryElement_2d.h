@@ -84,8 +84,8 @@ public:
         void addConservativeVariables(string v);
         void addConservativeVariables(vector<string> V);
 
-        void updateBoundary();
-        void setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B);
+        void updateBoundary(double time);
+        void setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time);
         void updateTopBoundary();
         void updateBottomBoundary();
         void updateLeftBoundary();

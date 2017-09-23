@@ -1311,9 +1311,10 @@ double DG_Element_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Eleme
 /**
  * @Synopsis  This function updates Boundary values after a timestep.
  *
+  * @Param time the solution time.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateBoundary() {
+void DG_Element_2d::updateBoundary(double time) {
     return ;
 }
 

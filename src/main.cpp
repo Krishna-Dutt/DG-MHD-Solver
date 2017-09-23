@@ -11,6 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
+  if(y > 2e-4 ) return 0.25;
   return 0.0;
 }
 
@@ -20,13 +21,11 @@ double V(double x, double y) {
 
 
 double IDensity(double x, double y) {
-  if( x < 0.5) return 1.0;
-  return 0.125;
+  return 1.4;
 }
 
 double IPressure(double x, double y) {
-  if( x < 0.5) return 1.0;
-  return 0.1;
+  return 1.0;
 }
 
 double StateEq(double D, double T) {
@@ -105,10 +104,10 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 100;
     double CFL = 0.15;
-    double time = 0.2;
+    double time = 1.0;
     EulerSolver* a;
-    a = new EulerSolver(200, 1, 1);
-    a->setDomain(0.0, 0.0, 1.0, 1.0);
+    a = new EulerSolver(10, 40, 1);
+    a->setDomain(0.0, 0.0, 0.1, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();
@@ -120,12 +119,12 @@ int main() {
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
 
-    a->setBoundaryCondtions("periodic", "outflow", "periodic", "inflow");
+    a->setBoundaryCondtions("noslipWall", "outflow", "neumann", "inflow");
     //a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressure, IE);
-    a->FindL2Norm(AnalyticalDensity, AnalyticalVelocity);
+    a->FindL2Norm(IDensity, U);
     a->plot("ViscousBL_test.vtk");
     
 

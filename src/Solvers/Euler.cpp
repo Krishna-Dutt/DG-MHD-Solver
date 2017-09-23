@@ -439,7 +439,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P);
 
-    field->updateBoundary();
+    field->updateBoundary(t);
     updatePrimitiveVariables(T, P);
    
     
@@ -471,7 +471,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     //updatePrimitiveVariables(T, P);
     RunPositivityLimiter(T, P); 
     
-    field->updateBoundary();
+    field->updateBoundary(t);
     updatePrimitiveVariables(T, P);
 
    // Third (Final) Step of RK3
@@ -503,7 +503,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
    //updatePrimitiveVariables(T, P);
    RunPositivityLimiter(T, P); 
    
-    field->updateBoundary();
+    field->updateBoundary(t);
     updatePrimitiveVariables(T, P);
 
    t += dt; 
