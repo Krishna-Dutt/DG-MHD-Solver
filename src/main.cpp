@@ -11,8 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if(y > 2e-4 ) return 0.25;
-  return 0.0;
+  return 0.25;
 }
 
 double V(double x, double y) {
@@ -125,7 +124,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_test.vtk");
+    a->plot("ViscousBL_test_xdirec.vtk");
     
 
     delete a;
