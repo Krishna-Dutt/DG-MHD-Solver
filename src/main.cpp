@@ -11,7 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
-  return 0.25;
+  return 0.025;
 }
 
 double V(double x, double y) {
@@ -103,7 +103,7 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 100;
     double CFL = 0.15;
-    double time = 1.0;
+    double time = 3.0;
     EulerSolver* a;
     a = new EulerSolver(10, 40, 1);
     a->setDomain(0.0, 0.0, 0.1, 0.1);
@@ -124,7 +124,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressure, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_test_xdirec.vtk");
+    a->plot("ViscousBL_test_xandydirec2.vtk");
     
 
     delete a;

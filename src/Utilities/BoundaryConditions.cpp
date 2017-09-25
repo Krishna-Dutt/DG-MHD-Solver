@@ -7,7 +7,7 @@ double BoundaryDensity(double x, double y) {
 } 
 
 double BoundaryU(double x, double y){
-    return 0.25;
+    return 0.025;
 }
 
 double BoundaryV(double x, double y) {

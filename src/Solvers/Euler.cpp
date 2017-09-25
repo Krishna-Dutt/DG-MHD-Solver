@@ -428,7 +428,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Y Momentum
     field->setFunctionsForVariables("quv", "Tauxy", Subtract, "xFlux");
     field->setFunctionsForVariables("qvv_plus_P", "Tauyy", Subtract, "yFlux");
-   // RK_Step1("qv","xFlux","yFlux","k1qv");
+    RK_Step1("qv","xFlux","yFlux","k1qv");
     // Energy
     field->setFunctionsForVariables("qE_plus_P_u", "Eviscousx", Subtract, "xFlux");
     field->setFunctionsForVariables("qE_plus_P_v", "Eviscousy", Subtract, "yFlux");
@@ -460,7 +460,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Y Momentum
     field->setFunctionsForVariables("quv", "Tauxy", Subtract, "xFlux");
     field->setFunctionsForVariables("qvv_plus_P", "Tauyy", Subtract, "yFlux");
-   // RK_Step2("qv","xFlux","yFlux","k1qv", "k2qv");
+    RK_Step2("qv","xFlux","yFlux","k1qv", "k2qv");
     // Energy
     field->setFunctionsForVariables("qE_plus_P_u", "Eviscousx", Subtract, "xFlux");
     field->setFunctionsForVariables("qE_plus_P_v", "Eviscousy", Subtract, "yFlux");
@@ -491,7 +491,7 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // Y Momentum
     field->setFunctionsForVariables("quv", "Tauxy", Subtract, "xFlux");
     field->setFunctionsForVariables("qvv_plus_P", "Tauyy", Subtract, "yFlux");
-   // RK_Step3("qv","xFlux","yFlux","k1qv", "k2qv", "k3qv");
+    RK_Step3("qv","xFlux","yFlux","k1qv", "k2qv", "k3qv");
     // Energy
     field->setFunctionsForVariables("qE_plus_P_u", "Eviscousx", Subtract, "xFlux");
     field->setFunctionsForVariables("qE_plus_P_v", "Eviscousy", Subtract, "yFlux");
