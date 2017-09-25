@@ -46,6 +46,8 @@ protected:
         string BoundaryLeft;
         string BoundaryRight;
 
+        string CornerCell;
+
         vector<string> ConservativeVariables;
 
 
@@ -90,6 +92,7 @@ public:
         void updateBottomBoundary();
         void updateLeftBoundary();
         void updateRightBoundary();
+        void AdjustCornerElement(int *Index, char B);
 
         // For Euler or Navier Stokes system !!
         void EulerCharacteristicInflowBoundary(int Index1, int Index2, char B);

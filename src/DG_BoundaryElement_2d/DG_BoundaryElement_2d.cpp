@@ -29,6 +29,8 @@ DG_BoundaryElement_2d::DG_BoundaryElement_2d(int _N, double x1, double y1, doubl
         BoundaryLeft = "NIL";
         BoundaryRight = "NIL";
 
+        CornerCell = "NIL";
+
         ConservativeVariables.resize(0);
 }
 
@@ -67,20 +69,48 @@ void DG_BoundaryElement_2d::assignBoundary(string type, char b) {
         case 't' : // `t` or `T` for top 
         case 'T' :
             BoundaryTop = type;
+
+            if ( BoundaryRight != "NIL") {
+                CornerCell = "TopRight";
+            }
+            else if( BoundaryLeft != "NIL") {
+                CornerCell = "TopLeft";
+            }
             break;
         case 'r' : // `r` or `R` for right
         case 'R' :
             // cout << "Calling assign Right Boundary !!" << endl;
             BoundaryRight = type;
+
+            if ( BoundaryTop != "NIL") {
+                CornerCell = "TopRight";
+            }
+            else if( BoundaryBottom != "NIL") {
+                CornerCell = "BottomRight";
+            }
             break;
         case 'b' : // `b` or `B` for bottom
         case 'B' :
             BoundaryBottom = type;
+
+            if ( BoundaryRight != "NIL") {
+                CornerCell = "BottomRight";
+            }
+            else if( BoundaryLeft != "NIL") {
+                CornerCell = "BottomLeft";
+            }
             break;
         case 'l' : // `l` or `L` for left
         case 'L' :
          //cout << "Calling assign Left Boundary !!" << endl;
             BoundaryLeft = type;
+
+            if ( BoundaryTop != "NIL") {
+                CornerCell = "TopLeft";
+            }
+            else if( BoundaryBottom != "NIL") {
+                CornerCell = "BottomLeft";
+            }
             break;
         default:
             cout << "WARNING!. No such neighbor type " << type << endl;
@@ -883,7 +913,61 @@ void DG_BoundaryElement_2d:: EulerCharacteristicOutflowBoundary(int Index1, int 
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function adjusts the indices for Boundary for Corner Cells
+ *
+ * @Param Index Index corresponding to start and end of boundary nodes.
+ * @Param B Position of boundary
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::AdjustCornerElement(int *Index, char B) {
+       int start, end;
+       if (CornerCell == "NIL") {
+            start = 0;
+            end = N;
+        }
+        else if( CornerCell == "TopRight") {
+            switch(B) {
+                case 'T' : start = 1;
+                           end = N;
+                           break;
+                case 'R' : start = 0;
+                           end = N-1;
+            }
+        }
+        else if( CornerCell == "BottomRight") {
+            switch(B) {
+                case 'B' : start = 1;
+                           end = N;
+                           break;
+                case 'R' : start = 1;
+                           end = N;
+            }
+        }
+         else if( CornerCell == "TopLeft") {
+            switch(B) {
+                case 'T' : start = 0;
+                           end = N-1;
+                           break;
+                case 'L' : start = 0;
+                           end = N-1;
+            }
+        }
+        else if( CornerCell == "BottomLeft") {
+            switch(B) {
+                case 'B' : start = 0;
+                           end = N-1;
+                           break;
+                case 'L' : start = 1;
+                           end = N;
+            }
+        }
+    Index[0] = start;
+    Index[1] = end;
 
+    return ;
+}
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -903,6 +987,10 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
     Xmom = ConservativeVariables[1];
     Ymom = ConservativeVariables[2];
     Energy = ConservativeVariables[3];
+
+    int* Ind = new int[2]; 
+    Ind[0] = 0;
+    Ind[1] = N;
 
     // add additional variables as required for other systems !!
 
@@ -927,16 +1015,17 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
         }
     }
-    if ( BoundaryPosition == "noslipWall" || BoundaryPosition == "symmetric") {
+    if ( BoundaryPosition == "noslipWall" ) {
         for(int i=0; i<=N; ++i) {
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
-            variable[Xmom][Index1 + ScaleI*i] = 0.0;
+            variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
             variable[Ymom][Index1 + ScaleI*i] = 0.0;
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
         }
     }
     else if(BoundaryPosition == "inflow") {
-        for(int i=0; i<=N; ++i) {
+        AdjustCornerElement(Ind, B);
+        for(int i=Ind[0]; i<=Ind[1]; ++i) {
             variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
@@ -949,7 +1038,8 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
         }
     }
     else if(BoundaryPosition == "outflow") {
-        for(int i=0; i<=N; ++i) {
+        AdjustCornerElement(Ind, B);
+        for(int i=Ind[0]; i<=Ind[1]; ++i) {
             if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) >= 1.0) {
                  for(int j=0; j<ConservativeVariables.size(); ++j) {
                      variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
@@ -997,6 +1087,8 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
     else {
         cout << "NO BOUNDARY SPECIFIED !!" << BoundaryPosition << " : " << B << endl;
     }
+
+    delete[] Ind;
     return;
 }
 
