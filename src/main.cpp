@@ -103,7 +103,7 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 100;
     double CFL = 0.15;
-    double time = 3.0;
+    double time = 1.0;
     EulerSolver* a;
     a = new EulerSolver(10, 40, 1);
     a->setDomain(0.0, 0.0, 0.1, 0.1);
