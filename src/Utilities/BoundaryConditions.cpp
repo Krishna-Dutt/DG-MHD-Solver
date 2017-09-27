@@ -7,7 +7,7 @@ double BoundaryDensity(double x, double y) {
 } 
 
 double BoundaryU(double x, double y){
-     if ( y > 2e-4) return 0.025;
+     if ( y > 1e-6) return 0.025;
   return 0.0;
 }
 
