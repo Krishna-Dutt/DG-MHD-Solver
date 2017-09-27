@@ -21,7 +21,7 @@ double V(double x, double y) {
 
 
 double IDensity(double x, double y) {
-  return 1.4;
+  return 14.0;
 }
 
 double IPressure(double x, double y) {
@@ -106,7 +106,7 @@ int main() {
     double CFL = 0.24;
     double time = 2.0;
     EulerSolver* a;
-    a = new EulerSolver(60, 60, 1);
+    a = new EulerSolver(40, 40, 1);
     a->setDomain(0.0, 0.0, 0.1, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -125,7 +125,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_test_N1_60x60.vtk");
+    a->plot("ViscousBL_test_N1_40x40_D14.vtk");
     
 
     delete a;
