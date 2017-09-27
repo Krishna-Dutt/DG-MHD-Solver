@@ -7,6 +7,7 @@
 #include "../../includes/Utilities/LobattoNodes.h"
 #include "../../includes/Utilities/MinMod.h"
 #include "../../includes/Utilities/BoundaryConditions.h"
+#include "../../includes/Utilities/Thermodynamics.h"
 
 #define MAX(a, b)(a>b?a:b)
 #define MIN(a, b)(a<b?a:b)
@@ -915,6 +916,104 @@ void DG_BoundaryElement_2d:: EulerCharacteristicOutflowBoundary(int Index1, int 
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This function applies Subsonic Inflow conditions at the boundary
+ *
+ * @Param Index1 Index corresponding to boundary nodes.
+ * @Param Index2 Index corresponding to neighboring nodes.
+ * @Param B Position of boundary
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2, char B) {
+    double nx, ny, u, v, P ,IE, r, c;
+    double ub, vb, Pb, rb;
+
+    switch(B) {
+        case 'T' : nx = 0.0;
+                   ny = 1.0;
+                   break;
+        case 'B' : nx = 0.0;
+                   ny = -1.0;
+                   break;
+        case 'R' : ny = 0.0;
+                   nx = 1.0;
+                   break;
+        case 'L' : ny = 0.0;
+                   nx = -1.0;
+                   break;
+    }
+    r = variable[ConservativeVariables[0]][Index2];
+    u = variable[ConservativeVariables[1]][Index2]/r;
+    v = variable[ConservativeVariables[2]][Index2]/r;
+
+    IE = variable[ConservativeVariables[3]][Index2] - 0.5 * r * (u*u + v*v);
+    P = Pressure(r, IE);
+    c = SoundSpeed(r, P);
+
+    Pb = 0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
+    rb = BoundaryDensity(X[Index1], Y[Index1]) + ( -BoundaryPressure(X[Index1], Y[Index1]) + Pb)/(c*c);
+    ub = BoundaryU(X[Index1], Y[Index1]) - nx*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
+    vb = BoundaryV(X[Index1], Y[Index1]) - ny*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
+
+    variable[ConservativeVariables[0]][Index1] = rb;
+    variable[ConservativeVariables[1]][Index1] = rb * ub;
+    variable[ConservativeVariables[2]][Index1] = rb * vb;
+    variable[ConservativeVariables[3]][Index1] = InternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
+
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function applies Subsonic Outflow conditions at the boundary
+ *
+ * @Param Index1 Index corresponding to boundary nodes.
+ * @Param Index2 Index corresponding to neighboring nodes.
+ * @Param B Position of boundary
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d:: EulerSubsonicOutflowBoundary(int Index1, int Index2, char B) {
+    double nx, ny, u, v, P ,IE, r, c;
+    double ub, vb, Pb, rb;
+
+    switch(B) {
+        case 'T' : nx = 0.0;
+                   ny = 1.0;
+                   break;
+        case 'B' : nx = 0.0;
+                   ny = -1.0;
+                   break;
+        case 'R' : ny = 0.0;
+                   nx = 1.0;
+                   break;
+        case 'L' : ny = 0.0;
+                   nx = -1.0;
+                   break;
+    }
+    r = variable[ConservativeVariables[0]][Index2];
+    u = variable[ConservativeVariables[1]][Index2]/r;
+    v = variable[ConservativeVariables[2]][Index2]/r;
+
+    IE = variable[ConservativeVariables[3]][Index2] - 0.5 * r * (u*u + v*v);
+    P = Pressure(r, IE);
+    c = SoundSpeed(r, P);
+
+    Pb =  BoundaryPressure(X[Index1], Y[Index1]);
+    rb = r + ( -P + Pb)/(c*c);
+    ub = u + nx*( P - Pb )/(r*c);
+    vb = v + ny*( P - Pb )/(r*c);
+
+    variable[ConservativeVariables[0]][Index1] = rb;
+    variable[ConservativeVariables[1]][Index1] = rb * ub;
+    variable[ConservativeVariables[2]][Index1] = rb * vb;
+    variable[ConservativeVariables[3]][Index1] = InternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
+
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This function adjusts the indices for Boundary for Corner Cells
  *
  * @Param Index Index corresponding to start and end of boundary nodes.
@@ -1033,7 +1132,8 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
             
             if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) < 1.0) {
                 //cout << "Called Inflow BC !!" << endl;
-                EulerCharacteristicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+                //EulerCharacteristicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+                EulerSubsonicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
             }
         }
     }
@@ -1046,12 +1146,13 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
                 }
             }
             else {
-                variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
-                variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
-                variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
-                variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             
-                EulerCharacteristicOutflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+                //EulerCharacteristicOutflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+                EulerSubsonicOutflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
             }
         }
     }

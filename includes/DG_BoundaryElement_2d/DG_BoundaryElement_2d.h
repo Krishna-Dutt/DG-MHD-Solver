@@ -97,6 +97,9 @@ public:
         // For Euler or Navier Stokes system !!
         void EulerCharacteristicInflowBoundary(int Index1, int Index2, char B);
         void EulerCharacteristicOutflowBoundary(int Index1, int Index2, char B);
+
+        void EulerSubsonicInflowBoundary(int Index1, int Index2, char B);
+        void EulerSubsonicOutflowBoundary(int Index1, int Index2, char B);
         
 };
 
