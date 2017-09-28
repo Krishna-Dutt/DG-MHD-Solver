@@ -21,7 +21,7 @@ double V(double x, double y) {
 
 
 double IDensity(double x, double y) {
-  return 14.0;
+  return 1.4;
 }
 
 double IPressure(double x, double y) {
@@ -120,12 +120,12 @@ int main() {
     a->updateConservativeVariables(IE);
 
     a->setBoundaryCondtions("noslipWall", "outflow", "neumann", "inflow");
-    //a->SetShockDetector("KXRCF");
+    a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_test_N1_40x40_D14.vtk");
+    a->plot("ViscousBL_test_N1_40x40_KXRCF.vtk");
     
 
     delete a;

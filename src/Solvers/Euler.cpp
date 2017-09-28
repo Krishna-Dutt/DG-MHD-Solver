@@ -562,10 +562,10 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_CellCentered("CellMarker");
+    /*field->addVariable_CellCentered("CellMarker");
     field->ResetVariables_CellCentered("CellMarker", 1.5);
     field->addVariable_withBounary("CellMarkerGlobal");
-    field->scal(0.0, "CellMarkerGlobal");
+    field->scal(0.0, "CellMarkerGlobal");*/
     field->addVariable_CellCentered("Max");
     field->addVariable_CellCentered("Min");
 
