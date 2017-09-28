@@ -1167,6 +1167,25 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(string w, string x, string 
 }
 
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable z to f(x, y).
+ *
+ * @Param x The first parameter of the function.
+ * @Param y The second parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)> f, string z) {
+    
+    for(int i = 0 ; i < (N+1)*(N+1); i++)
+        *variable[z] = f(variable[x][i],variable[y][i], *variable[z]);
+    return ;
+}
+
+
+
 double DG_Element_2d::l2Norm(string v1, string v2) {
     double* diff = new double[(N+1)*(N+1)];
     cblas_dscal((N+1)*(N+1), 0.0, diff, 1);
@@ -1189,6 +1208,45 @@ double DG_Element_2d::FindMax(string v) {
             Max = max(variable[v][i], Max);
     return Max;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dx in the field.
+ *
+ * @Param dx To store the minimum dx in the element
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::FindMindx(string dx) {
+    *variable[dx] = min(dxMin, dyMin);
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dt in the field.
+ *
+ * @Param dt To find th mimimum dt from all dt.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Element_2d::FindMindt(string dt) {
+   return *variable[dt];
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dt in the element.
+ *
+ * @Param dx To store the minimum dx in the element
+ * @Param dt Stores the minimum dt in an element
+ * @Param U Stores the Maximum eigne value in the element
+ * @Param CFL CFL to be used
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::FindTimestep(string dt, string dx, string U, double CFL) {
+    *variable[dt] = (CFL/(0.0*N + 1.0)) * (*variable[dx])/(*variable[U]);
+    return ;
+}
+
 /* ----------------------------------------------------------------------------*/
 //--------------------------VIRTUAL FUNCTIONS----------------------------------//
 /*-----------------------------------------------------------------------------*/

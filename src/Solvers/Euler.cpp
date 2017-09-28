@@ -104,10 +104,18 @@ void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
    no_of_time_steps = _no_of_time_steps;
    dx = field->FindMindx();
   // cout << "dx : " << dx << "\n" << "CFL : " << CFL;
+  field->addVariable_CellCentered("dx");
+  field->FindMindx("dx");
+  field->addVariable_CellCentered("dt");
+  field->addVariable_CellCentered("UMax");
+  field->ResetVariables_CellCentered("UMax", 0.0);
 
     return ;
 }
 
+double Maximum( double x, double y, double z) {
+  return max(max(x,y),z);
+}
 
 double Product(double x, double y) {
     return (x*y) ;
@@ -382,11 +390,14 @@ void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, st
 
 void EulerSolver::setTimeStep() {
   //double dx = field->FindMindx();
-  double speed;
-  speed = max(field->FindMax("u_plus_c"),field->FindMax("v_plus_c"));
+  //double speed;
+  //speed = max(field->FindMax("u_plus_c"),field->FindMax("v_plus_c"));
   //cout << "Max Speed  :" << field->FindMax("u_plus_c") << " : " <<field->FindMax("v_plus_c") << endl;
   //cout << "dx : " <<  dx << endl;
-  dt = CFL * dx/speed;
+  field->setFunctionsForVariablesCellCentered("u_plus_c", "v_plus_c", Maximum, "UMax");
+  field->FindTimestep("dt", "dx", "UMax", CFL);
+  dt = field->FindMindt("dt");
+  //dt = CFL * dx/speed;
   return ;
 }
 

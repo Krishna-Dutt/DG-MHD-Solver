@@ -143,13 +143,19 @@ public:
     // Function to apply linear operation on variables stored only on Boundary points.
     void setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)>, string z);
     void setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)>, string z);
-
+    
+    // Fucntions to compute cell centered values
+    void setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)>, string z); 
+    
 
     // Functions to do various other operations on the elements.
     double l2Norm(string v1, string v2);
 
     // Misc. Functions on for global field data 
     double FindMax(string v);
+    void FindMindx(string v);
+    void FindTimestep(string dt, string dx, string U, double CFL);
+    double FindMindt(string dt);
 
     // Virtual Function for Polymorphic behaviour
     virtual void assignBoundary( string type, char b);

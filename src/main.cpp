@@ -104,7 +104,7 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 100;
     double CFL = 0.24;
-    double time = 2.0;
+    double time = 0.0;
     EulerSolver* a;
     a = new EulerSolver(40, 40, 1);
     a->setDomain(0.0, 0.0, 0.1, 0.1);
@@ -125,7 +125,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_test_N1_40x40_Betax.vtk");
+    a->plot("Test_Timestepping.vtk");
     
 
     delete a;

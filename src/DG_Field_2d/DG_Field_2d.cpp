@@ -1004,6 +1004,24 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(string w, string x, string y,
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable stored at center z to f(x, y).
+ *
+ * @Param x The first parameter of the function.
+ * @Param y The second parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)> f, string z) {
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->setFunctionsForVariablesCellCentered(x, y, f, z);
+    return;
+}
+
+
 
 
 double DG_Field_2d::l2Norm(string v1, string v2) {
@@ -1115,4 +1133,50 @@ double DG_Field_2d::FindMindx() {
         for(int j = 0; j < ne_y; j++)
             Min = min(min(elements[i][j]->dxMin, elements[i][j]->dyMin), Min);
     return Min;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dx in the field.
+ *
+ * @Param dx To store the minimum dx in the element
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::FindMindx(string dx) {
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->FindMindx(dx);
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dt in the field.
+ *
+ * @Param dt To find th mimimum dt from all dt.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Field_2d::FindMindt(string dt) {
+    double Mini = elements[0][0]->FindMindt(dt);
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            Mini = min(elements[i][j]->FindMindt(dt), Mini);
+    return Mini;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the minimum dx in the field.
+ *
+ * @Param dx To store the minimum dx in the element
+ * @Param dt Stores the minimum dt in an element
+ * @Param U Stores the Maximum eigne value in the element
+ * @Param CFL CFL to be used
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::FindTimestep(string dt, string dx, string U, double CFL) {
+    for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->FindTimestep(dt, dx, U, CFL);
+    return ;
 }
