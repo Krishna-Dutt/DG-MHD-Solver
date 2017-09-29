@@ -186,7 +186,7 @@ double ArtificialViscosity( double x , double y) {
   double B2 = 20.5;
 
  // return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
-  return 1.98e-5;
+  return 7.7e-7;
 }
 
 void EulerSolver::setXMomentum() {
@@ -573,10 +573,10 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    field->addVariable_CellCentered("CellMarker");
+    /*field->addVariable_CellCentered("CellMarker");
     field->ResetVariables_CellCentered("CellMarker", 1.5);
     field->addVariable_withBounary("CellMarkerGlobal");
-    field->scal(0.0, "CellMarkerGlobal");
+    field->scal(0.0, "CellMarkerGlobal");*/
     field->addVariable_CellCentered("Max");
     field->addVariable_CellCentered("Min");
 
