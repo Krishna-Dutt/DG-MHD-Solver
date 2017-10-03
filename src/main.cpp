@@ -11,7 +11,7 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if ( y > 1e-6) return 0.025;
+  if ( y > 1e-6) return 0.05;
   return 0.0;
 }
 
@@ -103,10 +103,10 @@ int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 100;
-    double CFL = 0.15;
-    double time = 8.0;
+    double CFL = 0.24;
+    double time = 4.0;
     EulerSolver* a;
-    a = new EulerSolver(50, 40, 1);
+    a = new EulerSolver(40, 40, 1);
     a->setDomain(0.0, 0.0, 0.2, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -125,7 +125,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_N1_50x40_Re9050_KXRCF_CFLpoint15_t8.vtk");
+    a->plot("ViscousBL_N1_40x50_Re2x9050_KXRCF_t2.vtk");
     
 
     delete a;
