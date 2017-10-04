@@ -104,10 +104,10 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 100;
     double CFL = 0.24;
-    double time = 4.0;
+    double time = 8.0;
     EulerSolver* a;
-    a = new EulerSolver(40, 40, 1);
-    a->setDomain(0.0, 0.0, 0.2, 0.1);
+    a = new EulerSolver(50, 40, 1);
+    a->setDomain(0.0, 0.0, 0.3, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();
