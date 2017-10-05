@@ -186,7 +186,7 @@ double ArtificialViscosity( double x , double y) {
   double B2 = 20.5;
 
  // return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
-  return 7.7e-7;
+  return 2e-5;
 }
 
 void EulerSolver::setXMomentum() {
