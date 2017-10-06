@@ -107,7 +107,7 @@ int main() {
     double time = 8.0;
     EulerSolver* a;
     a = new EulerSolver(60, 30, 1);
-    a->setDomain(0.0, 0.0, 0.8, 0.05);
+    a->setDomain(0.0, 0.0, 0.8, 0.1);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();
