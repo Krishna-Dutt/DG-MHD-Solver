@@ -106,8 +106,8 @@ int main() {
     double CFL = 0.24;
     double time = 8.0;
     EulerSolver* a;
-    a = new EulerSolver(60, 30, 1);
-    a->setDomain(0.0, 0.0, 0.8, 0.1);
+    a = new EulerSolver(50, 30, 1);
+    a->setDomain(0.0, 0.0, 0.8, 0.15);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     a->setGradientPrimitiveVariables();
@@ -125,7 +125,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_N1_60x30_Re1050_KXRCF_t8.vtk");
+    a->plot("ViscousBL_N1_50x30_Re1050_KXRCF_t8_ModSubInflow.vtk");
     
 
     delete a;
