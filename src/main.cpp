@@ -104,7 +104,7 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 100;
     double CFL = 0.3;
-    double time = 16.0;
+    double time = 32.0;
     EulerSolver* a;
     a = new EulerSolver(40, 10, 1);
     a->setDomain(0.0, 0.0, 1.2, 0.2);
@@ -125,7 +125,7 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_N1_40x10_Re1400_KXRCF_t16_ModSubInflow.vtk");
+    a->plot("ViscousBL_N1_40x10_Re1400_KXRCF_t32_ModSubInflow.vtk");
     
 
     delete a;

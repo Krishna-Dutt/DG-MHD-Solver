@@ -951,8 +951,8 @@ void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2,
 
     Pb = 0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
     rb = BoundaryDensity(X[Index1], Y[Index1]) + ( -BoundaryPressure(X[Index1], Y[Index1]) + Pb)/(c*c);
-    ub = BoundaryU(X[Index1], Y[Index1]) ;//- nx*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
-    vb = BoundaryV(X[Index1], Y[Index1]) ;//- ny*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
+    ub = BoundaryU(X[Index1], Y[Index1]) - nx*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
+    vb = BoundaryV(X[Index1], Y[Index1]) - ny*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
 
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
