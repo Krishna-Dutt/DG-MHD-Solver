@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := NSDG
+EXECUTABLE := LaminarBL
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths
