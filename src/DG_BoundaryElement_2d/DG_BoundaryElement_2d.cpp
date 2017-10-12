@@ -990,18 +990,18 @@ void DG_BoundaryElement_2d:: EulerSubsonicOutflowBoundary(int Index1, int Index2
                    nx = -1.0;
                    break;
     }
-    r = variable[ConservativeVariables[0]][Index2];
-    u = variable[ConservativeVariables[1]][Index2]/r;
-    v = variable[ConservativeVariables[2]][Index2]/r;
+    r = variable[ConservativeVariables[0]][Index1];
+    u = variable[ConservativeVariables[1]][Index1]/r;
+    v = variable[ConservativeVariables[2]][Index1]/r;
 
-    IE = variable[ConservativeVariables[3]][Index2] - 0.5 * r * (u*u + v*v);
+    IE = variable[ConservativeVariables[3]][Index1] - 0.5 * r * (u*u + v*v);
     P = Pressure(r, IE);
     c = SoundSpeed(r, P);
 
     Pb =  BoundaryPressure(X[Index1], Y[Index1]);
     rb = r + ( -P + Pb)/(c*c);
-    ub = u + nx*( P - Pb )/(r*c);
-    vb = v + ny*( P - Pb )/(r*c);
+    ub = u*r/rb ;//+ nx*( P - Pb )/(r*c);
+    vb = v*r/rb;// + ny*( P - Pb )/(r*c);
 
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
