@@ -1,5 +1,63 @@
 #include "../../includes/Solvers/EulerSolver.h"
 
+// Primitve Variables
+#define D   0
+#define Vx  1
+#define Vy  2
+#define P   3
+#define T   4
+
+// Conservative Variables
+#define DVx 5
+#define DVy 6
+#define DE  7
+#define De  8
+#define KE  9
+
+// Inviscid Flux
+#define DVxVx_plus_P 10
+#define DVxVy        11
+#define DVyVy_plus_P 12
+#define DE_plus_P_Vx 13
+#define DE_plus_P_Vy 14
+
+// Eigen Values
+#define C         15
+#define Vx_plus_C 16
+#define Vy_plus_C 17
+
+// Aux. Variables // Define all auxillary (needed or not here)
+#define K1D   18
+#define K1DVx 19
+#define K1DVy 20
+#define K1DE  21
+#define K2D   22
+#define K2DVx 23
+#define K2DVy 24
+#define K2DE  25
+#define K3D   26
+#define K3DVx 27
+#define K3DVy 28
+#define K3DE  29
+#define dbydx 30
+#define dbydy 31
+
+#define DAnalytical  32
+#define VxAnalytical 33
+#define ZERO         34
+
+// Shock Detector
+#define CellMarkerG  35
+
+// Limiter
+#define Moment    36
+#define ModMoment 37
+// Add corresponding variables for Characteristic Limiter
+
+// Add separate list for cell centered variables !!
+
+
+
 EulerSolver::EulerSolver(int _ne_x, int _ne_y, int _N) {
     ne_x = _ne_x;
     ne_y = _ne_y;
@@ -312,8 +370,6 @@ void EulerSolver::updatePrimitiveGradient() {
 void EulerSolver::setAuxillaryVariables() {
  // cout << " Calling setAuxillaryVariables " << endl;
   field->addVariable_withoutBounary("k1q");
-  field->addVariable_withoutBounary("dbydx");
-  field->addVariable_withoutBounary("dbydy");
   field->addVariable_withoutBounary("k1qu");
   field->addVariable_withoutBounary("k1qv");
   field->addVariable_withoutBounary("k1qE");
@@ -325,9 +381,16 @@ void EulerSolver::setAuxillaryVariables() {
   field->addVariable_withoutBounary("k3qu");
   field->addVariable_withoutBounary("k3qv");
   field->addVariable_withoutBounary("k3qE");
+  field->addVariable_withoutBounary("dbydx");
+  field->addVariable_withoutBounary("dbydy");
 
-  field->addVariable_withBounary("xFlux");
-  field->addVariable_withBounary("yFlux");
+  field->addVariable_withBounary("qAnalytical");
+  field->addVariable_withBounary("uAnalytical");
+  
+  field->addVariable_withoutBounary("Zero");
+
+  //field->addVariable_withBounary("xFlux");
+  //field->addVariable_withBounary("yFlux");
   return ;
 }
 
@@ -406,11 +469,8 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
   // Requires all Primitive and Conservative Variables to be setup and initialised.
   double t = 0.0;
   int count = 0;
-  setAuxillaryVariables();
-  setInviscidFlux();
-  setEigenValues(SoundSpeed);
-  setViscousFlux();
-
+  
+ 
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
   while(t <= time) {
@@ -644,10 +704,10 @@ void EulerSolver::Run_PositivityMomentLimiter(string v, unsigned Index) {
 
 
 void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double(double, double)> U ) {
-  field->addVariable_withBounary("qAnalytical");
-  field->addVariable_withBounary("uAnalytical");
+  //field->addVariable_withBounary("qAnalytical");
+  //field->addVariable_withBounary("uAnalytical");
   
-  field->addVariable_withoutBounary("Zero");
+  //field->addVariable_withoutBounary("Zero");
   field->scal(0.0,"Zero");
 
   field->initializeVariable("qAnalytical", D);

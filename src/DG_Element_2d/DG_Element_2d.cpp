@@ -88,34 +88,34 @@ DG_Element_2d::~DG_Element_2d() {
     delete[] X;
     delete[] Y;
 
-    for ( map<string, double*>::iterator itr = variable.begin() ;itr != variable.end(); itr++){
+    for ( vector<double*>::iterator itr = variable.begin() ;itr != variable.end(); itr++){
       delete[] (itr->second);
     }
     // Do I need to delete other maps pointing to Boundary elements, since no new memory is dynamically allocated for them ??
 
-    for ( map<string, double**>::iterator itr = boundaryTop.begin() ;itr != boundaryTop.end(); itr++){
+    for ( vector<double**>::iterator itr = boundaryTop.begin() ;itr != boundaryTop.end(); itr++){
       delete[] (itr->second);
     }
-    for ( map<string, double**>::iterator itr = boundaryBottom.begin() ;itr != boundaryBottom.end(); itr++){
+    for ( vector<double**>::iterator itr = boundaryBottom.begin() ;itr != boundaryBottom.end(); itr++){
       delete[] (itr->second);
     }
-    for ( map<string, double**>::iterator itr = boundaryRight.begin() ;itr != boundaryRight.end(); itr++){
+    for ( vector<double**>::iterator itr = boundaryRight.begin() ;itr != boundaryRight.end(); itr++){
       delete[] (itr->second);
     }
-    for ( map<string, double**>::iterator itr = boundaryLeft.begin() ;itr != boundaryLeft.end(); itr++){
+    for ( vector<double**>::iterator itr = boundaryLeft.begin() ;itr != boundaryLeft.end(); itr++){
       delete[] (itr->second);
     }
 
-    for ( map<string, double**>::iterator itr = neighboringTop.begin() ;itr != neighboringTop.end(); itr++){
+    for ( vector<double**>::iterator itr = neighboringTop.begin() ;itr != neighboringTop.end(); itr++){
       delete[] (itr->second);
     }
-    for ( map<string, double**>::iterator itr = neighboringBottom.begin() ;itr != neighboringBottom.end(); itr++){
+    for ( vector<double**>::iterator itr = neighboringBottom.begin() ;itr != neighboringBottom.end(); itr++){
       delete[] (itr->second);
     }
-    for ( map<string, double**>::iterator itr = neighboringRight.begin() ;itr != neighboringRight.end(); itr++){
+    for ( vector<double**>::iterator itr = neighboringRight.begin() ;itr != neighboringRight.end(); itr++){
       delete[] (itr->second);
     }
-    for ( map<string, double**>::iterator itr = neighboringLeft.begin() ;itr != neighboringLeft.end(); itr++){
+    for ( vector<double**>::iterator itr = neighboringLeft.begin() ;itr != neighboringLeft.end(); itr++){
       delete[] (itr->second);
     }
 }
@@ -169,7 +169,7 @@ void DG_Element_2d::setSystem(string S) {
  * @Param v  This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_withoutBoundary(string v) {
+void DG_Element_2d::addVariable_withoutBoundary(int v) {
     double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
     variable[v] = newVariable; /// Now assigning the same to the map.
 
@@ -184,7 +184,7 @@ void DG_Element_2d::addVariable_withoutBoundary(string v) {
  * @Param v  This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_CellCentered(string v) {
+void DG_Element_2d::addVariable_CellCentered(int v) {
     double * newVariable = new double[1] ;/// Allocating the space for the new variable which is to be created.
     variable[v] = newVariable; /// Now assigning the same to the map.
 
@@ -200,7 +200,7 @@ void DG_Element_2d::addVariable_CellCentered(string v) {
  * @Param value The value to which the variable is to be reset.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::ResetVariables_CellCentered(string v, double value) {
+void DG_Element_2d::ResetVariables_CellCentered(int v, double value) {
    *variable[v] = value; 
     return ;
 }
@@ -227,7 +227,7 @@ void DG_Element_2d::ResetMap_OutFlow() {
  * @Param v This is the velocity in the y direction.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
+void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
   double start = -1.0;
   double end = 1.0;
   
@@ -257,7 +257,7 @@ void DG_Element_2d::updateOutFlowBoundary(string u, string v) {
  * @Param m This is the variables used to store the cell marker.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateCellMarker(string v, string m) {
+void DG_Element_2d::updateCellMarker(int v, int m) {
   double radius = 1.0;
   double OutflowSize = 0.0;
   double MaxVariable = 0.0;
@@ -333,7 +333,7 @@ void DG_Element_2d::updateCellMarker(string v, string m) {
  *v@Param level This string is used to identify the level of limiting required.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::checkPositivity(string v, string cm, string level) {
+void DG_Element_2d::checkPositivity(int v, int cm, string level) {
     //if (*variable[cm])
      {
         
@@ -381,7 +381,7 @@ void DG_Element_2d::resetPositivity() {
  * @Param m This is the variable used to store the computed moments.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::computeMoments(string v, string m) {
+void DG_Element_2d::computeMoments(int v, int m) {
   /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
   
@@ -408,7 +408,7 @@ void DG_Element_2d::computeMoments(string v, string m) {
  * @Param cm This is the cell marker used to identify troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
+void DG_Element_2d::convertMomentToVariable(int m, int v, int cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
  if (*variable[cm] && PositivityMarker)
@@ -441,7 +441,7 @@ void DG_Element_2d::convertMomentToVariable(string m, string v, string cm) {
  * @Param Index This is the index to start the limiting process.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::limitMoments(string m, string modm, string cm, unsigned Index) {
+void DG_Element_2d::limitMoments(int m, int modm, int cm, unsigned Index) {
 
 if (*variable[cm] && PositivityMarker) 
   { // Checking if cell marker is not equal to zero
@@ -565,7 +565,7 @@ if (*variable[cm] && PositivityMarker)
  * @Param v  This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_withBoundary(string v) {
+void DG_Element_2d::addVariable_withBoundary(int v) {
     double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
     variable[v] = newVariable; /// Now assigning the same to the map.
     
@@ -614,7 +614,7 @@ void DG_Element_2d::addVariable_withBoundary(string v) {
  * @Param v  This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_onlyBoundary(string v) {
+void DG_Element_2d::addVariable_onlyBoundary(int v) {
     double * newVariable = new double[(N+1)*(4)]; /// Allocating the space for the new variable which is to be created, and stored only at boundary of quadrilateral cell.
     variable[v] = newVariable; /// Now assigning the same to the map.
     
@@ -665,7 +665,7 @@ void DG_Element_2d::addVariable_onlyBoundary(string v) {
  * @Param f This is the f(x, y) which is used to initialize the variable.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::initializeVariable(string v, function<double(double, double)> f) {
+void DG_Element_2d::initializeVariable(int v, function<double(double, double)> f) {
     for(int i=0; i<((N+1)*(N+1)); i++)
         variable[v][i] = f(X[i], Y[i]);
     
@@ -673,7 +673,7 @@ void DG_Element_2d::initializeVariable(string v, function<double(double, double)
 }
 
 
-void DG_Element_2d::setVariableNeighbors(string v) {
+void DG_Element_2d::setVariableNeighbors(int v) {
     int j;
     if(topNeighbor!=this) {
         for( j = 0 ; j <= N; j++) 
@@ -706,7 +706,6 @@ void DG_Element_2d::setVariableNeighbors(string v) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setNeighboringElement(char type, DG_Element_2d* neighbor) {
-    string currentVariable;
     switch(type) {
         case 't' : // `t` or `T` for top 
         case 'T' :
@@ -743,7 +742,7 @@ void DG_Element_2d::setNeighboringElement(char type, DG_Element_2d* neighbor) {
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
     
@@ -807,7 +806,7 @@ void DG_Element_2d::delByDelX(string v, string vDash, string conserVar, string f
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -869,7 +868,7 @@ void DG_Element_2d::delByDelY(string v, string vDash, string conserVar, string f
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::delByDelX(string v, string vDash, string fluxType) {
+void DG_Element_2d::delByDelX(int v, int vDash, string fluxType) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
     
@@ -909,7 +908,7 @@ void DG_Element_2d::delByDelX(string v, string vDash, string fluxType) {
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::delByDelY(string v, string vDash, string fluxType) {
+void DG_Element_2d::delByDelY(int v, int vDash, string fluxType) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -1053,7 +1052,7 @@ void DG_Element_2d::setBottomFluxMatrix(double* f){
  * @param[in]  y     The column vector `y`
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::axpy(double a, string x, string y) {
+void DG_Element_2d::axpy(double a, int x, int y) {
     cblas_daxpy((N+1)*(N+1), a, variable[x], 1, variable[y], 1);
     return ;
 }
@@ -1067,7 +1066,7 @@ void DG_Element_2d::axpy(double a, string x, string y) {
  * @param[in]  y     The column vector `y`
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::scal(double a, string x) {
+void DG_Element_2d::scal(double a, int x) {
     cblas_dscal((N+1)*(N+1), a, variable[x], 1);
     return ;
 }
@@ -1082,7 +1081,7 @@ void DG_Element_2d::scal(double a, string x) {
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(string x, string y, function<double(double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForVariables(int x, int y, function<double(double, double)> f, int z) {
     for(int i = 0 ; i < (N+1)*(N+1); i++)
         variable[z][i] = f(variable[x][i],variable[y][i]);
     return ;
@@ -1099,7 +1098,7 @@ void DG_Element_2d::setFunctionsForVariables(string x, string y, function<double
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
     for(int i = 0 ; i < (N+1)*(N+1); i++)
         variable[z][i] = f(variable[w][i],variable[x][i],variable[y][i]);
     return ;
@@ -1117,7 +1116,7 @@ void DG_Element_2d::setFunctionsForVariables(string w, string x, string y, funct
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)> f, int z) {
     for(int i = 0 ; i < (N+1)*(N+1); i++)
         variable[z][i] = f(variable[a][i],variable[b][i],variable[c][i], variable[d][i]);
     return ;
@@ -1135,7 +1134,7 @@ void DG_Element_2d::setFunctionsForVariables(string a, string b, string c, strin
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)> f, int z) {
     for(int i = 0 ; i <= N ; i++){
          *boundaryTop[z][i] = f(*boundaryTop[x][i], *boundaryTop[y][i]);
          *boundaryRight[z][i] = f(*boundaryRight[x][i], *boundaryRight[y][i]);
@@ -1156,7 +1155,7 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(string x, string y, functio
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
     for(int i = 0 ; i <= N ; i++){
          *boundaryTop[z][i] = f(*boundaryTop[w][i], *boundaryTop[x][i], *boundaryTop[y][i]);
          *boundaryRight[z][i] = f(*boundaryRight[w][i], *boundaryRight[x][i], *boundaryRight[y][i]);
@@ -1177,7 +1176,7 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(string w, string x, string 
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)> f, string z) {
+void DG_Element_2d::setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z) {
     
     for(int i = 0 ; i < (N+1)*(N+1); i++)
         *variable[z] = f(variable[x][i],variable[y][i], *variable[z]);
@@ -1186,7 +1185,7 @@ void DG_Element_2d::setFunctionsForVariablesCellCentered(string x, string y, fun
 
 
 
-double DG_Element_2d::l2Norm(string v1, string v2) {
+double DG_Element_2d::l2Norm(int v1, int v2) {
     double* diff = new double[(N+1)*(N+1)];
     cblas_dscal((N+1)*(N+1), 0.0, diff, 1);
     cblas_daxpy((N+1)*(N+1),  1.0, variable[v1], 1, diff, 1);
@@ -1199,10 +1198,10 @@ double DG_Element_2d::l2Norm(string v1, string v2) {
 /**
  * @Synopsis  This function finds the maximum value in the Field .
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-double DG_Element_2d::FindMax(string v) {
+double DG_Element_2d::FindMax(int v) {
     double Max = variable[v][0]; 
     for(int i = 0; i < (N+1)*(N+1); i++)
             Max = max(variable[v][i], Max);
@@ -1216,7 +1215,7 @@ double DG_Element_2d::FindMax(string v) {
  * @Param dx To store the minimum dx in the element
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::FindMindx(string dx) {
+void DG_Element_2d::FindMindx(int dx) {
     *variable[dx] = min(dxMin, dyMin);
     return ;
 }
@@ -1228,7 +1227,7 @@ void DG_Element_2d::FindMindx(string dx) {
  * @Param dt To find th mimimum dt from all dt.
  */
 /* ----------------------------------------------------------------------------*/
-double DG_Element_2d::FindMindt(string dt) {
+double DG_Element_2d::FindMindt(int dt) {
    return *variable[dt];
 }
 
@@ -1242,7 +1241,7 @@ double DG_Element_2d::FindMindt(string dt) {
  * @Param CFL CFL to be used
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::FindTimestep(string dt, string dx, string U, double CFL) {
+void DG_Element_2d::FindTimestep(int dt, int dx, int U, double CFL) {
     *variable[dt] = (CFL/(0.0*N + 1.0)) * (*variable[dx])/(*variable[U]);
     return ;
 }
@@ -1272,7 +1271,7 @@ void DG_Element_2d::assignBoundary( string type, char b) {
  * @Param b This defines the location of the boundary element.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setBoundaryValue(string v, string b) {
+void DG_Element_2d::setBoundaryValue(int v, string b) {
     return ;
 }
 
@@ -1320,7 +1319,7 @@ void DG_Element_2d::PeriodicBoundary(double *Matrix, initializer_list<int> I) {
  * @Param Matrix  RHS Matrix that is to be modified.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateNeumann(string v, double *Matrix) {
+void DG_Element_2d::updateNeumann(int v, double *Matrix) {
     return ;
 }
 
@@ -1332,7 +1331,7 @@ void DG_Element_2d::updateNeumann(string v, double *Matrix) {
  * @Param Matrix  RHS Matrix that is to be modified.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateDirichlet(string v, double *Matrix) {
+void DG_Element_2d::updateDirichlet(int v, double *Matrix) {
     return ;
 }
 
@@ -1343,7 +1342,7 @@ void DG_Element_2d::updateDirichlet(string v, double *Matrix) {
  * @Param v This is the variable ,whose boundary values are to be fixed.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateBoundaryVariables(string v) {
+void DG_Element_2d::updateBoundaryVariables(int v) {
     return ;
 }
 
@@ -1352,7 +1351,7 @@ void DG_Element_2d::updateBoundaryVariables(string v) {
  * @Synopsis  This function performs MinMod for Boundary elements, eliminating all non-existing 
  * neighbouring cells.
  *
- * @Param m This string represents the moment of the variable
+ * @Param m This int represents the moment of the variable
  * @Param Index This is represents to be limited.
  * @Param Alpha This is the scaling factor used in Lilia's Moment Limiter.
  * @Param R This is the pointer to RightNeighbour.
@@ -1361,7 +1360,7 @@ void DG_Element_2d::updateBoundaryVariables(string v) {
  * @Param B This is the pointer to BottomNeighbour.
 */
 /* ----------------------------------------------------------------------------*/
-double DG_Element_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
+double DG_Element_2d::BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
     return 0.0 ;
 }
 
@@ -1383,10 +1382,10 @@ void DG_Element_2d::updateBoundary(double time) {
  * @Param v This is the conservative variable 
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addConservativeVariables(string v) {
+void DG_Element_2d::addConservativeVariables(int v) {
     return ;
 }
 
-void DG_Element_2d::addConservativeVariables(vector<string> v) {
+void DG_Element_2d::addConservativeVariables(vector<int> v) {
     return ;
 }

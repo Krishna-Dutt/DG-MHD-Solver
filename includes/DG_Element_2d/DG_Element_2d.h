@@ -60,20 +60,20 @@ public:
 
     double *X, *Y;
     double dxMin, dyMin ;
-    map<string, double*> variable; /// This is the map which would contain all the variable that are needed by the problem.
+    vector<double*> variable; /// This is the map which would contain all the variable that are needed by the problem.
 
-    map<string, double**> boundaryTop;
-    map<string, double**> boundaryRight;
-    map<string, double**> boundaryLeft;
-    map<string, double**> boundaryBottom;
+    vector<double**> boundaryTop;
+    vector<double**> boundaryRight;
+    vector<double**> boundaryLeft;
+    vector<double**> boundaryBottom;
     
-    map<string, double**> neighboringTop;
-    map<string, double**> neighboringRight;
-    map<string, double**> neighboringBottom;
-    map<string, double**> neighboringLeft;
+    vector<double**> neighboringTop;
+    vector<double**> neighboringRight;
+    vector<double**> neighboringBottom;
+    vector<double**> neighboringLeft;
 
-    vector<string> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
-    vector<string> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
+    vector<int> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
+    vector<int> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
 
     map<string, bool> OutFlow; /// Map to flag outflow boundaries of each cell.
 
@@ -86,38 +86,38 @@ public:
 
     void setSystem(string S); 
 
-    void addVariable_withBoundary(string v);
-    void addVariable_onlyBoundary( string v);
-    void addVariable_withoutBoundary(string v);
-    void addVariable_CellCentered(string v);
+    void addVariable_withBoundary(int v);
+    void addVariable_onlyBoundary( int v);
+    void addVariable_withoutBoundary(int v);
+    void addVariable_CellCentered(int v);
 
-    void initializeVariable(string v, function<double(double, double)> f);
+    void initializeVariable(int v, function<double(double, double)> f);
     void setNeighboringElement(char type, DG_Element_2d* neighbor );
-    void setVariableNeighbors(string v);
+    void setVariableNeighbors(int v);
     void ResetMap_OutFlow();
-    void updateOutFlowBoundary(string u, string v);
-    void updateCellMarker(string v, string m);
+    void updateOutFlowBoundary(int u, int v);
+    void updateCellMarker(int v, int m);
 
     // Function to check Positivity of data stored in cell .
-    void checkPositivity(string v, string cm, string level);
+    void checkPositivity(int v, int cm, string level);
     void resetPositivity();
 
     // Functions to support Moment Limiters.
-    void computeMoments(string v, string m);
-    virtual void limitMoments(string m, string modm, string cm, unsigned Index);
-    virtual void convertMomentToVariable(string m, string v, string cm);
+    void computeMoments(int v, int m);
+    virtual void limitMoments(int m, int modm, int cm, unsigned Index);
+    virtual void convertMomentToVariable(int m, int v, int cm);
 
     // Functions to manipulate Cell Centered Variables.
-    void ResetVariables_CellCentered(string v, double value = 0.0);
+    void ResetVariables_CellCentered(int v, double value = 0.0);
 
     // Functions for various operations on the variables.
-    virtual void delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+    virtual void delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
-    virtual void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+    virtual void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
     
-    virtual void delByDelX(string v, string vDash, string fluxType);
+    virtual void delByDelX(int v, int vDash, string fluxType);
 
-    virtual void delByDelY(string v, string vDash, string fluxType);
+    virtual void delByDelY(int v, int vDash, string fluxType);
 
     // Functions to set the various operator matrices.
     void setMassMatrix(double* m);
@@ -134,46 +134,46 @@ public:
     void setTransposederivateMatrix_y(double* id);
 
     // Functions to apply linear operations on the variables.
-    void axpy(double a, string x, string y);
-    void scal(double a, string x);
-    void setFunctionsForVariables(string x, string y, function<double(double, double)>, string z);
-    void setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)>, string z);
-    void setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)>, string z);
+    void axpy(double a, int x, int y);
+    void scal(double a, int x);
+    void setFunctionsForVariables(int x, int y, function<double(double, double)>, int z);
+    void setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)>, int z);
+    void setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)>, int z);
 
     // Function to apply linear operation on variables stored only on Boundary points.
-    void setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)>, string z);
-    void setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)>, string z);
+    void setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)>, int z);
+    void setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)>, int z);
     
     // Fucntions to compute cell centered values
-    void setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)>, string z); 
+    void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)>, int z); 
     
 
     // Functions to do various other operations on the elements.
-    double l2Norm(string v1, string v2);
+    double l2Norm(int v1, int v2);
 
     // Misc. Functions on for global field data 
-    double FindMax(string v);
-    void FindMindx(string v);
-    void FindTimestep(string dt, string dx, string U, double CFL);
-    double FindMindt(string dt);
+    double FindMax(int v);
+    void FindMindx(int v);
+    void FindTimestep(int dt, int dx, int U, double CFL);
+    double FindMindt(int dt);
 
     // Virtual Function for Polymorphic behaviour
     virtual void assignBoundary( string type, char b);
-    virtual void setBoundaryValue(string v, string b);
+    virtual void setBoundaryValue(int v, string b);
     virtual void DirichletBoundary(double *Matrix, initializer_list<int> I);
     virtual void NeumannBoundary( double *Matrix, initializer_list<int> I);
     virtual void PeriodicBoundary(double *Matrix, initializer_list<int> I);
 
-    virtual void updateDirichlet(string v, double *Matrix);
-    virtual void updateNeumann(string v, double *Matrix);
-    virtual void updateBoundaryVariables(string v);
+    virtual void updateDirichlet(int v, double *Matrix);
+    virtual void updateNeumann(int v, double *Matrix);
+    virtual void updateBoundaryVariables(int v);
 
-    virtual double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
+    virtual double BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
 
     // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
 
-    virtual void addConservativeVariables(string v);
-    virtual void addConservativeVariables(vector<string> V);
+    virtual void addConservativeVariables(int v);
+    virtual void addConservativeVariables(vector<int> V);
 
     virtual void updateBoundary(double time);
         

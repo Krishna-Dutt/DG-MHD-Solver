@@ -129,7 +129,7 @@ void DG_BoundaryElement_2d::assignBoundary(string type, char b) {
  * @Param b This defines the location of the boundary element.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::setBoundaryValue(string v, string b) {
+void DG_BoundaryElement_2d::setBoundaryValue(int v, string b) {
     return ;
 }
 /* ----------------------------------------------------------------------------*/
@@ -199,7 +199,7 @@ void DG_BoundaryElement_2d::PeriodicBoundary(double *Matrix, initializer_list<in
  * @Param Matrix  RHS Matrix that is to be modified.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::updateNeumann(string v, double *Matrix) {
+void DG_BoundaryElement_2d::updateNeumann(int v, double *Matrix) {
     if (TopBoundary.count(v)) {
         if (TopBoundary[v] == "neumann") NeumannBoundary(Matrix, {N*(N+1), 1, -(N+1)});
     }
@@ -223,7 +223,7 @@ void DG_BoundaryElement_2d::updateNeumann(string v, double *Matrix) {
  * @Param Matrix  RHS Matrix that is to be modified.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::updateDirichlet(string v, double *Matrix) {
+void DG_BoundaryElement_2d::updateDirichlet(int v, double *Matrix) {
     if (TopBoundary.count(v)) {
         if (TopBoundary[v] == "dirichlet") DirichletBoundary(Matrix, {N*(N+1), 1});
     }
@@ -252,7 +252,7 @@ void DG_BoundaryElement_2d::updateDirichlet(string v, double *Matrix) {
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+void DG_BoundaryElement_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable = "") {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -317,7 +317,7 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string conserVar, 
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+void DG_BoundaryElement_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable = "") {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -381,7 +381,7 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string conserVar, 
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string fluxType) {
+void DG_BoundaryElement_2d::delByDelX(int v, int vDash, string fluxType) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -434,7 +434,7 @@ void DG_BoundaryElement_2d::delByDelX(string v, string vDash, string fluxType) {
  * @Param fluxType  The type of flux that is to be used. eg "central"
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
+void DG_BoundaryElement_2d::delByDelY(int v, int vDash, string fluxType) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
@@ -486,7 +486,7 @@ void DG_BoundaryElement_2d::delByDelY(string v, string vDash, string fluxType) {
  * @Param Index This is the index to start the limiting process.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsigned Index) {
+void DG_BoundaryElement_2d::limitMoments(int m, int modm, int cm, unsigned Index) {
 
  if (*variable[cm] && PositivityMarker) 
   { // Checking if cell marker is not equal to zero
@@ -557,7 +557,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
  * @Synopsis  This function performs MinMod for Boundary elements, eliminating all non-existing 
  * neighbouring cells.
  *
- * @Param m This string represents the moment of the variable
+ * @Param m This int represents the moment of the variable
  * @Param Index This is represents to be limited.
  * @Param Alpha This is the scaling factor used in Lilia's Moment Limiter.
  * @Param R This is the pointer to RightNeighbour.
@@ -566,7 +566,7 @@ void DG_BoundaryElement_2d::limitMoments(string m, string modm, string cm, unsig
  * @Param B This is the pointer to BottomNeighbour.
 */
 /* ----------------------------------------------------------------------------*/
-double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
+double DG_BoundaryElement_2d::BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
     vector<double> Elements;
     double epsilon = 1e-16;
     double M = 50.0;
@@ -606,7 +606,7 @@ double DG_BoundaryElement_2d::BoundaryMinMod(string m, int Index, double Alpha, 
  * @Param v This is the variable ,whose boundary values are to be fixed.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
+void DG_BoundaryElement_2d::updateBoundaryVariables(int v) {
     // Update only for Neumann/Outflow/Zero Gradient ,right now !!
     if (TopBoundary.count(v)) {
         if (TopBoundary[v] == "neumann") {
@@ -662,7 +662,7 @@ void DG_BoundaryElement_2d::updateBoundaryVariables(string v) {
  * @Param cm This is the cell marker used to identified troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string cm) {
+void DG_BoundaryElement_2d::convertMomentToVariable(int m, int v, int cm) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
  if (*variable[cm] && PositivityMarker)
@@ -733,18 +733,18 @@ void DG_BoundaryElement_2d::convertMomentToVariable(string m, string v, string c
 
 /* ----------------------------------------------------------------------------*/
 /**
- * @Synopsis  This function adds given string to the list of conservative variables.
+ * @Synopsis  This function adds given int to the list of conservative variables.
  *
  * @Param v This is the conservative variable to be added
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::addConservativeVariables(string v) {
+void DG_BoundaryElement_2d::addConservativeVariables(int v) {
     ConservativeVariables.push_back(v);
 
     return;
 }
 
-void DG_BoundaryElement_2d::addConservativeVariables(vector<string> V) {
+void DG_BoundaryElement_2d::addConservativeVariables(vector<int> V) {
     for(int t=0; t< V.size(); ++t) {
         ConservativeVariables.push_back(V[t]);
     }

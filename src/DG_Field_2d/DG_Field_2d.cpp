@@ -59,11 +59,11 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
 
     DeltaX = (x2-x1);
     Beta_x = 1.05;
-    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
+    //dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){
         y_curr = y1;
-        dy = DeltaY * (Beta_y - 1.0 + epsilon)/(pow(Beta_y, ne_y) -1.0 + epsilon);
+        //dy = DeltaY * (Beta_y - 1.0 + epsilon)/(pow(Beta_y, ne_y) -1.0 + epsilon);
         for(int j=0; j<ne_y; j++){
             if ( i == 0 || i == ne_x-1 || j == 0 || j == ne_y-1) {
                 elements[i].push_back( new DG_BoundaryElement_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
@@ -74,10 +74,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             }
 
             y_curr += dy;
-            dy = Beta_y*dy;
+            //dy = Beta_y*dy;
         }
         x_curr += dx;
-        dx = Beta_x*dx;
+        //dx = Beta_x*dx;
     } // All the elements have been initialized.
 
     /// Setting the interaction between the elements by passing their neighboring elements addresses to each of the
@@ -419,10 +419,10 @@ void DG_Field_2d::setRightBoundary( string type) {
 /**
  * @Synopsis  This function sets the boundary  for a variable for Boundary Cells .
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setBoundaryNeighbours(string v) {
+void DG_Field_2d::setBoundaryNeighbours(int v) {
         // Setting the boundary for the top elements.
         for(int i = 0; i < ne_x; i++)
             elements[i][ne_y-1]->setVariableNeighbors(v);
@@ -447,7 +447,7 @@ void DG_Field_2d::setBoundaryNeighbours(string v) {
 /**
  * @Synopsis  This function sets the boundary  for all boundary variable for Boundary Cells .
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setBoundaryNeighbours() {
@@ -478,10 +478,10 @@ void DG_Field_2d::setBoundaryNeighbours() {
 /**
  * @Synopsis  This function updates the given Variable at the Boundary .
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::updateBoundaryVariables(string v) {
+void DG_Field_2d::updateBoundaryVariables(int v) {
         // Setting the boundary for the top elements.
         for(int i = 0; i < ne_x; i++)
             elements[i][ne_y-1]->updateBoundaryVariables(v);
@@ -507,10 +507,10 @@ void DG_Field_2d::updateBoundaryVariables(string v) {
  * @Synopsis  This function adds the variable to each and every element. In this the boundary points are not
  * specifically stored in each element.
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_withBounary(string v) {
+void DG_Field_2d::addVariable_withBounary(int v) {
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -532,10 +532,10 @@ void DG_Field_2d::addVariable_withBounary(string v) {
  * @Synopsis  This function adds the variable, required only at the boundary,to each and every element. In this the boundary points are not
  * specifically stored in each element.
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_onlyBounary(string v) {
+void DG_Field_2d::addVariable_onlyBounary(int v) {
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -563,7 +563,7 @@ void DG_Field_2d::addVariable_onlyBounary(string v) {
  * @Param v This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_withoutBounary(string v) {
+void DG_Field_2d::addVariable_withoutBounary(int v) {
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -583,7 +583,7 @@ void DG_Field_2d::addVariable_withoutBounary(string v) {
  * @Param v This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_CellCentered(string v) {
+void DG_Field_2d::addVariable_CellCentered(int v) {
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -595,7 +595,7 @@ void DG_Field_2d::addVariable_CellCentered(string v) {
 }
 
 
-void DG_Field_2d::initializeVariable(string v, function<double(double, double)> f) {
+void DG_Field_2d::initializeVariable(int v, function<double(double, double)> f) {
     
 
    for (int i=0; i < ne_x; i++ ){
@@ -615,7 +615,7 @@ void DG_Field_2d::initializeVariable(string v, function<double(double, double)> 
  * @Param value The value to which the variable is to be reset.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::ResetVariables_CellCentered(string v, double value) {
+void DG_Field_2d::ResetVariables_CellCentered(int v, double value) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
             elements[i][j]->ResetVariables_CellCentered(v, value);
@@ -649,7 +649,7 @@ void DG_Field_2d::ResetMap_OutFlow() {
  * @Param v This is the velocity in y direction.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::updateOutFlowBoundary(string u, string v) {
+void DG_Field_2d::updateOutFlowBoundary(int u, int v) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
             elements[i][j]->updateOutFlowBoundary(u, v);
@@ -667,7 +667,7 @@ void DG_Field_2d::updateOutFlowBoundary(string u, string v) {
  * @Param m This is the variable used to store the value of cell marker.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::updateCellMarker(string v, string m) {
+void DG_Field_2d::updateCellMarker(int v, int m) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
             elements[i][j]->updateCellMarker(v, m);
@@ -686,7 +686,7 @@ void DG_Field_2d::updateCellMarker(string v, string m) {
  * @Param m This is the variable used to store the moments.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::computeMoments(string v, string m) {
+void DG_Field_2d::computeMoments(int v, int m) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
       elements[i][j]->computeMoments(v, m);
@@ -705,7 +705,7 @@ void DG_Field_2d::computeMoments(string v, string m) {
  * @Param Index This is the index at which to start limiting .
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::limitMoments(string m, string modifiedm, string cm, unsigned Index) {
+void DG_Field_2d::limitMoments(int m, int modifiedm, int cm, unsigned Index) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
       elements[i][j]->limitMoments(m, modifiedm, cm, Index);
@@ -723,7 +723,7 @@ void DG_Field_2d::limitMoments(string m, string modifiedm, string cm, unsigned I
  * @Param cm This the cell marker used to identified troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::convertMomentToVariable(string m, string v, string cm) {
+void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
       elements[i][j]->convertMomentToVariable(m, v, cm);
@@ -818,7 +818,7 @@ void DG_Field_2d::writeVTK(string fileName){
  * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+void DG_Field_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
     for(int i = 0; i < ne_x; i++ )
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->delByDelX(v, vDash, conserVar, fluxType, fluxVariable);
@@ -836,7 +836,7 @@ void DG_Field_2d::delByDelX(string v, string vDash, string conserVar, string flu
  * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable = "") {
+void DG_Field_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
     for(int i = 0; i < ne_x; i++ )
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->delByDelY(v, vDash, conserVar, fluxType, fluxVariable);
@@ -853,7 +853,7 @@ void DG_Field_2d::delByDelY(string v, string vDash, string conserVar, string flu
  * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::delByDelX(string v, string vDash, string fluxType) {
+void DG_Field_2d::delByDelX(int v, int vDash, string fluxType) {
     for(int i = 0; i < ne_x; i++ )
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->delByDelX(v, vDash, fluxType);
@@ -870,7 +870,7 @@ void DG_Field_2d::delByDelX(string v, string vDash, string fluxType) {
  * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::delByDelY(string v, string vDash, string fluxType) {
+void DG_Field_2d::delByDelY(int v, int vDash, string fluxType) {
     for(int i = 0; i < ne_x; i++ )
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->delByDelY(v, vDash, fluxType);
@@ -888,7 +888,7 @@ void DG_Field_2d::delByDelY(string v, string vDash, string fluxType) {
  * @param[in]  y     The column vector `y`
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::axpy(double a, string x, string y) {
+void DG_Field_2d::axpy(double a, int x, int y) {
 
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
@@ -906,7 +906,7 @@ void DG_Field_2d::axpy(double a, string x, string y) {
  * @param[in]  y     The column vector `y`
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::scal(double a, string x) {
+void DG_Field_2d::scal(double a, int x) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->scal(a, x);
@@ -924,7 +924,7 @@ void DG_Field_2d::scal(double a, string x) {
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariables(string x, string y, function<double(double, double)> f, string z) {
+void DG_Field_2d::setFunctionsForVariables(int x, int y, function<double(double, double)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForVariables(x, y, f, z);
@@ -942,7 +942,7 @@ void DG_Field_2d::setFunctionsForVariables(string x, string y, function<double(d
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
+void DG_Field_2d::setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForVariables(w, x, y, f, z);
@@ -961,7 +961,7 @@ void DG_Field_2d::setFunctionsForVariables(string w, string x, string y, functio
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)> f, string z) {
+void DG_Field_2d::setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForVariables(a, b, c, d, f, z);
@@ -979,7 +979,7 @@ void DG_Field_2d::setFunctionsForVariables(string a, string b, string c, string 
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)> f, string z) {
+void DG_Field_2d::setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForBoundaryVariables(x, y, f, z);
@@ -997,7 +997,7 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(string x, string y, function<
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)> f, string z) {
+void DG_Field_2d::setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForBoundaryVariables(w, x, y, f, z);
@@ -1014,7 +1014,7 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(string w, string x, string y,
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)> f, string z) {
+void DG_Field_2d::setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForVariablesCellCentered(x, y, f, z);
@@ -1024,7 +1024,7 @@ void DG_Field_2d::setFunctionsForVariablesCellCentered(string x, string y, funct
 
 
 
-double DG_Field_2d::l2Norm(string v1, string v2) {
+double DG_Field_2d::l2Norm(int v1, int v2) {
     double norm = 0.0;
     double elementNorm;
     for(int i = 0; i < ne_x; i++)
@@ -1043,10 +1043,10 @@ double DG_Field_2d::l2Norm(string v1, string v2) {
  *
  * @Param v  This is the name of the variable whose positivity is to be checked.
  * @Param cm This is the cell marker used to identify troubled cells.
- * @Param level This string is used to identify the level of limiting rquired.
+ * @Param level This int is used to identify the level of limiting rquired.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::checkPositivity(string v, string cm, string level) {
+void DG_Field_2d::checkPositivity(int v, int cm, string level) {
      for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->checkPositivity(v, cm, level);
@@ -1073,7 +1073,7 @@ void DG_Field_2d::resetPositivity() {
  * @Param v The corresponding conservative variable in the system being solved
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addConservativeVariables(string v) {
+void DG_Field_2d::addConservativeVariables(int v) {
     for(int i = 0; i < ne_x; i++)
     for (int j = 0; j < ne_y; j++) {
       elements[i][j]->addConservativeVariables(v);
@@ -1082,7 +1082,7 @@ void DG_Field_2d::addConservativeVariables(string v) {
     return ;
 }
 
-void DG_Field_2d::addConservativeVariables(vector<string> V) {
+void DG_Field_2d::addConservativeVariables(vector<int> V) {
     for(int i = 0; i < ne_x; i++)
     for (int j = 0; j < ne_y; j++) {
       elements[i][j]->addConservativeVariables(V);
@@ -1111,10 +1111,10 @@ void DG_Field_2d::updateBoundary(double time) {
 /**
  * @Synopsis  This function finds the maximum value in the Field .
  *
- * @Param v This is a string which defines the variable name.
+ * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-double DG_Field_2d::FindMax(string v) {
+double DG_Field_2d::FindMax(int v) {
     double Max = elements[0][0]->FindMax(v); 
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
@@ -1142,7 +1142,7 @@ double DG_Field_2d::FindMindx() {
  * @Param dx To store the minimum dx in the element
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::FindMindx(string dx) {
+void DG_Field_2d::FindMindx(int dx) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->FindMindx(dx);
@@ -1156,7 +1156,7 @@ void DG_Field_2d::FindMindx(string dx) {
  * @Param dt To find th mimimum dt from all dt.
  */
 /* ----------------------------------------------------------------------------*/
-double DG_Field_2d::FindMindt(string dt) {
+double DG_Field_2d::FindMindt(int dt) {
     double Mini = elements[0][0]->FindMindt(dt);
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
@@ -1174,7 +1174,7 @@ double DG_Field_2d::FindMindt(string dt) {
  * @Param CFL CFL to be used
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::FindTimestep(string dt, string dx, string U, double CFL) {
+void DG_Field_2d::FindTimestep(int dt, int dx, int U, double CFL) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
             elements[i][j]->FindTimestep(dt, dx, U, CFL);

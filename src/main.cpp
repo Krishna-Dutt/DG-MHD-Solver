@@ -110,14 +110,19 @@ int main() {
     a->setDomain(0.0, 0.0, 1.2, 0.2);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
-    a->setGradientPrimitiveVariables();
-    a->setMaterialPropertyVariables();
+    //a->setGradientPrimitiveVariables();
+    //a->setMaterialPropertyVariables();
 
     a->setInitialVelocity(U, V);
     a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
     a->updateConservativeVariables(IE);
+
+    a->setInviscidFlux();
+    a->setEigenValues(SoundSpeed);
+   //a->setViscousFlux();
+    a->setAuxillaryVariables();
 
     a->setBoundaryCondtions("noslipWall", "outflow", "neumann", "inflow");
     a->SetShockDetector("KXRCF");

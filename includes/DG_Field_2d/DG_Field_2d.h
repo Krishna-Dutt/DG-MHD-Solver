@@ -25,75 +25,75 @@ private:
 
 public:
     vector< vector<DG_Element_2d*> > elements;
-    vector<string> variableNames; // This is stores all the variables which have been added to the field.
-    vector<string> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
+    vector<int> variableNames; // This is stores all the variables which have been added to the field.
+    vector<int> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
 
-    vector<string> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
+    vector<int> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
 
     DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, double _x2, double _y2);
     ~DG_Field_2d();
 
     void setSystem(string S);
 
-    void addVariable_withBounary(string v);
-    void addVariable_withoutBounary(string v);
-    void addVariable_onlyBounary( string v);
-    void addVariable_CellCentered(string v);
-    void initializeVariable(string v, function<double(double, double)>);
+    void addVariable_withBounary(int v);
+    void addVariable_withoutBounary(int v);
+    void addVariable_onlyBounary( int v);
+    void addVariable_CellCentered(int v);
+    void initializeVariable(int v, function<double(double, double)>);
 
     // Functions to set Boundary Conditions
     void setBoundaryConditions(string type);
-    void setBoundaryConditions(string v, string type, string b);
+    void setBoundaryConditions(int v, string type, string b);
     void setTopBoundary( string type);
     void setBottomBoundary(string type);
     void setLeftBoundary(string type);
     void setRightBoundary(string type);
-    void setBoundaryNeighbours(string v);
+    void setBoundaryNeighbours(int v);
     void setBoundaryNeighbours();
-    void updateBoundaryVariables(string v);
+    void updateBoundaryVariables(int v);
 
     // Functions to create output file in VTK format
     void writeVTK(string fileName);
 
     void ResetMap_OutFlow(); // Function to Reset the Map to Outflow Boundaries.
-    void updateOutFlowBoundary(string u, string v); // Function to update the map of Outflow Boundaries.
-    void updateCellMarker(string v, string m);
+    void updateOutFlowBoundary(int u, int v); // Function to update the map of Outflow Boundaries.
+    void updateCellMarker(int v, int m);
     
     void setVanderMandMatrix(); // Function to set the VanderMand and its Inverse
 
     // Functions to handle Moment Limiter
-    void computeMoments(string v, string m);
-    void limitMoments(string m, string modifiedm, string cm, unsigned Index);
-    void convertMomentToVariable(string m, string v, string cm);
+    void computeMoments(int v, int m);
+    void limitMoments(int m, int modifiedm, int cm, unsigned Index);
+    void convertMomentToVariable(int m, int v, int cm);
 
     // Function to Reset Cell Centered Variables 
-    void ResetVariables_CellCentered(string v, double value = 0.0);
+    void ResetVariables_CellCentered(int v, double value = 0.0);
     
     // Operators on the field.
-    void delByDelX(string v, string vDash,string conserVar, string fluxType, string fluxVariable);
+    void delByDelX(int v, int vDash,int conserVar, string fluxType, int fluxVariable);
 
-    void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+    void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
-    void delByDelX(string v, string vDash, string fluxType);
+    void delByDelX(int v, int vDash, string fluxType);
 
-    void delByDelY(string v, string vDash, string fluxType);
+    void delByDelY(int v, int vDash, string fluxType);
 
     // Functions to apply linear operations on the variables.
-    void axpy(double a, string x, string y);
-    void scal(double a, string x);
-    void setFunctionsForVariables(string x, string y, function<double(double, double)>, string z); 
-    void setFunctionsForVariables(string w, string x, string y, function<double(double, double, double)>, string z); 
+    void axpy(double a, int x, int y);
+    void scal(double a, int x);
+    void setFunctionsForVariables(int x, int y, function<double(double, double)>, int z); 
+    void setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)>, int z); 
     // Functions to apply operations only on variables stored at Boundary
-    void setFunctionsForBoundaryVariables(string x, string y, function<double(double, double)>, string z); 
-    void setFunctionsForBoundaryVariables(string w, string x, string y, function<double(double, double, double)>, string z); 
-    void setFunctionsForVariables(string a, string b, string c, string d, function<double(double, double, double, double)>, string z); 
+    void setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)>, int z); 
+    void setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)>, int z); 
+    void setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)>, int z); 
     // Fucntions to compute cell centered values
-    void setFunctionsForVariablesCellCentered(string x, string y, function<double(double, double, double)>, string z); 
+    void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)>, int z); 
     // Functions to give the information about the error.
-    double l2Norm(string v1, string v2);
+    double l2Norm(int v1, int v2);
 
     // Function to check Positivity of data stored in cell .
-    void checkPositivity(string v, string cm, string level);
+    void checkPositivity(int v, int cm, string level);
     void resetPositivity();
 
 

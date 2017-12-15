@@ -48,7 +48,7 @@ protected:
 
         string CornerCell;
 
-        vector<string> ConservativeVariables;
+        vector<int> ConservativeVariables;
 
 
 public:
@@ -57,34 +57,34 @@ public:
         ~DG_BoundaryElement_2d();
 
         void assignBoundary(string type, char b);
-        void setBoundaryValue(string v, string b);
+        void setBoundaryValue(int v, string b);
         void DirichletBoundary(double *Matrix, initializer_list<int> I);
         void NeumannBoundary(double *Matrix, initializer_list<int> I);
         void PeriodicBoundary(double *Matrix, initializer_list<int> I);
 
-        void updateDirichlet(string v, double *Matrix);
-        void updateNeumann(string v, double *Matrix);
+        void updateDirichlet(int v, double *Matrix);
+        void updateNeumann(int v, double *Matrix);
 
-        void updateBoundaryVariables(string v);
+        void updateBoundaryVariables(int v);
 
         // Functions for various operations on the variables.
-        void delByDelX(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+        void delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
-        void delByDelY(string v, string vDash, string conserVar, string fluxType, string fluxVariable);
+        void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
-        void delByDelX(string v, string vDash, string fluxType);
+        void delByDelX(int v, int vDash, string fluxType);
 
-        void delByDelY(string v, string vDash, string fluxType);
+        void delByDelY(int v, int vDash, string fluxType);
 
         // Methods for handling Moment Limiter !!
-        void limitMoments(string m, string modm, string cm, unsigned Index);
-        double BoundaryMinMod(string m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
-        void convertMomentToVariable(string m, string v, string cm);
+        void limitMoments(int m, int modm, int cm, unsigned Index);
+        double BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
+        void convertMomentToVariable(int m, int v, int cm);
 
         // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
 
-        void addConservativeVariables(string v);
-        void addConservativeVariables(vector<string> V);
+        void addConservativeVariables(int v);
+        void addConservativeVariables(vector<int> V);
 
         void updateBoundary(double time);
         void setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time);
