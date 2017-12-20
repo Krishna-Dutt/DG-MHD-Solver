@@ -171,10 +171,113 @@ void DG_Element_2d::setSystem(string S) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::addVariable_withoutBoundary(int v) {
     double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
-    variable[v] = newVariable; /// Now assigning the same to the map.
+    /// Allocating the space for the new variable which is to be created.
+    if (v == 0) variable.clear();
+
+    variable.push_back(p); /// Now assigning the same to the map.
+
+    double *b_top       = NULL; 
+    double *b_bottom    = NULL;
+    double *b_left      = NULL;
+    double *b_right     = NULL;
+
+   
+    double *n_top       = NULL;
+    double *n_left      = NULL;
+    double *n_right     = NULL;
+    double *n_bottom    = NULL;
+
+    if (v == 0) {
+        boundaryTop.clear();
+        boundaryBottom.clear();
+        boundaryLeft.clear();
+        boundaryRight.clear();
+
+        neighboringTop.clear();
+        neighboringBottom.clear();
+        neighboringLeft.clear();
+        neighboringRight.clear();
+    } 
+
+    boundaryTop.push_back(b_top);
+    boundaryRight.push_back(b_right);
+    boundaryBottom.push_back(b_bottom);
+    boundaryLeft.push_back(b_left);
+
+
+    neighboringTop.push_back(n_top);
+    neighboringRight.push_back(n_right);
+    neighboringBottom.push_back(n_bottom);
+    neighboringLeft.push_back(n_left);
+
 
     return ;
 }
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This functions creates space in order to take in one more variable on which operators are needed to be
+ * applied.
+ *
+ * @Param v  This is the name of the variable which is to be added.
+ * @Param p  Pointer to memory allocation for variable.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::addVariable_withBoundary(int v) {
+    double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
+    if (v == 0) variable.clear();
+
+    variable.push_back(p); /// Now assigning the same to the map.
+    
+    // **b_top is used because it will store the address to the boundary element, So whenever the actual value in the double* of the variable is changed then this will also change automatically. The same holds for all the other following mentioned variables.
+    
+    double *b_top    ; 
+    double *b_bottom ;
+    double *b_left   ;
+    double *b_right  ;
+
+   
+    double *n_top    ;
+    double *n_left   ;
+    double *n_right  ;
+    double *n_bottom ;
+
+    
+        n_bottom =   b_bottom = &(variable[v][0]);    
+        n_top    =   b_top    = &(variable[v][N*(N+1)+0]);
+        n_left   =   b_left   = &(variable[v][0*(N+1)]);
+        n_right  =   b_right  = &(variable[v][0*(N+1)+N]);
+    
+
+    if (v == 0) {
+        boundaryTop.clear();
+        boundaryBottom.clear();
+        boundaryLeft.clear();
+        boundaryRight.clear();
+
+        neighboringTop.clear();
+        neighboringBottom.clear();
+        neighboringLeft.clear();
+        neighboringRight.clear();
+    } 
+
+    boundaryTop.push_back(b_top);
+    boundaryRight.push_back(b_right);
+    boundaryBottom.push_back(b_bottom);
+    boundaryLeft.push_back(b_left);
+
+
+    neighboringTop.push_back(n_top);
+    neighboringRight.push_back(n_right);
+    neighboringBottom.push_back(n_bottom);
+    neighboringLeft.push_back(n_left);
+
+    boundaryVariables.push_back(v);
+
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -231,17 +334,17 @@ void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
   double start = -1.0;
   double end = 1.0;
   
-  if (lobattoIntegration(start, end, N, boundaryTop[v]) < 0.0) {
+  if (lobattoIntegration(start, end, N, 1, boundaryTop[v]) < 0.0) {
     OutFlow["Top"] = true;
   }
-  if (lobattoIntegration(start, end, N, boundaryBottom[v]) > 0.0) {
+  if (lobattoIntegration(start, end, N, 1, boundaryBottom[v]) > 0.0) {
     OutFlow["Bottom"] = true;
   }
   
-  if (lobattoIntegration(start, end, N, boundaryLeft[u]) > 0.0) {
+  if (lobattoIntegration(start, end, N, N+1, boundaryLeft[u]) > 0.0) {
     OutFlow["Left"] = true;
   }
-  if (lobattoIntegration(start, end, N, boundaryRight[u]) < 0.0) {
+  if (lobattoIntegration(start, end, N, N+1, boundaryRight[u]) < 0.0) {
     OutFlow["Right"] = true;
   }
   
@@ -264,30 +367,30 @@ void DG_Element_2d::updateCellMarker(int v, int m) {
   double VariableFlux = 0.0;
 
   if (OutFlow["Top"]) {
-    VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryTop[v]);
-    VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringTop[v]);
+    VariableFlux += lobattoIntegration(x_start, x_end, N, 1, boundaryTop[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, 1, neighboringTop[v]);
     OutflowSize += abs(x_end -x_start);
 
     for(int i=0; i<=N; ++i) {
-        MaxVariable = MAX(MaxVariable, *boundaryTop[v][i]);
+        MaxVariable = MAX(MaxVariable, boundaryTop[v][i]);
     }
   }
   if (OutFlow["Bottom"]) {
-    VariableFlux += lobattoIntegration(x_start, x_end, N, boundaryBottom[v]);
-    VariableFlux -= lobattoIntegration(x_start, x_end, N, neighboringBottom[v]);
+    VariableFlux += lobattoIntegration(x_start, x_end, N, 1, boundaryBottom[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, 1, neighboringBottom[v]);
     OutflowSize += abs(x_end -x_start);
 
     for(int i=0; i<=N; ++i) {
-        MaxVariable = MAX(MaxVariable, *boundaryBottom[v][i]);
+        MaxVariable = MAX(MaxVariable, boundaryBottom[v][i]);
     }
   }
   if (OutFlow["Left"]) {
-    VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryLeft[v]);
-    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringLeft[v]);
+    VariableFlux += lobattoIntegration(y_start, y_end, N, N+1, boundaryLeft[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, N+1, neighboringLeft[v]);
     OutflowSize += abs(y_end -y_start);
 
     for(int i=0; i<=N; ++i) {
-        MaxVariable = MAX(MaxVariable, *boundaryLeft[v][i]);
+        MaxVariable = MAX(MaxVariable, boundaryLeft[v][i]);
     }
   }
   if (OutFlow["Right"]) {
@@ -385,15 +488,6 @@ void DG_Element_2d::computeMoments(int v, int m) {
   /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v],1,0,variable[m],1);
   
- /* *variable["Min"] = variable[v][0];
-  *variable["Max"] = variable[v][0];
-  for (int i=1; i< (N+1)*(N+1); ++i) {
-      *variable["Min"] = min(*variable["Min"], variable[v][i]);
-      *variable["Max"] = max(*variable["Max"], variable[v][i]);
-  }*/
-  /*for(int b=0; b <(N+1)*(N+1); ++b) {
-                    variable["CellMarkerGlobal"][b] = *variable["Min"];
-  }*/
   return ;
 }
 
@@ -415,15 +509,6 @@ void DG_Element_2d::convertMomentToVariable(int m, int v, int cm) {
   { 
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
   
-  /*for (int i=0; i< (N+1)*(N+1); ++i) {
-      if (variable[v][i] < *variable["Min"]) {
-          variable[v][i] = *variable["Min"] ;
-      }
-      else if (variable[v][i] > *variable["Max"]) {
-          variable[v][i] = *variable["Max"] ;
-      }
-  }*/
-
   }
 
   return ;
@@ -555,56 +640,6 @@ if (*variable[cm] && PositivityMarker)
   return ;
 }
 
-
-
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This functions creates space in order to take in one more variable on which operators are needed to be
- * applied.
- *
- * @Param v  This is the name of the variable which is to be added.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_withBoundary(int v) {
-    double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
-    variable[v] = newVariable; /// Now assigning the same to the map.
-    
-    // **b_top is used because it will store the address to the boundary element, So whenever the actual value in the double* of the variable is changed then this will also change automatically. The same holds for all the other following mentioned variables.
-    
-    double **b_top       = new double* [N+1]; 
-    double **b_bottom    = new double* [N+1];
-    double **b_left      = new double* [N+1];
-    double **b_right     = new double* [N+1];
-
-   
-    double **n_top       = new double* [N+1];
-    double **n_left      = new double* [N+1];
-    double **n_right     = new double* [N+1];
-    double **n_bottom    = new double* [N+1];
-
-    for(int i=0; i<=N; i++){
-        n_bottom[i] =   b_bottom[i] = &(variable[v][i]);    
-        n_top[i]    =   b_top[i]    = &(variable[v][N*(N+1)+i]);
-        n_left[i]   =   b_left[i]   = &(variable[v][i*(N+1)]);
-        n_right[i]  =   b_right[i]  = &(variable[v][i*(N+1)+N]);
-    }
-
-
-    boundaryTop[v]      = b_top;
-    boundaryRight[v]    = b_right;
-    boundaryBottom[v]   = b_bottom;
-    boundaryLeft[v]     = b_left;
-
-
-    neighboringTop[v]   = n_top;
-    neighboringRight[v] = n_right;
-    neighboringBottom[v]= n_bottom;
-    neighboringLeft[v]  = n_left;
-
-    boundaryVariables.push_back(v);
-
-    return ;
-}
 
 /* ----------------------------------------------------------------------------*/
 /**
