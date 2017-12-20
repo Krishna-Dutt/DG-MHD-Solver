@@ -68,18 +68,19 @@ public:
         void updateBoundaryVariables(int v);
 
         // Functions for various operations on the variables.
-        void delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
+        /*void delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
         void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
         void delByDelX(int v, int vDash, string fluxType);
 
         void delByDelY(int v, int vDash, string fluxType);
+        */
 
         // Methods for handling Moment Limiter !!
         void limitMoments(int m, int modm, int cm, unsigned Index);
         double BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
-        void convertMomentToVariable(int m, int v, int cm);
+       // void convertMomentToVariable(int m, int v, int cm);
 
         // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
 

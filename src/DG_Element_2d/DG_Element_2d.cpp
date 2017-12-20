@@ -390,16 +390,16 @@ void DG_Element_2d::updateCellMarker(int v, int m) {
     OutflowSize += abs(y_end -y_start);
 
     for(int i=0; i<=N; ++i) {
-        MaxVariable = MAX(MaxVariable, boundaryLeft[v][i]);
+        MaxVariable = MAX(MaxVariable, boundaryLeft[v][i*(N+1)]);
     }
   }
   if (OutFlow["Right"]) {
-    VariableFlux += lobattoIntegration(y_start, y_end, N, boundaryRight[v]);
-    VariableFlux -= lobattoIntegration(y_start, y_end, N, neighboringRight[v]);
+    VariableFlux += lobattoIntegration(y_start, y_end, N, N+1, boundaryRight[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, N+1, neighboringRight[v]);
     OutflowSize += abs(y_end -y_start);
 
     for(int i=0; i<=N; ++i) {
-        MaxVariable = MAX(MaxVariable, *boundaryRight[v][i]);
+        MaxVariable = MAX(MaxVariable, boundaryRight[v][i*(N+1)]);
     }
   }
 
@@ -422,7 +422,7 @@ void DG_Element_2d::updateCellMarker(int v, int m) {
   }
   
   for(int b=0; b <(N+1)*(N+1); ++b) {
-      variable["CellMarkerGlobal"][b] = *variable[m];
+      variable[35][b] = *variable[m]; // CellMarkerG
   }
  return ;
 }
@@ -446,7 +446,7 @@ void DG_Element_2d::checkPositivity(int v, int cm, string level) {
                 PositivityMarker = true;
                 *variable[cm] = 2.0;
                 for(int b=0; b <(N+1)*(N+1); ++b) {
-                    variable["CellMarkerGlobal"][b] = *variable[cm];
+                     variable[35][b] = *variable[cm]; // CellMarkerG
                 }
                 return ;
             }
@@ -593,7 +593,7 @@ if (*variable[cm] && PositivityMarker)
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
-       else //if( Temp1 !=0 && Temp2 !=0) 
+       else 
        {
          return ; // Need to exit both loops
        }
@@ -649,7 +649,7 @@ if (*variable[cm] && PositivityMarker)
  * @Param v  This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_onlyBoundary(int v) {
+/*void DG_Element_2d::addVariable_onlyBoundary(int v) {
     double * newVariable = new double[(N+1)*(4)]; /// Allocating the space for the new variable which is to be created, and stored only at boundary of quadrilateral cell.
     variable[v] = newVariable; /// Now assigning the same to the map.
     
@@ -689,7 +689,7 @@ void DG_Element_2d::addVariable_onlyBoundary(int v) {
     variableOnlyAtBoundary.push_back(v);
 
     return ;
-}
+}*/
 
 
 /* ----------------------------------------------------------------------------*/
@@ -711,20 +711,16 @@ void DG_Element_2d::initializeVariable(int v, function<double(double, double)> f
 void DG_Element_2d::setVariableNeighbors(int v) {
     int j;
     if(topNeighbor!=this) {
-        for( j = 0 ; j <= N; j++) 
-            neighboringTop[v][j] = topNeighbor->boundaryBottom[v][j];
+            neighboringTop[v] = topNeighbor->boundaryBottom[v];
     }
     if(rightNeighbor!=this) {
-        for( j = 0 ; j <= N; j++) 
-            neighboringRight[v][j] = rightNeighbor->boundaryLeft[v][j];
+            neighboringRight[v] = rightNeighbor->boundaryLeft[v];
     }
     if(leftNeighbor!=this) {
-        for( j = 0 ; j <= N; j++) 
-            neighboringLeft[v][j] = leftNeighbor->boundaryRight[v][j];
+            neighboringLeft[v] = leftNeighbor->boundaryRight[v];
     }
     if(bottomNeighbor!=this) {
-        for( j = 0 ; j <= N; j++) 
-            neighboringBottom[v][j] = bottomNeighbor->boundaryTop[v][j];
+            neighboringBottom[v] = bottomNeighbor->boundaryTop[v];
     }
     return ;
 }
@@ -786,8 +782,8 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
-            numericalFlux[i*(N+1)+N]    = 0.5*( *boundaryRight[v][i]    + *neighboringRight[v][i] ) ;   
-            numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
+            numericalFlux[i*(N+1)+N]    = 0.5*( boundaryRight[v][i*(N+1)]    + neighboringRight[v][i*(N+1)] ) ;   
+            numericalFlux[i*(N+1)]    = 0.5*( boundaryLeft[v][i*(N+1)]     + neighboringLeft[v][i*(N+1)] ) ;  
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -809,8 +805,8 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
           // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
-            numericalFlux[i*(N+1)+N] = 0.5*(*boundaryRight[v][i] + *neighboringRight[v][i] + MAX(fabs(*boundaryRight[fluxVariable][i]), fabs(*neighboringRight[fluxVariable][i]))*(*boundaryRight[conserVar][i] - *neighboringRight[conserVar][i])  ) ;   
-            numericalFlux[i*(N+1)]   = 0.5*(*boundaryLeft[v][i]  + *neighboringLeft[v][i]  - MAX(fabs(*boundaryLeft[fluxVariable][i]), fabs(*neighboringLeft[fluxVariable][i]))*(*boundaryLeft[conserVar][i] - *neighboringLeft[conserVar][i])  ) ;   
+            numericalFlux[i*(N+1)+N] = 0.5*(boundaryRight[v][i*(N+1)] + neighboringRight[v][i*(N+1)] + MAX(fabs(boundaryRight[fluxVariable][i*(N+1)]), fabs(neighboringRight[fluxVariable][i*(N+1)]))*(boundaryRight[conserVar][i*(N+1)] - neighboringRight[conserVar][i*(N+1)])  ) ;   
+            numericalFlux[i*(N+1)]   = 0.5*(boundaryLeft[v][i*(N+1)]  + neighboringLeft[v][i*(N+1)]  - MAX(fabs(boundaryLeft[fluxVariable][i*(N+1)]), fabs(neighboringLeft[fluxVariable][i*(N+1)]))*(boundaryLeft[conserVar][i*(N+1)] - neighboringLeft[conserVar][i*(N+1)])  ) ;   
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -850,8 +846,8 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
-            numericalFlux[N*(N+1)+i]    = 0.5*( *boundaryTop[v][i]    + *neighboringTop[v][i] ) ;   
-            numericalFlux[i]            = 0.5*( *boundaryBottom[v][i]     + *neighboringBottom[v][i] ) ;  
+            numericalFlux[N*(N+1)+i]    = 0.5*( boundaryTop[v][i]    + neighboringTop[v][i] ) ;   
+            numericalFlux[i]            = 0.5*( boundaryBottom[v][i]     + neighboringBottom[v][i] ) ;  
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -873,8 +869,8 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
           // Normals nx, ny have been incorporated into the signs, need to set them separately !!
-            numericalFlux[N*(N+1)+i]= 0.5*(*boundaryTop[v][i] + *neighboringTop[v][i] + MAX(fabs(*boundaryTop[fluxVariable][i]), fabs(*neighboringTop[fluxVariable][i]))*(*boundaryTop[conserVar][i] - *neighboringTop[conserVar][i]));
-            numericalFlux[i]        = 0.5*(*boundaryBottom[v][i] + *neighboringBottom[v][i] - MAX(fabs(*boundaryBottom[fluxVariable][i]), fabs(*neighboringBottom[fluxVariable][i]))*(*boundaryBottom[conserVar][i] - *neighboringBottom[conserVar][i])); 
+            numericalFlux[N*(N+1)+i]= 0.5*(boundaryTop[v][i] + neighboringTop[v][i] + MAX(fabs(boundaryTop[fluxVariable][i]), fabs(neighboringTop[fluxVariable][i]))*(boundaryTop[conserVar][i] - neighboringTop[conserVar][i]));
+            numericalFlux[i]        = 0.5*(boundaryBottom[v][i] + neighboringBottom[v][i] - MAX(fabs(boundaryBottom[fluxVariable][i]), fabs(neighboringBottom[fluxVariable][i]))*(boundaryBottom[conserVar][i] - neighboringBottom[conserVar][i])); 
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -912,8 +908,8 @@ void DG_Element_2d::delByDelX(int v, int vDash, string fluxType) {
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
-            numericalFlux[i*(N+1)+N]    = 0.5*( *boundaryRight[v][i]    + *neighboringRight[v][i] ) ;   
-            numericalFlux[i*(N+1)]    = 0.5*( *boundaryLeft[v][i]     + *neighboringLeft[v][i] ) ;  
+            numericalFlux[i*(N+1)+N]    = 0.5*( boundaryRight[v][i*(N+1)]    + neighboringRight[v][i*(N+1)] ) ;   
+            numericalFlux[i*(N+1)]    = 0.5*( boundaryLeft[v][i*(N+1)]     + neighboringLeft[v][i*(N+1)] ) ;  
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -952,8 +948,8 @@ void DG_Element_2d::delByDelY(int v, int vDash, string fluxType) {
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));                                                       
         for(int i=0; i<=N; i++){
-            numericalFlux[N*(N+1)+i]    = 0.5*( *boundaryTop[v][i]    + *neighboringTop[v][i] ) ;   
-            numericalFlux[i]            = 0.5*( *boundaryBottom[v][i]     + *neighboringBottom[v][i] ) ;  
+            numericalFlux[N*(N+1)+i]    = 0.5*( boundaryTop[v][i]    + neighboringTop[v][i] ) ;   
+            numericalFlux[i]            = 0.5*( boundaryBottom[v][i]     + neighboringBottom[v][i] ) ;  
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -1171,10 +1167,10 @@ void DG_Element_2d::setFunctionsForVariables(int a, int b, int c, int d, functio
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)> f, int z) {
     for(int i = 0 ; i <= N ; i++){
-         *boundaryTop[z][i] = f(*boundaryTop[x][i], *boundaryTop[y][i]);
-         *boundaryRight[z][i] = f(*boundaryRight[x][i], *boundaryRight[y][i]);
-         *boundaryLeft[z][i] = f(*boundaryLeft[x][i], *boundaryLeft[y][i]);
-         *boundaryBottom[z][i] = f(*boundaryBottom[x][i], *boundaryBottom[y][i]);
+         boundaryTop[z][i] = f(boundaryTop[x][i], boundaryTop[y][i]);
+         boundaryRight[z][i*(N+1)] = f(boundaryRight[x][i*(N+1)], boundaryRight[y][i*(N+1)]);
+         boundaryLeft[z][i*(N+1)] = f(boundaryLeft[x][i*(N+1)], boundaryLeft[y][i*(N+1)]);
+         boundaryBottom[z][i] = f(boundaryBottom[x][i], boundaryBottom[y][i]);
     }
     return ;
 }
@@ -1192,10 +1188,10 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(int x, int y, function<doub
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
     for(int i = 0 ; i <= N ; i++){
-         *boundaryTop[z][i] = f(*boundaryTop[w][i], *boundaryTop[x][i], *boundaryTop[y][i]);
-         *boundaryRight[z][i] = f(*boundaryRight[w][i], *boundaryRight[x][i], *boundaryRight[y][i]);
-         *boundaryLeft[z][i] = f(*boundaryLeft[w][i], *boundaryLeft[x][i], *boundaryLeft[y][i]);
-         *boundaryBottom[z][i] = f(*boundaryBottom[w][i], *boundaryBottom[x][i], *boundaryBottom[y][i]);
+         boundaryTop[z][i] = f(boundaryTop[w][i], boundaryTop[x][i], boundaryTop[y][i]);
+         boundaryRight[z][i*(N+1)] = f(boundaryRight[w][i*(N+1)], boundaryRight[x][i*(N+1)], boundaryRight[y][i*(N+1)]);
+         boundaryLeft[z][i*(N+1)] = f(boundaryLeft[w][i*(N+1)], boundaryLeft[x][i*(N+1)], boundaryLeft[y][i*(N+1)]);
+         boundaryBottom[z][i] = f(boundaryBottom[w][i], boundaryBottom[x][i], boundaryBottom[y][i]);
     }
     return;
 }

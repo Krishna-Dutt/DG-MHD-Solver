@@ -64,8 +64,8 @@ double lobattoIntegration(double start, double end, int N, unsigned Index, doubl
 	   Nodes[i] = 0.5*(start+end) +  (0.5*(end-start))*Nodes[i];///Made a shift from the computational space to the physical space.
 
 
-	for(i=0, int j=0;i<N;i++, j+=Index)
-		Values[i] =   f[j];
+	for(i=0;i<N;i++)
+		Values[i] =   f[i*Index];
 
 	for(i=0;i<N;i++)
 		integral += (Values[i]*Weights[i]);

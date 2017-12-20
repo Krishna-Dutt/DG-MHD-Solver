@@ -105,19 +105,19 @@ public:
     // Functions to support Moment Limiters.
     void computeMoments(int v, int m);
     virtual void limitMoments(int m, int modm, int cm, unsigned Index);
-    virtual void convertMomentToVariable(int m, int v, int cm);
+    void convertMomentToVariable(int m, int v, int cm);
 
     // Functions to manipulate Cell Centered Variables.
     void ResetVariables_CellCentered(int v, double value = 0.0);
 
     // Functions for various operations on the variables.
-    virtual void delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
+    void delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
 
-    virtual void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
+    void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
     
-    virtual void delByDelX(int v, int vDash, string fluxType);
+    void delByDelX(int v, int vDash, string fluxType);
 
-    virtual void delByDelY(int v, int vDash, string fluxType);
+    void delByDelY(int v, int vDash, string fluxType);
 
     // Functions to set the various operator matrices.
     void setMassMatrix(double* m);
