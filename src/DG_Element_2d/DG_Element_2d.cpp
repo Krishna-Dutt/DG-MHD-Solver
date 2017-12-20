@@ -226,7 +226,6 @@ void DG_Element_2d::addVariable_withoutBoundary(int v, double *p) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::addVariable_withBoundary(int v, double *p) {
-    //double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
     if (v == 0) variable.clear();
 
     variable.push_back(p); /// Now assigning the same to the map.
@@ -1107,15 +1106,17 @@ void DG_Element_2d::scal(double a, int x) {
 /**
  * @Synopsis  This is the function used to change the value of variable z to f(x, y).
  *
+ * @Param a Scaling value for x
  * @Param x The first parameter of the function.
+ * @Param b Scaling value for y
  * @Param y The second parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(int x, int y, function<double(double, double)> f, int z) {
-    for(int i = 0 ; i < (N+1)*(N+1); i++)
-        variable[z][i] = f(variable[x][i],variable[y][i]);
+void DG_Element_2d::setFunctionsForVariables(double a, int x, double b, int y, function<double(double, double)> f, int z) {
+    f(a, variable[x], b, variable[y], 1, (N+1)*(N+1), variable[z]);
+
     return ;
 }
 
@@ -1123,16 +1124,19 @@ void DG_Element_2d::setFunctionsForVariables(int x, int y, function<double(doubl
 /**
  * @Synopsis  This is the function used to change the value of variable z to f(w, x, y).
  *
+ * @Param a Scaling for first parameter.
  * @Param w The first parameter of the function
+ * @Param b Scaling for second parameter.
  * @Param x The second parameter of the function.
+ * @Param c Scaling for third parameter.
  * @Param y The third parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
-    for(int i = 0 ; i < (N+1)*(N+1); i++)
-        variable[z][i] = f(variable[w][i],variable[x][i],variable[y][i]);
+void DG_Element_2d::setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<double(double, double, double)> f, int z) {
+    f(a, variable[w], b, variable[x], c, variable[y], 1, (N+1)*(N+1), variable[z]);
+
     return ;
 }
 
@@ -1140,17 +1144,21 @@ void DG_Element_2d::setFunctionsForVariables(int w, int x, int y, function<doubl
 /**
  * @Synopsis  This is the function used to change the value of variable z to f(a, b, c, d).
  *
+ * @Param t Scaling for first parameter.
  * @Param a The first parameter of the function
+ * @Param u Scaling for second parameter.
  * @Param b The second parameter of the function.
+ * @Param v Scaling for third parameter.
  * @Param c The third parameter of the function.
- * @Param d The third parameter of the function.
+ * @Param x Scaling for fourth parameter.
+ * @Param d The fourth parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)> f, int z) {
-    for(int i = 0 ; i < (N+1)*(N+1); i++)
-        variable[z][i] = f(variable[a][i],variable[b][i],variable[c][i], variable[d][i]);
+void DG_Element_2d::setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    f(t, variable[a], u, variable[b], v, variable[c], x, variable[d], 1, (N+1)*(N+1), variable[z]);
+
     return ;
 }
 
@@ -1159,20 +1167,25 @@ void DG_Element_2d::setFunctionsForVariables(int a, int b, int c, int d, functio
 /**
  * @Synopsis  This is the function used to change the value of Boundary variable z to f(x, y).
  * 
- *
+ * @Param a Scaling value for x
  * @Param x The first parameter of the function.
- * @Param y The second parameter of the function.
+ * @Param b Scaling value for y
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)> f, int z) {
-    for(int i = 0 ; i <= N ; i++){
+void DG_Element_2d::setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    /*for(int i = 0 ; i <= N ; i++){
          boundaryTop[z][i] = f(boundaryTop[x][i], boundaryTop[y][i]);
          boundaryRight[z][i*(N+1)] = f(boundaryRight[x][i*(N+1)], boundaryRight[y][i*(N+1)]);
          boundaryLeft[z][i*(N+1)] = f(boundaryLeft[x][i*(N+1)], boundaryLeft[y][i*(N+1)]);
          boundaryBottom[z][i] = f(boundaryBottom[x][i], boundaryBottom[y][i]);
-    }
+    }*/
+    f(a, boundaryTop[x], b, boundaryTop[y], 1, N+1, boundaryTop[z]);
+    f(a, boundaryBottom[x], b, boundaryBottom[y], 1, N+1, boundaryBottom[z]);
+    f(a, boundaryRight[x], b, boundaryRight[y], N+1, N+1, boundaryRight[z]);
+    f(a, boundaryLeft[x], b, boundaryLeft[y], N+1, N+1, boundaryLeft[z]);
+
     return ;
 }
 
@@ -1180,20 +1193,28 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(int x, int y, function<doub
 /**
  * @Synopsis  This is the function used to change the value of  Boundary variable z to f(w, x, y).
  *
- * @Param w The first parameter of the function
+ * @Param a Scaling value for w
+ * @Param w The first parameter of the function.
+ * @Param b Scaling value for x
  * @Param x The second parameter of the function.
+ * @Param c Scaling value for y
  * @Param y The third parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
-    for(int i = 0 ; i <= N ; i++){
+void DG_Element_2d::setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    /*for(int i = 0 ; i <= N ; i++){
          boundaryTop[z][i] = f(boundaryTop[w][i], boundaryTop[x][i], boundaryTop[y][i]);
          boundaryRight[z][i*(N+1)] = f(boundaryRight[w][i*(N+1)], boundaryRight[x][i*(N+1)], boundaryRight[y][i*(N+1)]);
          boundaryLeft[z][i*(N+1)] = f(boundaryLeft[w][i*(N+1)], boundaryLeft[x][i*(N+1)], boundaryLeft[y][i*(N+1)]);
          boundaryBottom[z][i] = f(boundaryBottom[w][i], boundaryBottom[x][i], boundaryBottom[y][i]);
-    }
+    }*/
+    f(a, boundaryTop[w], b, boundaryTop[x], c, boundaryTop[y], 1, N+1, boundaryTop[z]);
+    f(a, boundaryBottom[w], b, boundaryBottom[x], c, boundaryBottom[y], 1, N+1, boundaryBottom[z]);
+    f(a, boundaryRight[w], b, boundaryRight[x], c, boundaryRight[y], N+1, N+1, boundaryRight[z]);
+    f(a, boundaryLeft[w], b, boundaryLeft[x], c, boundaryLeft[y], N+1, N+1, boundaryLeft[z]);
+
     return;
 }
 

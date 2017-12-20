@@ -136,13 +136,13 @@ public:
     // Functions to apply linear operations on the variables.
     void axpy(double a, int x, int y);
     void scal(double a, int x);
-    void setFunctionsForVariables(int x, int y, function<double(double, double)>, int z);
-    void setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)>, int z);
-    void setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)>, int z);
-
-    // Function to apply linear operation on variables stored only on Boundary points.
-    void setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)>, int z);
-    void setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)>, int z);
+    void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+    void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z);
+    void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+     
+    // Functions to apply operations only on variables stored at Boundary
+    void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+    void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
     
     // Fucntions to compute cell centered values
     void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)>, int z); 

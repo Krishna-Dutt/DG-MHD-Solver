@@ -928,16 +928,17 @@ void DG_Field_2d::scal(double a, int x) {
 /**
  * @Synopsis  This is the function used to change the value of variable z to f(x, y).
  *
+ * @Param a Scaling value for x
  * @Param x The first parameter of the function.
+ * @Param b Scaling value for y
  * @Param y The second parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariables(int x, int y, function<double(double, double)> f, int z) {
-    for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
-            elements[i][j]->setFunctionsForVariables(x, y, f, z);
+void DG_Field_2d::setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    f(a, domainVariable[x], b, domainVariable[y], 1, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z]);
+
     return;
 }
 
@@ -945,17 +946,19 @@ void DG_Field_2d::setFunctionsForVariables(int x, int y, function<double(double,
 /**
  * @Synopsis  This is the function used to change the value of variable z to f(w, x, y).
  *
+ * @Param a Scaling for first parameter.
  * @Param w The first parameter of the function
+ * @Param b Scaling for second parameter.
  * @Param x The second parameter of the function.
+ * @Param c Scaling for third parameter.
  * @Param y The third parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
-    for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
-            elements[i][j]->setFunctionsForVariables(w, x, y, f, z);
+void DG_Field_2d::setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    f(a, domainVariable[w], b, domainVariable[x], c, domainVariable[y], 1, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z]);
+    
     return ;
 }
 
@@ -963,18 +966,21 @@ void DG_Field_2d::setFunctionsForVariables(int w, int x, int y, function<double(
 /**
  * @Synopsis  This is the function used to change the value of variable z to f(a, b, c, d).
  *
+ * @Param t Scaling for first parameter.
  * @Param a The first parameter of the function
+ * @Param u Scaling for second parameter.
  * @Param b The second parameter of the function.
+ * @Param v Scaling for third parameter.
  * @Param c The third parameter of the function.
- * @Param d The third parameter of the function.
+ * @Param x Scaling for fourth parameter.
+ * @Param d The fourth parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariables(int a, int b, int c, int d, function<double(double, double, double, double)> f, int z) {
-    for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
-            elements[i][j]->setFunctionsForVariables(a, b, c, d, f, z);
+void DG_Field_2d::setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    f(t, domainVariable[a], u, domainVariable[b], v, domainVariable[c], x, domainVariable[d], 1, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z]);
+    
     return ;
 }
 
@@ -983,16 +989,17 @@ void DG_Field_2d::setFunctionsForVariables(int a, int b, int c, int d, function<
 /**
  * @Synopsis  This is the function used to change the value of Boundary variable z to f(x, y).
  *
+ * @Param a Scaling value for x
  * @Param x The first parameter of the function.
- * @Param y The second parameter of the function.
+ * @Param b Scaling value for y
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForBoundaryVariables(int x, int y, function<double(double, double)> f, int z) {
+void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->setFunctionsForBoundaryVariables(x, y, f, z);
+            elements[i][j]->setFunctionsForBoundaryVariables(a, x, b, y, f, z);
     return;
 }
 
@@ -1000,17 +1007,20 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(int x, int y, function<double
 /**
  * @Synopsis  This is the function used to change the value of Boundary variable z to f(w, x, y).
  *
- * @Param w The first parameter of the function
+ * @Param a Scaling value for w
+ * @Param w The first parameter of the function.
+ * @Param b Scaling value for x
  * @Param x The second parameter of the function.
+ * @Param c Scaling value for y
  * @Param y The third parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForBoundaryVariables(int w, int x, int y, function<double(double, double, double)> f, int z) {
+void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->setFunctionsForBoundaryVariables(w, x, y, f, z);
+            elements[i][j]->setFunctionsForBoundaryVariables(a, w, b, x, c, y, f, z);
     return ;
 }
 
