@@ -25,6 +25,7 @@ private:
 
 public:
     vector< vector<DG_Element_2d*> > elements;
+    vector<double*> domainVariable; // To store variables that have values at all nodes
     vector<int> variableNames; // This is stores all the variables which have been added to the field.
     vector<int> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
 

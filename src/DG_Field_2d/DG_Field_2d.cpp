@@ -154,6 +154,8 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
 
     variableNames.resize(0);
     variablesWithBoundaryInfo.resize(0);
+    variableOnlyAtBoundary.resize(0);
+    domainVariable.resize(0);
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -502,30 +504,6 @@ void DG_Field_2d::updateBoundaryVariables(int v) {
     return ;
 }
 
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function adds the variable to each and every element. In this the boundary points are not
- * specifically stored in each element.
- *
- * @Param v This is a int which defines the variable name.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_withBounary(int v) {
-    
-   for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
-           elements[i][j]->addVariable_withBoundary(v); // Adding the variable for the (i, j) th element.
-       }
-   }
-   for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
-           elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
-       }
-   }
-   variableNames.push_back(v);
-   variablesWithBoundaryInfo.push_back(v); // What about vector variableWithBoundaryInfo, why is it there ??
-    return ;
-}
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -535,7 +513,7 @@ void DG_Field_2d::addVariable_withBounary(int v) {
  * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_onlyBounary(int v) {
+/*void DG_Field_2d::addVariable_onlyBounary(int v) {
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -550,9 +528,37 @@ void DG_Field_2d::addVariable_onlyBounary(int v) {
   // variableNames.push_back(v); // Is this required, or rather, would it affect the solver in some way ; Shouldn't bee included in variablenames, as there are being written in output vtk file !!
    variableOnlyAtBoundary.push_back(v);
     return ;
+}*/
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function adds the variable to each and every element. In this the boundary points are not
+ * specifically stored in each element.
+ *
+ * @Param v This is a int which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::addVariable_withBounary(int v) {
+    double *newVariable = new double[(N+1)*(N+1)*ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
+
+   if (v == 0) domainVariable.clear();
+   domainVariable.push_back(newVariable); /// Now assigning the same to the map. 
+    
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+           elements[i][j]->addVariable_withBoundary(v, newVariable + (N+1)*(N+1)*(ne_y*i + j) ); // Adding the variable for the (i, j) th element.
+       }
+   }
+   for (int i=0; i < ne_x; i++ ){
+       for (int j=0; j<ne_y; j++) {
+           elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
+       }
+   }
+   variableNames.push_back(v);
+   variablesWithBoundaryInfo.push_back(v);
+    return ;
 }
-
-
 
 
 /* ----------------------------------------------------------------------------*/
@@ -564,13 +570,17 @@ void DG_Field_2d::addVariable_onlyBounary(int v) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::addVariable_withoutBounary(int v) {
+   double *newVariable = new double[(N+1)*(N+1)*ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
     
+   if (v == 0) domainVariable.clear();
+   domainVariable.push_back(newVariable); /// Now assigning the same to the map. 
+
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
-           elements[i][j]->addVariable_withoutBoundary(v); // Adding the variable for the (i, j) th element.
+           elements[i][j]->addVariable_withoutBoundary(v, newVariable + (N+1)*(N+1)*(ne_y*i + j) ); // Adding the variable for the (i, j) th element.
        }
    }
-  // variableNames.push_back(v); // These are support variables, Hence not required in output vtk files.
+   variableNames.push_back(v);
    return ;
 }
 

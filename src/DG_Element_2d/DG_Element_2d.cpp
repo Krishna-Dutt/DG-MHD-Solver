@@ -167,10 +167,11 @@ void DG_Element_2d::setSystem(string S) {
  * applied.
  *
  * @Param v  This is the name of the variable which is to be added.
+ * @Param p  This is the pointer to the allocated memory
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_withoutBoundary(int v) {
-    double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
+void DG_Element_2d::addVariable_withoutBoundary(int v, double *p) {
+    //double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
     /// Allocating the space for the new variable which is to be created.
     if (v == 0) variable.clear();
 
@@ -224,8 +225,8 @@ void DG_Element_2d::addVariable_withoutBoundary(int v) {
  * @Param p  Pointer to memory allocation for variable.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::addVariable_withBoundary(int v) {
-    double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
+void DG_Element_2d::addVariable_withBoundary(int v, double *p) {
+    //double * newVariable = new double[(N+1)*(N+1)]; /// Allocating the space for the new variable which is to be created.
     if (v == 0) variable.clear();
 
     variable.push_back(p); /// Now assigning the same to the map.
