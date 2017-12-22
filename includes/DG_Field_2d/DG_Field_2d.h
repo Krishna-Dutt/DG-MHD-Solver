@@ -26,9 +26,11 @@ private:
 public:
     vector< vector<DG_Element_2d*> > elements;
     vector<double*> domainVariable; // To store variables that have values at all nodes
+    vector<double*> cellcenterVariable; // To store variables with only one value per element
+    vector<bool> PositivityMarker;
+
     vector<int> variableNames; // This is stores all the variables which have been added to the field.
     vector<int> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
-
     vector<int> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
 
     DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, double _x2, double _y2);
@@ -90,7 +92,8 @@ public:
     void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
     void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
     // Fucntions to compute cell centered values
-    void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)>, int z); 
+    void setFunctionsForVariablesCellCentered(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, double*)>, int z); 
+    void setFunctionsForCellCenterVariablesfromDomainVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*, unsigned)> f, int z); 
     // Functions to give the information about the error.
     double l2Norm(int v1, int v2);
 

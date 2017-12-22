@@ -108,6 +108,7 @@ int main() {
     EulerSolver* a;
     a = new EulerSolver(40, 20, 1);
     a->setDomain(0.0, 0.0, 1.2, 0.2);
+    a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
     //a->setGradientPrimitiveVariables();
@@ -127,7 +128,6 @@ int main() {
     a->setBoundaryCondtions("noslipWall", "outflow", "neumann", "inflow");
     a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
-    a->setSolver(CFL, time, time_steps);
     a->solve( Sound,T, Pressures, IE);
     a->FindL2Norm(IDensity, U);
     a->plot("ViscousBL_test_t32_ModSubsonic.vtk");

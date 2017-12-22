@@ -88,7 +88,7 @@ DG_Element_2d::~DG_Element_2d() {
     delete[] X;
     delete[] Y;
 
-    for ( vector<double*>::iterator itr = variable.begin() ;itr != variable.end(); itr++){
+    /*for ( vector<double*>::iterator itr = variable.begin() ;itr != variable.end(); itr++){
       delete[] (itr->second);
     }
     // Do I need to delete other maps pointing to Boundary elements, since no new memory is dynamically allocated for them ??
@@ -117,7 +117,7 @@ DG_Element_2d::~DG_Element_2d() {
     }
     for ( vector<double**>::iterator itr = neighboringLeft.begin() ;itr != neighboringLeft.end(); itr++){
       delete[] (itr->second);
-    }
+    }*/
 }
 
 
@@ -303,10 +303,10 @@ void DG_Element_2d::addVariable_CellCentered(int v) {
  * @Param value The value to which the variable is to be reset.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::ResetVariables_CellCentered(int v, double value) {
+/*void DG_Element_2d::ResetVariables_CellCentered(int v, double value) {
    *variable[v] = value; 
     return ;
-}
+}*/
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -360,11 +360,12 @@ void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
  * @Param m This is the variables used to store the cell marker.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateCellMarker(int v, int m) {
+double DG_Element_2d::updateCellMarker(int v) {
   double radius = 1.0;
   double OutflowSize = 0.0;
   double MaxVariable = 0.0;
   double VariableFlux = 0.0;
+  double Marker = 0.0;
 
   if (OutFlow["Top"]) {
     VariableFlux += lobattoIntegration(x_start, x_end, N, 1, boundaryTop[v]);
@@ -413,18 +414,18 @@ void DG_Element_2d::updateCellMarker(int v, int m) {
 
   radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
 
-  *variable[m] = abs(VariableFlux) / ( abs(OutflowSize) * MaxVariable * pow(radius, 0.5 * (N+1)));
-  if (*variable[m] > 1.0) {
-    *variable[m] = 1.0;
+  Marker = abs(VariableFlux) / ( abs(OutflowSize) * MaxVariable * pow(radius, 0.5 * (N+1)));
+  if (Marker > 1.0) {
+    Marker = 1.0;
   }
   else {
-    *variable[m] = 0.0;
+    Marker = 0.0;
   }
   
   for(int b=0; b <(N+1)*(N+1); ++b) {
-      variable[35][b] = *variable[m]; // CellMarkerG
+      variable[35][b] = Marker; // CellMarkerG
   }
- return ;
+ return Marker;
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -436,31 +437,24 @@ void DG_Element_2d::updateCellMarker(int v, int m) {
  *v@Param level This string is used to identify the level of limiting required.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::checkPositivity(int v, int cm, string level) {
-    //if (*variable[cm])
-     {
-        
-
+bool DG_Element_2d::checkPositivity(int v, string level) {     
         for (int i=0; i< (N+1)*(N+1); ++i) {
             if (variable[v][i] < 0.0) {
-                PositivityMarker = true;
-                *variable[cm] = 2.0;
+                //PositivityMarker = true;
+                /**variable[cm] = 2.0;
                 for(int b=0; b <(N+1)*(N+1); ++b) {
                      variable[35][b] = *variable[cm]; // CellMarkerG
-                }
-                return ;
+                }*/
+                return true ;
             }
         }
 
         if (level == "One"){
-            PositivityMarker = false;
+            //PositivityMarker = false;
+            return false;
         }
-               
-    }
-
-    // Switching off the PositivityMarker
-    
-    return ;
+                 
+    return false;
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -469,11 +463,11 @@ void DG_Element_2d::checkPositivity(int v, int cm, string level) {
  *
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::resetPositivity() {
+/*void DG_Element_2d::resetPositivity() {
     PositivityMarker = true;
          
     return;
-}
+}*/
 
 
 /* ----------------------------------------------------------------------------*/
@@ -502,14 +496,10 @@ void DG_Element_2d::computeMoments(int v, int m) {
  * @Param cm This is the cell marker used to identify troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::convertMomentToVariable(int m, int v, int cm) {
+void DG_Element_2d::convertMomentToVariable(int m, int v) {
   /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
 
- if (*variable[cm] && PositivityMarker)
-  { 
   cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m],1,0,variable[v],1);
-  
-  }
 
   return ;
 }
@@ -526,9 +516,8 @@ void DG_Element_2d::convertMomentToVariable(int m, int v, int cm) {
  * @Param Index This is the index to start the limiting process.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::limitMoments(int m, int modm, int cm, unsigned Index) {
+void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
 
-if (*variable[cm] && PositivityMarker) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
@@ -1229,12 +1218,12 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(double a, int w, double b, 
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z) {
+/*void DG_Element_2d::setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z) {
     
     for(int i = 0 ; i < (N+1)*(N+1); i++)
         *variable[z] = f(variable[x][i],variable[y][i], *variable[z]);
     return ;
-}
+}*/
 
 
 
@@ -1254,12 +1243,12 @@ double DG_Element_2d::l2Norm(int v1, int v2) {
  * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-double DG_Element_2d::FindMax(int v) {
+/*double DG_Element_2d::FindMax(int v) {
     double Max = variable[v][0]; 
     for(int i = 0; i < (N+1)*(N+1); i++)
             Max = max(variable[v][i], Max);
     return Max;
-}
+}*/
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1268,10 +1257,10 @@ double DG_Element_2d::FindMax(int v) {
  * @Param dx To store the minimum dx in the element
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::FindMindx(int dx) {
+/*void DG_Element_2d::FindMindx(int dx) {
     *variable[dx] = min(dxMin, dyMin);
     return ;
-}
+}*/
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1280,9 +1269,9 @@ void DG_Element_2d::FindMindx(int dx) {
  * @Param dt To find th mimimum dt from all dt.
  */
 /* ----------------------------------------------------------------------------*/
-double DG_Element_2d::FindMindt(int dt) {
+/*double DG_Element_2d::FindMindt(int dt) {
    return *variable[dt];
-}
+}*/
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1294,10 +1283,10 @@ double DG_Element_2d::FindMindt(int dt) {
  * @Param CFL CFL to be used
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::FindTimestep(int dt, int dx, int U, double CFL) {
+/*void DG_Element_2d::FindTimestep(int dt, int dx, int U, double CFL) {
     *variable[dt] = (CFL/(0.0*N + 1.0)) * (*variable[dx])/(*variable[U]);
     return ;
-}
+}*/
 
 /* ----------------------------------------------------------------------------*/
 //--------------------------VIRTUAL FUNCTIONS----------------------------------//

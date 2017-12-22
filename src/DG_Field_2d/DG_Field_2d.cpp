@@ -156,6 +156,11 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     variablesWithBoundaryInfo.resize(0);
     variableOnlyAtBoundary.resize(0);
     domainVariable.resize(0);
+    cellcenterVariable.resize(0);
+
+    PositivityMarker.resize(0);
+    for(int i =0 ; i < ne_x*ne_y ; ++i) 
+       PositivityMarker.push_back(true);
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -206,6 +211,12 @@ void DG_Field_2d::setVanderMandMatrix() {
 DG_Field_2d::~DG_Field_2d() {
   // To explicitly deallocate memory associated with the DG Matrices, shared by all elements
   elements[0][0]->Destroy_Matrices();
+  for(int i=0; i < domainVariable.size(); ++i) {
+      delete domainVariable[i];
+  }
+  for(int i=0; i < cellcenterVariable.size(); ++i) {
+      delete cellcenterVariable[i];
+  }
   for(int i = 0; i < ne_x; i++)
     for (int j = 0; j < ne_y; j++) {
       delete elements[i][j];
@@ -590,17 +601,15 @@ void DG_Field_2d::addVariable_withoutBounary(int v) {
  * @Synopsis  This is similar to DG_Field_2d::addVariable_withoutBoundary.Just only one value is store at for each cell,
  *  could be considered as cell centered value.
  *
- * @Param v This is the name of the variable which is to be added.
+ * @Param v This is the name of the cell centered variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::addVariable_CellCentered(int v) {
+   double *newVariable = new double[ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
     
-   for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
-           elements[i][j]->addVariable_CellCentered(v); // Adding the variable for the (i, j) th element.
-       }
-   }
-   // variableNames.push_back(v);
+   if (v == 0) cellcenterVariable.clear();
+   cellcenterVariable.push_back(newVariable); /// Now assigning the same to the map. 
+   
    return ;
 }
 
@@ -628,7 +637,7 @@ void DG_Field_2d::initializeVariable(int v, function<double(double, double)> f) 
 void DG_Field_2d::ResetVariables_CellCentered(int v, double value) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
-            elements[i][j]->ResetVariables_CellCentered(v, value);
+            cellcenterVariable[v][i*ne_y + j] = value;
        }
    }
 
@@ -680,7 +689,7 @@ void DG_Field_2d::updateOutFlowBoundary(int u, int v) {
 void DG_Field_2d::updateCellMarker(int v, int m) {
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
-            elements[i][j]->updateCellMarker(v, m);
+            cellcenterVariable[m][i*ne_y + j] = elements[i][j]->updateCellMarker(v);
        }
    }
 
@@ -718,7 +727,9 @@ void DG_Field_2d::computeMoments(int v, int m) {
 void DG_Field_2d::limitMoments(int m, int modifiedm, int cm, unsigned Index) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
-      elements[i][j]->limitMoments(m, modifiedm, cm, Index);
+        if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
+            elements[i][j]->limitMoments(m, modifiedm, Index);
+        }
     }
 
   return ;
@@ -736,7 +747,9 @@ void DG_Field_2d::limitMoments(int m, int modifiedm, int cm, unsigned Index) {
 void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
-      elements[i][j]->convertMomentToVariable(m, v, cm);
+        if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j] ) {
+            elements[i][j]->convertMomentToVariable(m, v);
+        }
     }
 
   return ;
@@ -1031,15 +1044,33 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int w, double b, in
  * @Param x The first parameter of the function.
  * @Param y The second parameter of the function.
  * @Param functionf The function `f` which is required for the intended mapping.
+ *                  with arguments - a, x, b, y, Sizeof(x), z  
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z) {
-    for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
-            elements[i][j]->setFunctionsForVariablesCellCentered(x, y, f, z);
+void DG_Field_2d::setFunctionsForVariablesCellCentered(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, double*)>, int z) {
+    f(a, cellcenterVariable[x], b, cellcenterVariable[y], ne_x*ne_y, cellcenterVariable[z]);
+
     return;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of cell center variable stored at z to f(x, y) dependent on domain variables x and y.
+ *
+ * @Param x The first parameter of the function.
+ * @Param y The second parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ *                  with arguments - a, x, b, y, Sizeof(x), Sizeof(z), z, Nodes in element   
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForCellCenterVariablesfromDomainVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*, unsigned)> f, int z) {
+    f(a, domainVariable[x], b, domainVariable[y], (N+1)*(N+1)*ne_x*ne_y, ne_x*ne_y, cellcenterVariable[z], (N+1)*(N+1));
+
+    return;
+}
+
 
 
 
@@ -1069,7 +1100,11 @@ double DG_Field_2d::l2Norm(int v1, int v2) {
 void DG_Field_2d::checkPositivity(int v, int cm, string level) {
      for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->checkPositivity(v, cm, level);
+           // if ( cellcenterVariable[cm][i*ne_y + j]) 
+            {
+              PositivityMarker[i*ne_y + ne_x] = elements[i][j]->checkPositivity(v, level);
+        } 
+            
     return;
 }
 
@@ -1082,7 +1117,8 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
 void DG_Field_2d::resetPositivity() {
      for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->resetPositivity();
+            PositivityMarker[i*ne_y + j] = true;
+
     return;
 }
 
@@ -1135,10 +1171,10 @@ void DG_Field_2d::updateBoundary(double time) {
  */
 /* ----------------------------------------------------------------------------*/
 double DG_Field_2d::FindMax(int v) {
-    double Max = elements[0][0]->FindMax(v); 
-    for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
-            Max = max(elements[i][j]->FindMax(v), Max);
+    double Max = domainVariable[v][0]; 
+    for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i) {
+        Max  = max(Max, domainVariable[v][i]);
+    }
     return Max;
 }
 /* ----------------------------------------------------------------------------*/
@@ -1165,7 +1201,8 @@ double DG_Field_2d::FindMindx() {
 void DG_Field_2d::FindMindx(int dx) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->FindMindx(dx);
+            cellcenterVariable[dx][i*ne_y + j] = min(elements[i][j]->dxMin, elements[i][j]->dyMin);
+
     return ;
 }
 
@@ -1177,26 +1214,28 @@ void DG_Field_2d::FindMindx(int dx) {
  */
 /* ----------------------------------------------------------------------------*/
 double DG_Field_2d::FindMindt(int dt) {
-    double Mini = elements[0][0]->FindMindt(dt);
+    double Mini = cellcenterVariable[dt][0];
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            Mini = min(elements[i][j]->FindMindt(dt), Mini);
+            Mini = min(cellcenterVariable[dt][i*ne_y + j] , Mini);
+
     return Mini;
 }
 
 /* ----------------------------------------------------------------------------*/
 /**
- * @Synopsis  This function finds the minimum dx in the field.
+ * @Synopsis  This function finds the minimum dt in the field.
  *
  * @Param dx To store the minimum dx in the element
  * @Param dt Stores the minimum dt in an element
- * @Param U Stores the Maximum eigne value in the element
+ * @Param U Stores the Maximum eigen value in the element
  * @Param CFL CFL to be used
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::FindTimestep(int dt, int dx, int U, double CFL) {
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            elements[i][j]->FindTimestep(dt, dx, U, CFL);
+            cellcenterVariable[dt][i*ne_y + j] = CFL * (cellcenterVariable[dx][i*ne_y + j]/ cellcenterVariable[U][i*ne_y + j] );
+
     return ;
 }

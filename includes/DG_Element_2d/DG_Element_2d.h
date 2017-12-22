@@ -96,16 +96,16 @@ public:
     void setVariableNeighbors(int v);
     void ResetMap_OutFlow();
     void updateOutFlowBoundary(int u, int v);
-    void updateCellMarker(int v, int m);
+    double updateCellMarker(int v);
 
     // Function to check Positivity of data stored in cell .
-    void checkPositivity(int v, int cm, string level);
+    bool checkPositivity(int v, string level);
     void resetPositivity();
 
     // Functions to support Moment Limiters.
     void computeMoments(int v, int m);
-    virtual void limitMoments(int m, int modm, int cm, unsigned Index);
-    void convertMomentToVariable(int m, int v, int cm);
+    virtual void limitMoments(int m, int modm, unsigned Index);
+    void convertMomentToVariable(int m, int v);
 
     // Functions to manipulate Cell Centered Variables.
     void ResetVariables_CellCentered(int v, double value = 0.0);

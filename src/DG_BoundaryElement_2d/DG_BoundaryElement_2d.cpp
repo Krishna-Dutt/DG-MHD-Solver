@@ -486,9 +486,8 @@ void DG_BoundaryElement_2d::assignBoundary(string type, char b) {
  * @Param Index This is the index to start the limiting process.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::limitMoments(int m, int modm, int cm, unsigned Index) {
+void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
 
- if (*variable[cm] && PositivityMarker) 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;

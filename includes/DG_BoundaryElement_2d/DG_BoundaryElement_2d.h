@@ -78,7 +78,7 @@ public:
         */
 
         // Methods for handling Moment Limiter !!
-        void limitMoments(int m, int modm, int cm, unsigned Index);
+        void limitMoments(int m, int modm, unsigned Index);
         double BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
        // void convertMomentToVariable(int m, int v, int cm);
 
