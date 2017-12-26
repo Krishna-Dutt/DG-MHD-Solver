@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := LaminarBL
+EXECUTABLE := Eulersolver
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths

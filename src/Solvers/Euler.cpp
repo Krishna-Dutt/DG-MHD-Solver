@@ -274,7 +274,7 @@ void EulerSolver::updatePressure() {
 void EulerSolver::updatePrimitiveVariables() {
   updateVelocity();
   setKineticEnergy();
-  setInternalEnergy();
+  setInternalEnergyfromPrimitive();
   updateTemperature();
   updatePressure();
   return ;
@@ -518,7 +518,7 @@ void EulerSolver::solve() {
     
    RunShockDetector();
    RunLimiter();
-   RunPositivityLimiter(); 
+   //RunPositivityLimiter(); 
    
     field->updateBoundary(t);
     updatePrimitiveVariables();

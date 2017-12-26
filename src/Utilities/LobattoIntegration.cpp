@@ -43,7 +43,7 @@ double lobattoIntegration(double start, double end, unsigned N, function<double(
 
 double lobattoIntegration(double start, double end, int N, unsigned Index, double *f_value) {
     N++;
-    const double const *f = f_value;
+    const double *f = f_value;
     double *Nodes,*Weights,*Values;
     Nodes   =   new double[N];
     Weights =   new double[N];

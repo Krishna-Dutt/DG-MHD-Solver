@@ -445,12 +445,8 @@ double DG_Element_2d::updateCellMarker(int v) {
 /* ----------------------------------------------------------------------------*/
 bool DG_Element_2d::checkPositivity(int v, string level) {     
         for (int i=0; i< (N+1)*(N+1); ++i) {
-            if (variable[v][i] < 0.0) {
-                //PositivityMarker = true;
-                /**variable[cm] = 2.0;
-                for(int b=0; b <(N+1)*(N+1); ++b) {
-                     variable[35][b] = *variable[cm]; // CellMarkerG
-                }*/
+            if (variable[v][i] < 0.0)
+             {
                 return true ;
             }
         }
@@ -1109,7 +1105,7 @@ void DG_Element_2d::scal(double a, int x) {
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(double a, int x, double b, int y, function<double(double, double)> f, int z) {
+void DG_Element_2d::setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
     f(a, variable[x], b, variable[y], 1, (N+1)*(N+1), variable[z]);
 
     return ;
@@ -1129,7 +1125,7 @@ void DG_Element_2d::setFunctionsForVariables(double a, int x, double b, int y, f
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<double(double, double, double)> f, int z) {
+void DG_Element_2d::setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
     f(a, variable[w], b, variable[x], c, variable[y], 1, (N+1)*(N+1), variable[z]);
 
     return ;
@@ -1310,78 +1306,6 @@ void DG_Element_2d::assignBoundary( string type, char b) {
     return ;
 }
 
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function updates the linear system for a variable corresponding 
- * to its Boundary settings.
- *
- * @Param v  This is the name of the variable whose Boundary is to be set.
- * @Param b This defines the location of the boundary element.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setBoundaryValue(int v, string b) {
-    return ;
-}
-
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function implements Dirichlet BC.
- *
- * @Param Matrix  RHS Matrix that is to be modified.
- * @Param List I List of indices and corresponding increments to access elements to be modified.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::DirichletBoundary(double *Matrix, initializer_list<int> I) {
-    return ;
-}
-
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function implements Neumann BC ( To be precise, zero gradient condition).
- *
- * @Param Matrix  RHS Matrix that is to be modified.
- * @Param List I List of indices and corresponding increments required to access elements to be modified.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::NeumannBoundary(double *Matrix, initializer_list<int> I) {
-    return ;
-}
-
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function implements Periodic BC .
- *
- * @Param Matrix  RHS Matrix that is to be modified.
- * @Param List I List of indices and corresponding increments required to access elements to be modified.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::PeriodicBoundary(double *Matrix, initializer_list<int> I) {
-    return ;
-}
-
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function updates Neumann Boundaries of a cell.
- *
- * @Param v This is the variable ,whose boundary values are to be fixed.
- * @Param Matrix  RHS Matrix that is to be modified.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateNeumann(int v, double *Matrix) {
-    return ;
-}
-
-/* ----------------------------------------------------------------------------*/
-/**
- * @Synopsis  This function updates Dirichlet Boundaries of a cell.
- *
- * @Param v This is the variable ,whose boundary values are to be fixed.
- * @Param Matrix  RHS Matrix that is to be modified.
- */
-/* ----------------------------------------------------------------------------*/
-void DG_Element_2d::updateDirichlet(int v, double *Matrix) {
-    return ;
-}
 
 /* ----------------------------------------------------------------------------*/
 /**

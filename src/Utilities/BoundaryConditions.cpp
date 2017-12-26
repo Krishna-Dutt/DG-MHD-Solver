@@ -1,5 +1,6 @@
 #include "../../includes/Utilities/HeaderFiles.h"
 #include "../../includes/Utilities/PolyEval.h"
+#include "../../includes/Utilities/MaterialProperties.h"
  
 
 double BoundaryDensity(double x, double y) {

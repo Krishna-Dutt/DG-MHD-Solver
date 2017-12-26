@@ -212,10 +212,10 @@ DG_Field_2d::~DG_Field_2d() {
   // To explicitly deallocate memory associated with the DG Matrices, shared by all elements
   elements[0][0]->Destroy_Matrices();
   for(int i=0; i < domainVariable.size(); ++i) {
-      delete domainVariable[i];
+      delete[] domainVariable[i];
   }
   for(int i=0; i < cellcenterVariable.size(); ++i) {
-      delete cellcenterVariable[i];
+      delete[] cellcenterVariable[i];
   }
   for(int i = 0; i < ne_x; i++)
     for (int j = 0; j < ne_y; j++) {
@@ -555,6 +555,7 @@ void DG_Field_2d::addVariable_withBounary(int v) {
 
    if (v == 0) domainVariable.clear();
    domainVariable.push_back(newVariable); /// Now assigning the same to the map. 
+   
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -568,6 +569,9 @@ void DG_Field_2d::addVariable_withBounary(int v) {
    }
    variableNames.push_back(v);
    variablesWithBoundaryInfo.push_back(v);
+
+   //scal(0.0, v);
+
     return ;
 }
 
@@ -592,6 +596,8 @@ void DG_Field_2d::addVariable_withoutBounary(int v) {
        }
    }
    variableNames.push_back(v);
+   //scal(0.0, v);
+
    return ;
 }
 
@@ -1048,7 +1054,7 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int w, double b, in
  * @Param z The variable in which the value is to be stored
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::setFunctionsForVariablesCellCentered(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, double*)>, int z) {
+void DG_Field_2d::setFunctionsForVariablesCellCentered(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, double*)> f, int z) {
     f(a, cellcenterVariable[x], b, cellcenterVariable[y], ne_x*ne_y, cellcenterVariable[z]);
 
     return;
@@ -1102,7 +1108,7 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
         for(int j = 0; j < ne_y; j++)
            // if ( cellcenterVariable[cm][i*ne_y + j]) 
             {
-              PositivityMarker[i*ne_y + ne_x] = elements[i][j]->checkPositivity(v, level);
+              PositivityMarker[i*ne_y + j] = elements[i][j]->checkPositivity(v, level);
         } 
             
     return;

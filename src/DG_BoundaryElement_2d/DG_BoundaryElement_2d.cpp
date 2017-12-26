@@ -605,9 +605,9 @@ double DG_BoundaryElement_2d::BoundaryMinMod(int m, int Index, double Alpha, DG_
  * @Param v This is the variable ,whose boundary values are to be fixed.
  */
 /* ----------------------------------------------------------------------------*/
-/*void DG_BoundaryElement_2d::updateBoundaryVariables(int v) {
+void DG_BoundaryElement_2d::updateBoundaryVariables(int v) {
     // Update only for Neumann/Outflow/Zero Gradient ,right now !!
-    if (TopBoundary.count(v)) {
+   /* if (TopBoundary.count(v)) {
         if (TopBoundary[v] == "neumann") {
             for(int i=0; i<=N; ++i)
                 variable[v][N*(N+1) + i] = variable[v][N*(N+1) + i -(N+1)];
@@ -646,10 +646,10 @@ double DG_BoundaryElement_2d::BoundaryMinMod(int m, int Index, double Alpha, DG_
             for(int i=0; i<=N; ++i)
                 *boundaryLeft[v][i] = DirichletLeft[v][i];
         }
-    }
+    }*/
 
     return ;
-}*/
+}
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1032,7 +1032,7 @@ void DG_BoundaryElement_2d::AdjustCornerElement(int *Index, char B) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time) {
-    string D, Xmom, Ymom, Energy;
+    int D, Xmom, Ymom, Energy;
     D = ConservativeVariables[0];
     Xmom = ConservativeVariables[1];
     Ymom = ConservativeVariables[2];

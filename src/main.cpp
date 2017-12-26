@@ -82,12 +82,12 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 100;
+    int time_steps = 1;
     double CFL = 0.3;
-    double time = 32.0;
+    double time = 0.0;
     EulerSolver* a;
-    a = new EulerSolver(40, 20, 1);
-    a->setDomain(0.0, 0.0, 1.2, 0.2);
+    a = new EulerSolver(10, 10, 1);
+    a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -105,12 +105,12 @@ int main() {
    //a->setViscousFlux();
     a->setAuxillaryVariables();
 
-    a->setBoundaryCondtions("noslipWall", "outflow", "neumann", "inflow");
+    a->setBoundaryCondtions("periodic", "periodic", "periodic", "periodic");
     a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ViscousBL_test_t32_ModSubsonic.vtk");
+    //a->plot("Output.vtk");
     
 
     delete a;

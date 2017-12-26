@@ -112,6 +112,13 @@ public:
      */
     /* ----------------------------------------------------------------------------*/
     void setBoundary(string Var, string Bottom, string Right, string Top, string Left);
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis   This function is to find the L2Norm.
+     *
+     */
+    /* ----------------------------------------------------------------------------*/
+    void FindL2Norm(function<double(double, double)> Density );
  
 };
 

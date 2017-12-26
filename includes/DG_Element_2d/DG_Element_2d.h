@@ -62,15 +62,15 @@ public:
     double dxMin, dyMin ;
     vector<double*> variable; /// This is the map which would contain all the variable that are needed by the problem.
 
-    vector<double**> boundaryTop;
-    vector<double**> boundaryRight;
-    vector<double**> boundaryLeft;
-    vector<double**> boundaryBottom;
+    vector<double*> boundaryTop;
+    vector<double*> boundaryRight;
+    vector<double*> boundaryLeft;
+    vector<double*> boundaryBottom;
     
-    vector<double**> neighboringTop;
-    vector<double**> neighboringRight;
-    vector<double**> neighboringBottom;
-    vector<double**> neighboringLeft;
+    vector<double*> neighboringTop;
+    vector<double*> neighboringRight;
+    vector<double*> neighboringBottom;
+    vector<double*> neighboringLeft;
 
     vector<int> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
     vector<int> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
@@ -86,9 +86,9 @@ public:
 
     void setSystem(string S); 
 
-    void addVariable_withBoundary(int v);
+    void addVariable_withBoundary(int v, double* p);
     void addVariable_onlyBoundary( int v);
-    void addVariable_withoutBoundary(int v);
+    void addVariable_withoutBoundary(int v, double* p);
     void addVariable_CellCentered(int v);
 
     void initializeVariable(int v, function<double(double, double)> f);
@@ -159,13 +159,6 @@ public:
 
     // Virtual Function for Polymorphic behaviour
     virtual void assignBoundary( string type, char b);
-    virtual void setBoundaryValue(int v, string b);
-    virtual void DirichletBoundary(double *Matrix, initializer_list<int> I);
-    virtual void NeumannBoundary( double *Matrix, initializer_list<int> I);
-    virtual void PeriodicBoundary(double *Matrix, initializer_list<int> I);
-
-    virtual void updateDirichlet(int v, double *Matrix);
-    virtual void updateNeumann(int v, double *Matrix);
     virtual void updateBoundaryVariables(int v);
 
     virtual double BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
