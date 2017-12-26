@@ -4,9 +4,6 @@
 #include <cmath>
 #include <ctime>
 
-#define R 285.0
-
-
 using namespace std;
 
 

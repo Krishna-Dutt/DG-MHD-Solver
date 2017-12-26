@@ -75,7 +75,7 @@ public:
     vector<int> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
     vector<int> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
 
-    map<string, bool> OutFlow; /// Map to flag outflow boundaries of each cell.
+    vector< bool> OutFlow; /// Map to flag outflow boundaries of each cell.
 
     bool PositivityMarker;
    
@@ -136,16 +136,16 @@ public:
     // Functions to apply linear operations on the variables.
     void axpy(double a, int x, int y);
     void scal(double a, int x);
-    void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
-    void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z);
-    void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+    void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
+    void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z);
+    void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
      
     // Functions to apply operations only on variables stored at Boundary
-    void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
-    void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+    void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
+    void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
     
     // Fucntions to compute cell centered values
-    void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)>, int z); 
+    void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z); 
     
 
     // Functions to do various other operations on the elements.

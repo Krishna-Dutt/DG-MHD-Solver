@@ -1,4 +1,8 @@
 #include "../../includes/Solvers/EulerSolver.h"
+#include "../../includes/Utilities/HeaderFiles.h"
+#include "../../includes/Utilities/MaterialProperties.h"
+#include "../../includes/Utilities/MathOperators.h"
+#include "../../includes/Utilities/Thermodynamics.h"
 
 // Primitve Variables
 #define D   0
@@ -174,128 +178,10 @@ void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
     return ;
 }
 
-void Product(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
-    for(int i=0; i< size; i+=index) {
-      z[i] = a * x[i] * b * y[i];
-    }
-
-    return ;
-}
-
-void Add(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
-    for(int i=0; i< size; i+=index) {
-      z[i] = (a * x[i]) + ( b * y[i]);
-    }
-
-    return ;
-}
-
-void Add(double a, double* x, double b, double* y, double c, double* z, unsigned index, unsigned size, double * Z) {
-    for(int i=0; i< size; i+=index) {
-      Z[i] = (a * x[i]) + ( b * y[i]) + (c * z[i]);
-    }
-
-    return ;
-}
-
-void Add(double a, double* p, double b, double* q, double c, double* r, double d, double* s, unsigned index, unsigned size, double * t) {
-    for(int i=0; i< size; i+=index) {
-      t[i] = (a * p[i]) + ( b * q[i]) + (c * r[i]) + (d * s[i]);
-    }
-
-    return ;
-}
-
-void Subtract(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
-    for(int i=0; i< size; i+=index) {
-      z[i] = (a * x[i]) - (b * y[i]);
-    }
-
-    return ;
-}
-
-void Divide(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
-    for(int i=0; i< size; i+=index) {
-      if (b*y[i] != 0)
-          z[i] = (a * x[i]) / (b * y[i]);
-      else {
-        std::cout << "Error :: Division by Zero !! \n";
-      }
-    }
-
-    return ;
-}
- 
-void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
-    for(int i=0; i< size; i+=index) {
-      z[i] = abs(a * x[i]) + abs( b * y[i]);
-    }
-
-    return ;
-}
-
-
 /*double Subtract2(double x, double y) {
   return (x ) ;
 }*/
 
-void KineticEnergy(double a, double* rho, double b, double* u, double c, double* v, unsigned index, unsigned size, double* ke) {
-  for(int i=0; i < size; i+=index) {
-    ke[i] = 0.5 * (a*rho[i]) * (pow(b*u[i], 2) + pow(c*v[i],2));
-  }
-  return ;
-}
-
-void MomentumFluxPressure(double a, double* f, double b, double* u, double c, double* Pr, unsigned index, unsigned size, double* momflux_P) {
-  for(int i=0; i < size; i+=index) {
-    momflux_P[i] = (a*f[i]) * (b*u[i]) + (c*Pr[i]);
-  }
-  return ;
-}
-  
-
-void MomentumFlux(double a, double* f, double b, double* u, unsigned index, unsigned size, double* momflux) {
-  for(int i=0; i < size; i+=index) {
-    momflux[i] = (a*f[i]) * (b*u[i]);
-  }
-  return ;
-}
-
-
-void EnergyFlux(double a, double* E, double b, double* Pr, double c, double* u, unsigned index, unsigned size, double* eflux) {
-  for(int i=0; i < size; i+=index) {
-    eflux[i] = ((a*E[i]) + (b*Pr[i])) * (c * u[i]) ;
-  }
-  return ;
-}
-
-void IE(double a, double* rho, double b, double* Tp, double c, double* Pr, unsigned index, unsigned size, double* ie) {
-  for(int i=0; i < size; i+=index) {
-    ie[i] = Pr[i]/(gamma - 1.0) ;
-  }
-  return ;
-}
-  
-void Temperature(double a, double* ie, double b, double* rho, unsigned index, unsigned size, double* Tp) {
-  for(int i=0; i < size; i+=index) {
-    Tp[i] = ie[i]*( gamma - 1.0 )/(rho[i] * R) ;
-  }
-  return ;
-}
-
-void SoundSpeed(double a, double* rho, double b, double* Pr, unsigned index, unsigned size, double* c) {
-  for(int i=0; i < size; i+=index) {
-    c[i] = sqrt(gamma * Pr[i]/ rho[i]) ;
-  }
-  return ;
-}
-
-void Pressure(double a, double* rho, double b, double* ie, unsigned index, unsigned size, double* Pr) {
-    for(int i=0; i < size; i+=index) {
-    Pr[i] = ie[i] * (gamma - 1.0) ;
-  }
-  return ;
-}
 
 /*double PressureE(double D, double e) {
   return D*e*(1.4 -1.0) ;
@@ -331,7 +217,7 @@ void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsign
       count = 0;
       z[j] = a*x[i];
     }
-    z[j] = max(a*x[i], b*y[i], z[j]);
+    z[j] = max( max(a*x[i], b*y[i]), z[j]);
     count++;
   }
 
@@ -353,7 +239,7 @@ void EulerSolver::setEnergy() {
   return ;
 }
 
-void EulerSolver::setInternalEnergyfromPrimitve() {
+void EulerSolver::setInternalEnergyfromPrimitive() {
   field->setFunctionsForVariables(1.0, D, 1.0, T, 1.0, P, IE, De);
   return ;
 }
@@ -421,6 +307,7 @@ void EulerSolver::updateInviscidFlux() {
   field->setFunctionsForVariables(1.0, DVx, 1.0, Vy, MomentumFlux, DVxVy);
   field->setFunctionsForVariables(1.0, DE, 1.0, P, 1.0, Vx, EnergyFlux, DE_plus_P_Vx);
   field->setFunctionsForVariables(1.0, DE, 1.0, P, 1.0, Vy, EnergyFlux, DE_plus_P_Vy);
+  
   return ;
 }
 
@@ -503,7 +390,7 @@ void EulerSolver::updateEigenValues() {
   return ;
 }
 
-void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
+void EulerSolver::RK_Step1(int Var, int FluxX, int FluxY, int K) {
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
@@ -518,7 +405,7 @@ void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
   return;
 }
 
-void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2) {
+void EulerSolver::RK_Step2(int Var, int FluxX, int FluxY, int K1, int K2) {
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
@@ -534,7 +421,7 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
   return;
 }
 
-void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3) {
+void EulerSolver::RK_Step3(int Var, int FluxX, int FluxY, int K1, int K2, int K3) {
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
@@ -721,7 +608,7 @@ void EulerSolver::RunLimiter() {
   return ;
 }
 
-void EulerSolver::Run_LiliaMomentLimiter(string v) {
+void EulerSolver::Run_LiliaMomentLimiter(int v) {
   field->computeMoments(v, Moment);
   field->computeMoments(v, ModMoment);
   field->limitMoments(Moment, ModMoment, CellMarker, (N+1)*(N+1)-1);
@@ -752,7 +639,7 @@ void EulerSolver::RunPositivityLimiter() {
   return ;
 }
 
-void EulerSolver::Run_PositivityMomentLimiter(string v, unsigned Index) {
+void EulerSolver::Run_PositivityMomentLimiter(int v, unsigned Index) {
   field->computeMoments(v, Moment);
   field->scal(0.0, ModMoment);
   field->limitMoments(Moment, ModMoment, CellMarker, Index);
@@ -762,10 +649,10 @@ void EulerSolver::Run_PositivityMomentLimiter(string v, unsigned Index) {
 }
 
 
-void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double(double, double)> U ) {
+void EulerSolver::FindL2Norm(function<double(double, double)> Density, function<double(double, double)> U ) {
   field->scal(0.0,ZERO);
 
-  field->initializeVariable(DAnalytical, D);
+  field->initializeVariable(DAnalytical, Density);
   field->initializeVariable(VxAnalytical, U);
 
   // Computing L2Norm

@@ -12,7 +12,5 @@
 #include <cblas.h>
 #include <fstream>
 
-#define gamma 1.4
-
 using namespace std;
 #endif

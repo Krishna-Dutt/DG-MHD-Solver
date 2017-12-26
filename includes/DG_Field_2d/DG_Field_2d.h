@@ -84,15 +84,15 @@ public:
     // Functions to apply linear operations on the variables.
     void axpy(double a, int x, int y);
     void scal(double a, int x);
-    void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
-    void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z);
-    void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+    void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
+    void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z);
+    void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
      
     // Functions to apply operations only on variables stored at Boundary
-    void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
-    void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)>, int z); 
+    void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
+    void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
     // Fucntions to compute cell centered values
-    void setFunctionsForVariablesCellCentered(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, double*)>, int z); 
+    void setFunctionsForVariablesCellCentered(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, double*)> f, int z); 
     void setFunctionsForCellCenterVariablesfromDomainVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*, unsigned)> f, int z); 
     // Functions to give the information about the error.
     double l2Norm(int v1, int v2);
@@ -104,17 +104,17 @@ public:
 
     // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
 
-    void addConservativeVariables(string v);
-    void addConservativeVariables(vector<string> V);
+    void addConservativeVariables(int v);
+    void addConservativeVariables(vector<int> V);
 
     void updateBoundary(double time);
     
     // Misc. Functions on for global field data 
-    double FindMax(string v);
+    double FindMax(int v);
     double FindMindx();
-    void FindMindx(string v);
-    void FindTimestep(string dt, string dx, string U, double CFL);
-    double FindMindt(string dt);
+    void FindMindx(int v);
+    void FindTimestep(int dt, int dx, int U, double CFL);
+    double FindMindt(int dt);
 };
 
 #endif

@@ -3,6 +3,10 @@
 
 # include "../DG_Field_2d/DG_Field_2d.h" 
 #include "../Utilities/HeaderFiles.h"
+#include "../Utilities/MaterialProperties.h"
+#include "../Utilities/MathOperators.h"
+#include "../Utilities/Thermodynamics.h"
+
 
 using namespace std;
 
@@ -251,7 +255,7 @@ public:
      * @Param K Coefficient K1
      */
     /* ----------------------------------------------------------------------------*/
-    void RK_Step1(string Var, string FluxX, string FluxY, string K);
+    void RK_Step1(int Var, int FluxX, int FluxY, int K);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to perform Second step of RK3.
@@ -263,7 +267,7 @@ public:
      * @Param K2 Coefficient K2
      */
     /* ----------------------------------------------------------------------------*/
-    void RK_Step2(string Var, string FluxX, string FluxY, string K1, string K2);
+    void RK_Step2(int Var, int FluxX, int FluxY, int K1, int K2);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to perform Third step of RK3.
@@ -276,7 +280,7 @@ public:
      * @Param K3 Coefficient K3
      */
     /* ----------------------------------------------------------------------------*/
-    void RK_Step3(string Var, string FluxX, string FluxY, string K1, string K2, string K3);
+    void RK_Step3(int Var, int FluxX, int FluxY, int K1, int K2, int K3);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.
@@ -373,7 +377,7 @@ public:
      * @Param v The variable on which the the limiter is to be performed 
      */
     /* ----------------------------------------------------------------------------*/
-    void Run_LiliaMomentLimiter(string v);
+    void Run_LiliaMomentLimiter(int v);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function Runs the required Positivity Limiter Method.
@@ -391,7 +395,7 @@ public:
      * @Param Index This is the index at which to start the limiting process. 
      */
     /* ----------------------------------------------------------------------------*/
-    void Run_PositivityMomentLimiter(string v, unsigned Index);
+    void Run_PositivityMomentLimiter(int v, unsigned Index);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function performs the positivity check.
