@@ -7,7 +7,7 @@
 #include "../../includes/Utilities/LobattoNodes.h"
 #include "../../includes/Utilities/MinMod.h"
 #include "../../includes/Utilities/BoundaryConditions.h"
-#include "../../includes/Utilities/Thermodynamics.h"
+#include "../../includes/Utilities/ThermodynamicFunctions.h"
 
 #define MAX(a, b)(a>b?a:b)
 #define MIN(a, b)(a<b?a:b)
@@ -897,8 +897,8 @@ void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2,
     v = variable[ConservativeVariables[2]][Index1]/r;
 
     IE = variable[ConservativeVariables[3]][Index1] - 0.5 * r * (u*u + v*v);
-    P = Pressure(r, IE);
-    c = SoundSpeed(r, P);
+    P = ReturnPressure(r, IE);
+    c = ReturnSoundSpeed(r, P);
 
     Pb = 0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
     rb = BoundaryDensity(X[Index1], Y[Index1])  + ( -BoundaryPressure(X[Index1], Y[Index1]) + Pb)/(c*c);
@@ -908,7 +908,7 @@ void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2,
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
     variable[ConservativeVariables[2]][Index1] = rb * vb;
-    variable[ConservativeVariables[3]][Index1] = InternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
+    variable[ConservativeVariables[3]][Index1] = ReturnInternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
 
     return ;
 }
@@ -946,8 +946,8 @@ void DG_BoundaryElement_2d:: EulerSubsonicOutflowBoundary(int Index1, int Index2
     v = variable[ConservativeVariables[2]][Index1]/r;
 
     IE = variable[ConservativeVariables[3]][Index1] - 0.5 * r * (u*u + v*v);
-    P = Pressure(r, IE);
-    c = SoundSpeed(r, P);
+    P = ReturnPressure(r, IE);
+    c = ReturnSoundSpeed(r, P);
 
     Pb =  BoundaryPressure(X[Index1], Y[Index1]);
     rb = r + ( -P + Pb)/(c*c);
@@ -957,7 +957,7 @@ void DG_BoundaryElement_2d:: EulerSubsonicOutflowBoundary(int Index1, int Index2
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
     variable[ConservativeVariables[2]][Index1] = rb * vb;
-    variable[ConservativeVariables[3]][Index1] = InternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
+    variable[ConservativeVariables[3]][Index1] = ReturnInternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
 
     return ;
 }

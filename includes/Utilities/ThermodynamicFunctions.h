@@ -1,9 +1,9 @@
-#ifndef THERMODYNAMICS_H
-#define THERMODYNAMCIS_H
+#ifndef THERMODYNAMICFUNCTIONS_H
+#define THERMODYNAMICFUNCTIONS_H
 
-double Pressure(double Rho, double IE);
-double SoundSpeed( double Rho, double Pr);
-double InternalEnergy(double Rho, double Pr);
+double ReturnPressure(double Rho, double IE);
+double ReturnSoundSpeed( double Rho, double Pr);
+double ReturnInternalEnergy(double Rho, double Pr);
 
 void KineticEnergy(double a, double* rho, double b, double* u, double c, double* v, unsigned index, unsigned size, double* ke);
 void MomentumFluxPressure(double a, double* f, double b, double* u, double c, double* Pr, unsigned index, unsigned size, double* momflux_P);

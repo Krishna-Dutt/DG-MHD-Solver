@@ -5,7 +5,7 @@
 #include "../Utilities/HeaderFiles.h"
 #include "../Utilities/MaterialProperties.h"
 #include "../Utilities/MathOperators.h"
-#include "../Utilities/Thermodynamics.h"
+#include "../Utilities/ThermodynamicFunctions.h"
 
 
 using namespace std;

@@ -2,7 +2,7 @@
 #include "../../includes/Utilities/HeaderFiles.h"
 #include "../../includes/Utilities/MaterialProperties.h"
 #include "../../includes/Utilities/MathOperators.h"
-#include "../../includes/Utilities/Thermodynamics.h"
+#include "../../includes/Utilities/ThermodynamicFunctions.h"
 
 // Primitve Variables
 #define D   0
@@ -235,7 +235,7 @@ void EulerSolver::setYMomentum() {
 }
 
 void EulerSolver::setEnergy() {
-  field->setFunctionsForVariables(1.0, KE, 1.0, De, Add, DE);
+  field->setFunctionsForVariables(1.0, KE, 1.0, De, Addab, DE);
   return ;
 }
 
@@ -397,10 +397,10 @@ void EulerSolver::RK_Step1(int Var, int FluxX, int FluxY, int K) {
   //field->scal(0.0, K);
   //field->axpy(-1.0, dbydx, K);
   //field->axpy(-1.0, dbydy, K);
-  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Add, K);
+  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K);
   
   //field->axpy(0.5*dt, K, Var);
-  field->setFunctionsForVariables(0.5*dt, K, 1.0, Var, Add, Var);
+  field->setFunctionsForVariables(0.5*dt, K, 1.0, Var, Addab, Var);
 
   return;
 }
@@ -412,11 +412,11 @@ void EulerSolver::RK_Step2(int Var, int FluxX, int FluxY, int K1, int K2) {
   //field->scal(0.0, K2);
   //field->axpy(-1.0, dbydx, K2);
   //field->axpy(-1.0, dbydy, K2);
-  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Add, K2);
+  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K2);
   
   //field->axpy(-1.5*dt, K1, Var);
   //field->axpy(2.0*dt, K2, Var);
-  field->setFunctionsForVariables(-1.5*dt, K1, 2.0*dt, K2, 1.0, Var, Add, Var);
+  field->setFunctionsForVariables(-1.5*dt, K1, 2.0*dt, K2, 1.0, Var, Addabc, Var);
 
   return;
 }
@@ -428,12 +428,12 @@ void EulerSolver::RK_Step3(int Var, int FluxX, int FluxY, int K1, int K2, int K3
   //field->scal(0.0, K3);
   //field->axpy(-1.0, dbydx, K3);
   //field->axpy(-1.0, dbydy, K3);
-  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Add, K3);
+  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K3);
   
   //field->axpy((7.0/6.0)*dt, K1, Var);
   //field->axpy(-(4.0/3.0)*dt, K2, Var);
   //field->axpy((1.0/6.0)*dt, K3, Var);
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1, -(4.0/3.0)*dt, K2, (1.0/6.0)*dt, K3, 1.0, Var, Add, Var);
+  field->setFunctionsForVariables((7.0/6.0)*dt, K1, -(4.0/3.0)*dt, K2, (1.0/6.0)*dt, K3, 1.0, Var, Addabcd, Var);
   return;
 }
 

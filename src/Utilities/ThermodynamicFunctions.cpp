@@ -1,20 +1,20 @@
 #include "../../includes/Utilities/HeaderFiles.h"
 #include "../../includes/Utilities/PolyEval.h"
-#include "../../includes/Utilities/Thermodynamics.h"
+#include "../../includes/Utilities/ThermodynamicFunctions.h"
 #include "../../includes/Utilities/MaterialProperties.h"
 
  
 // Euler System 
 
-double Pressure(double Rho, double IE) {
+double ReturnPressure(double Rho, double IE) {
     return IE * (gamma - 1.0);
 }
 
-double SoundSpeed( double Rho, double Pr) {
+double ReturnSoundSpeed( double Rho, double Pr) {
     return sqrt(gamma * Pr/Rho);
 }
 
-double InternalEnergy(double Rho, double Pr) {
+double ReturnInternalEnergy(double Rho, double Pr) {
     return Pr/(gamma -1.0);
 }
 
