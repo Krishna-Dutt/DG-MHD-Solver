@@ -48,23 +48,6 @@ double ITemperature(double x, double y) {
 }
 
 
-
-double IE(double D, double T, double P) {
-  return P/(gamma - 1.0) ;
-}
-
-double T(double IE, double D) {
-  return IE*(gamma -1.0)/(D*R) ;
-}
-
-double Sound( double D, double P) {
-  return sqrt(gamma*P/D) ;
-}
-
-double Pressures(double D, double IE) {
-    return IE*(gamma - 1.0) ;
-}
-
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
 double AnalyticalDensity(double x, double y) {
   if (0.0 <= x && x <= 0.26) {
@@ -118,17 +101,17 @@ int main() {
     a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
-    a->updateConservativeVariables(IE);
+    a->updateConservativeVariables();
 
     a->setInviscidFlux();
-    a->setEigenValues(SoundSpeed);
+    a->setEigenValues();
    //a->setViscousFlux();
     a->setAuxillaryVariables();
 
     a->setBoundaryCondtions("noslipWall", "outflow", "neumann", "inflow");
     a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
-    a->solve( Sound,T, Pressures, IE);
+    a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("ViscousBL_test_t32_ModSubsonic.vtk");
     

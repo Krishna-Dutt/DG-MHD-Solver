@@ -94,7 +94,7 @@ void EulerSolver::setPrimitiveVariables(){
   return ;
 }
 
-void EulerSolver::setGradientPrimitiveVariables(){
+/*void EulerSolver::setGradientPrimitiveVariables(){
   field->addVariable_withoutBounary("dqdx");
   field->addVariable_withoutBounary("dudx");
   field->addVariable_withoutBounary("dvdx");
@@ -108,7 +108,7 @@ void EulerSolver::setGradientPrimitiveVariables(){
   field->addVariable_withoutBounary("dTdy");
 
   return ;
-}
+}*/
 
 
 void EulerSolver::setConservativeVariables(){
@@ -125,10 +125,10 @@ void EulerSolver::setConservativeVariables(){
   return ;
 }
 
-void EulerSolver::setMaterialPropertyVariables(){
+/*void EulerSolver::setMaterialPropertyVariables(){
   field->addVariable_withoutBounary("meu");
   return ;
-}
+}*/
 
 void EulerSolver::setInitialDensity(function<double(double, double)> Rho) {
     field->initializeVariable(D, Rho);
@@ -174,143 +174,231 @@ void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
     return ;
 }
 
-double Maximum( double x, double y, double z) {
-  return max(max(x,y),z);
+void Product(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    for(int i=0; i< size; i+=index) {
+      z[i] = a * x[i] * b * y[i];
+    }
+
+    return ;
 }
 
-double Product(double x, double y) {
-    return (x*y) ;
+void Add(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    for(int i=0; i< size; i+=index) {
+      z[i] = (a * x[i]) + ( b * y[i]);
+    }
+
+    return ;
 }
 
-double KineticEnergy(double rho, double u, double v) {
-  return 0.5*rho*(u*u + v*v) ;
+void Add(double a, double* x, double b, double* y, double c, double* z, unsigned index, unsigned size, double * Z) {
+    for(int i=0; i< size; i+=index) {
+      Z[i] = (a * x[i]) + ( b * y[i]) + (c * z[i]);
+    }
+
+    return ;
 }
 
-double Add(double x, double y) {
-  return (x + y) ;
+void Add(double a, double* p, double b, double* q, double c, double* r, double d, double* s, unsigned index, unsigned size, double * t) {
+    for(int i=0; i< size; i+=index) {
+      t[i] = (a * p[i]) + ( b * q[i]) + (c * r[i]) + (d * s[i]);
+    }
+
+    return ;
 }
 
-double Subtract(double x, double y) {
-  return (x - y) ;
+void Subtract(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    for(int i=0; i< size; i+=index) {
+      z[i] = (a * x[i]) - (b * y[i]);
+    }
+
+    return ;
 }
 
-double Subtract2(double x, double y) {
+void Divide(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    for(int i=0; i< size; i+=index) {
+      if (b*y[i] != 0)
+          z[i] = (a * x[i]) / (b * y[i]);
+      else {
+        std::cout << "Error :: Division by Zero !! \n";
+      }
+    }
+
+    return ;
+}
+ 
+void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    for(int i=0; i< size; i+=index) {
+      z[i] = abs(a * x[i]) + abs( b * y[i]);
+    }
+
+    return ;
+}
+
+
+/*double Subtract2(double x, double y) {
   return (x ) ;
-}
+}*/
 
-
-double Divide(double x, double y){
-  if ( y != 0.0) {
-    return (x / y) ;
+void KineticEnergy(double a, double* rho, double b, double* u, double c, double* v, unsigned index, unsigned size, double* ke) {
+  for(int i=0; i < size; i+=index) {
+    ke[i] = 0.5 * (a*rho[i]) * (pow(b*u[i], 2) + pow(c*v[i],2));
   }
-  else {
-    std::cout << "Error :: Division by Zero !! \n";
+  return ;
+}
+
+void MomentumFluxPressure(double a, double* f, double b, double* u, double c, double* Pr, unsigned index, unsigned size, double* momflux_P) {
+  for(int i=0; i < size; i+=index) {
+    momflux_P[i] = (a*f[i]) * (b*u[i]) + (c*Pr[i]);
   }
-  return 0 ;
+  return ;
+}
+  
+
+void MomentumFlux(double a, double* f, double b, double* u, unsigned index, unsigned size, double* momflux) {
+  for(int i=0; i < size; i+=index) {
+    momflux[i] = (a*f[i]) * (b*u[i]);
+  }
+  return ;
 }
 
-double ModulusAdd(double x, double y) {
-  return ( fabs(x) + fabs(y) ) ;
+
+void EnergyFlux(double a, double* E, double b, double* Pr, double c, double* u, unsigned index, unsigned size, double* eflux) {
+  for(int i=0; i < size; i+=index) {
+    eflux[i] = ((a*E[i]) + (b*Pr[i])) * (c * u[i]) ;
+  }
+  return ;
 }
 
-double MomentumFluxPressure(double f, double u, double P) {
-  return (f * u + P) ;
+void IE(double a, double* rho, double b, double* Tp, double c, double* Pr, unsigned index, unsigned size, double* ie) {
+  for(int i=0; i < size; i+=index) {
+    ie[i] = Pr[i]/(gamma - 1.0) ;
+  }
+  return ;
+}
+  
+void Temperature(double a, double* ie, double b, double* rho, unsigned index, unsigned size, double* Tp) {
+  for(int i=0; i < size; i+=index) {
+    Tp[i] = ie[i]*( gamma - 1.0 )/(rho[i] * R) ;
+  }
+  return ;
 }
 
-double MomentumFlux(double f, double u) {
-  return (f * u) ;
+void SoundSpeed(double a, double* rho, double b, double* Pr, unsigned index, unsigned size, double* c) {
+  for(int i=0; i < size; i+=index) {
+    c[i] = sqrt(gamma * Pr[i]/ rho[i]) ;
+  }
+  return ;
 }
 
-double EnergyFlux(double E, double P, double u) {
-  return (E + P)*u ;
+void Pressure(double a, double* rho, double b, double* ie, unsigned index, unsigned size, double* Pr) {
+    for(int i=0; i < size; i+=index) {
+    Pr[i] = ie[i] * (gamma - 1.0) ;
+  }
+  return ;
 }
 
-double PressureE(double D, double e) {
+/*double PressureE(double D, double e) {
   return D*e*(1.4 -1.0) ;
-}
+}*/
 
-double NormalViscousStress(double meu, double x, double y) {
+/*double NormalViscousStress(double meu, double x, double y) {
   return meu * ((4.0/3.0)*x - (2.0/3.0)*y) ;
-}
+}*/
 
-double TangentialViscousStress(double meu, double x, double y) {
+/*double TangentialViscousStress(double meu, double x, double y) {
   return meu * ( x + y) ;
-}
+}*/
 
-double EnergyViscous(double u, double uTau, double v, double vTau) {
+/*double EnergyViscous(double u, double uTau, double v, double vTau) {
   return (u * uTau + v * vTau) ;
-}
+}*/
 
-double ArtificialViscosity( double x , double y) {
+/*double ArtificialViscosity( double x , double y) {
   double Beta = 1.5;
   double B1 = 6.0;
   double B2 = 20.5;
 
  // return (Beta - 1.0)*(B1/B2)* x * (1.0/500) ;
   return 1e-4;//2e-5;
+}*/
+
+// Functions for cell centered variables
+void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsigned size_CV, double* z, unsigned node) {
+  int j =-1 , count = 0; 
+  for(int i=0; i < size_DV; ++i) {
+    if(count % node == 0) {
+      j++;
+      count = 0;
+      z[j] = a*x[i];
+    }
+    z[j] = max(a*x[i], b*y[i], z[j]);
+    count++;
+  }
+
+  return ;
 }
 
 void EulerSolver::setXMomentum() {
-  field->setFunctionsForVariables(D, Vx, Product, DVx);
+  field->setFunctionsForVariables(1.0, D, 1.0, Vx, Product, DVx);
   return ;
 }
 
 void EulerSolver::setYMomentum() {
-  field->setFunctionsForVariables(D, Vy, Product, DVy);
+  field->setFunctionsForVariables(1.0, D, 1.0, Vy, Product, DVy);
   return ;
 }
 
 void EulerSolver::setEnergy() {
-  field->setFunctionsForVariables(KE, De, Add, DE);
+  field->setFunctionsForVariables(1.0, KE, 1.0, De, Add, DE);
   return ;
 }
 
-void EulerSolver::setInternalEnergy(function<double(double,double,double)> IE) {
-  field->setFunctionsForVariables(D, T, P, IE, De);
+void EulerSolver::setInternalEnergyfromPrimitve() {
+  field->setFunctionsForVariables(1.0, D, 1.0, T, 1.0, P, IE, De);
   return ;
 }
 
 void EulerSolver::setInternalEnergy() {
-  field->setFunctionsForVariables(DE, KE, Subtract, De);
+  field->setFunctionsForVariables(1.0, DE, 1.0, KE, Subtract, De);
   return ;
 }
 
 
 void EulerSolver::setKineticEnergy() {
-  field->setFunctionsForVariables(D, Vx, Vy, KineticEnergy, KE);
+  field->setFunctionsForVariables(1.0, D, 1.0, Vx, 1.0, Vy, KineticEnergy, KE);
   return ;
 }
 
 void EulerSolver::updateVelocity() {
-  field->setFunctionsForVariables(DVx, D, Divide, Vx);
-  field->setFunctionsForVariables(DVy, D, Divide, Vy);
+  field->setFunctionsForVariables(1.0, DVx, 1.0, D, Divide, Vx);
+  field->setFunctionsForVariables(1.0 ,DVy, 1.0, D, Divide, Vy);
   return ;
 }
 
-void EulerSolver::updateTemperature(function<double(double,double)> Tp) {
-  field->setFunctionsForVariables(De, D, Tp, T);
+void EulerSolver::updateTemperature() {
+  field->setFunctionsForVariables(1.0, De, 1.0, D, Temperature, T);
   return ;
 }
 
-void EulerSolver::updatePressure(function<double(double,double)> Pr) {
-  field->setFunctionsForVariables(D, De, Pr, P);
+void EulerSolver::updatePressure() {
+  field->setFunctionsForVariables(1.0, D, 1.0, De, Pressure, P);
   return ;
 }
 
-void EulerSolver::updatePrimitiveVariables(function<double(double,double)> T, function<double(double,double)> P) {
+void EulerSolver::updatePrimitiveVariables() {
   updateVelocity();
   setKineticEnergy();
   setInternalEnergy();
-  updateTemperature(T);
-  updatePressure(P);
+  updateTemperature();
+  updatePressure();
   return ;
 }
 
-void EulerSolver::updateConservativeVariables(function<double(double,double,double)> IE) {
+void EulerSolver::updateConservativeVariables() {
   setXMomentum();
   setYMomentum();
   setKineticEnergy();
-  setInternalEnergy(IE);
+  setInternalEnergy();
   setEnergy();
   return ;
 }
@@ -328,15 +416,15 @@ void EulerSolver::setInviscidFlux() {
 }
 
 void EulerSolver::updateInviscidFlux() {
-  field->setFunctionsForVariables(DVx, Vx, P, MomentumFluxPressure, DVxVx_plus_P);
-  field->setFunctionsForVariables(DVy, Vy, P, MomentumFluxPressure, DVyVy_plus_P);
-  field->setFunctionsForVariables(DVx, Vy, MomentumFlux, DVxVy);
-  field->setFunctionsForVariables(DE, P, Vx, EnergyFlux, DE_plus_P_Vx);
-  field->setFunctionsForVariables(DE, P, Vy, EnergyFlux, DE_plus_P_Vy);
+  field->setFunctionsForVariables(1.0, DVx, 1.0, Vx, 1.0, P, MomentumFluxPressure, DVxVx_plus_P);
+  field->setFunctionsForVariables(1.0, DVy, 1.0, Vy, 1.0, P, MomentumFluxPressure, DVyVy_plus_P);
+  field->setFunctionsForVariables(1.0, DVx, 1.0, Vy, MomentumFlux, DVxVy);
+  field->setFunctionsForVariables(1.0, DE, 1.0, P, 1.0, Vx, EnergyFlux, DE_plus_P_Vx);
+  field->setFunctionsForVariables(1.0, DE, 1.0, P, 1.0, Vy, EnergyFlux, DE_plus_P_Vy);
   return ;
 }
 
-void EulerSolver::setViscousFlux() {
+/*void EulerSolver::setViscousFlux() {
   field->addVariable_withBounary("Tauxx");
   field->addVariable_withBounary("Tauxy");
   field->addVariable_withBounary("Tauyy");
@@ -345,18 +433,18 @@ void EulerSolver::setViscousFlux() {
 
   updateInviscidFlux();
   return ;
-}
+}*/
 
-void EulerSolver::updateViscousFlux() {
+/*void EulerSolver::updateViscousFlux() {
   field->setFunctionsForVariables("meu", "dudx", "dvdy", NormalViscousStress, "Tauxx");
   field->setFunctionsForVariables("meu", "dvdy", "dudx", NormalViscousStress, "Tauyy");
   field->setFunctionsForVariables("meu", "dudy", "dvdx", TangentialViscousStress, "Tauxy");
   field->setFunctionsForVariables(Vx, "Tauxx", Vy, "Tauxy", EnergyViscous, "Eviscousx");
   field->setFunctionsForVariables(Vx, "Tauxy", Vy, "Tauyy", EnergyViscous, "Eviscousy");
   return ;
-}
+}*/
 
-void EulerSolver::updatePrimitiveGradient() {
+/*void EulerSolver::updatePrimitiveGradient() {
   field->delByDelX(D, "dqdx", "central");
   field->delByDelX(Vx, "dudx", "central");
   field->delByDelX(Vy, "dvdx", "central");
@@ -368,7 +456,7 @@ void EulerSolver::updatePrimitiveGradient() {
   field->delByDelY(Vy, "dvdy", "central");
   field->delByDelY(P, "dPdy", "central");
   field->delByDelY(T, "dTdy", "central");
-}
+}*/
 
 void EulerSolver::setAuxillaryVariables() {
  // cout << " Calling setAuxillaryVariables " << endl;
@@ -397,21 +485,21 @@ void EulerSolver::setAuxillaryVariables() {
   return ;
 }
 
-void EulerSolver::setEigenValues(function<double(double,double)> SoundSpeed) {
+void EulerSolver::setEigenValues() {
  // cout << "Calling setEigenValues " << endl;
   field->addVariable_withBounary(C);
   field->addVariable_withBounary(Vx_plus_C);
   field->addVariable_withBounary(Vy_plus_C);// Recheck formulation of eigen value !!
 
-  updateEigenValues(SoundSpeed);
+  updateEigenValues();
   return ;
 }
 
-void EulerSolver::updateEigenValues(function<double(double,double)> SoundSpeed) {
+void EulerSolver::updateEigenValues() {
  // cout << " Calling updateEigenValues " << endl;
-  field->setFunctionsForVariables(D, P, SoundSpeed, C);
-  field->setFunctionsForVariables(Vx, C, ModulusAdd, Vx_plus_C);
-  field->setFunctionsForVariables(Vy, C, ModulusAdd, Vy_plus_C);
+  field->setFunctionsForVariables(1.0, D, 1.0, P, SoundSpeed, C);
+  field->setFunctionsForVariables(1.0, Vx, 1.0, C, ModulusAdd, Vx_plus_C);
+  field->setFunctionsForVariables(1.0, Vy, 1.0, C, ModulusAdd, Vy_plus_C);
   return ;
 }
 
@@ -419,11 +507,14 @@ void EulerSolver::RK_Step1(string Var, string FluxX, string FluxY, string K) {
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
-  field->scal(0.0, K);
-  field->axpy(-1.0, dbydx, K);
-  field->axpy(-1.0, dbydy, K);
+  //field->scal(0.0, K);
+  //field->axpy(-1.0, dbydx, K);
+  //field->axpy(-1.0, dbydy, K);
+  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Add, K);
   
-  field->axpy(0.5*dt, K, Var);
+  //field->axpy(0.5*dt, K, Var);
+  field->setFunctionsForVariables(0.5*dt, K, 1.0, Var, Add, Var);
+
   return;
 }
 
@@ -431,12 +522,15 @@ void EulerSolver::RK_Step2(string Var, string FluxX, string FluxY, string K1, st
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
-  field->scal(0.0, K2);
-  field->axpy(-1.0, dbydx, K2);
-  field->axpy(-1.0, dbydy, K2);
+  //field->scal(0.0, K2);
+  //field->axpy(-1.0, dbydx, K2);
+  //field->axpy(-1.0, dbydy, K2);
+  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Add, K2);
   
-  field->axpy(-1.5*dt, K1, Var);
-  field->axpy(2.0*dt, K2, Var);
+  //field->axpy(-1.5*dt, K1, Var);
+  //field->axpy(2.0*dt, K2, Var);
+  field->setFunctionsForVariables(-1.5*dt, K1, 2.0*dt, K2, 1.0, Var, Add, Var);
+
   return;
 }
 
@@ -444,18 +538,20 @@ void EulerSolver::RK_Step3(string Var, string FluxX, string FluxY, string K1, st
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
-  field->scal(0.0, K3);
-  field->axpy(-1.0, dbydx, K3);
-  field->axpy(-1.0, dbydy, K3);
+  //field->scal(0.0, K3);
+  //field->axpy(-1.0, dbydx, K3);
+  //field->axpy(-1.0, dbydy, K3);
+  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Add, K3);
   
-  field->axpy((7.0/6.0)*dt, K1, Var);
-  field->axpy(-(4.0/3.0)*dt, K2, Var);
-  field->axpy((1.0/6.0)*dt, K3, Var);
+  //field->axpy((7.0/6.0)*dt, K1, Var);
+  //field->axpy(-(4.0/3.0)*dt, K2, Var);
+  //field->axpy((1.0/6.0)*dt, K3, Var);
+  field->setFunctionsForVariables((7.0/6.0)*dt, K1, -(4.0/3.0)*dt, K2, (1.0/6.0)*dt, K3, 1.0, Var, Add, Var);
   return;
 }
 
 void EulerSolver::setTimeStep() {
-  field->setFunctionsForCellCenterVariablesfromDomainVariables(Vx_plus_C, Vy_plus_C, Maximum, UMax);
+  field->setFunctionsForCellCenterVariablesfromDomainVariables(1.0, Vx_plus_C, 1.0, Vy_plus_C, Maximum, UMax);
   field->FindTimestep(Dt, Dx, UMax, CFL);
   dt = field->FindMindt(Dt);
   //dt = CFL * dx/speed;
@@ -463,7 +559,7 @@ void EulerSolver::setTimeStep() {
 }
 
 
-void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<double(double,double)> T, function<double(double,double)> P, function<double(double,double,double)> IE) {
+void EulerSolver::solve() {
   // Requires all Primitive and Conservative Variables to be setup and initialised.
   double t = 0.0;
   int count = 0;
@@ -475,105 +571,70 @@ void EulerSolver::solve(function<double(double,double)> SoundSpeed ,function<dou
     // First Step of RK3
     
     updateInviscidFlux();
-    updateEigenValues(SoundSpeed);
+    updateEigenValues();
 
     if ( count%no_of_time_steps == 0) {
       setTimeStep();
       cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
       count = 0;
     }
-
-    field->setFunctionsForVariables(Vx_plus_C, Vx_plus_C, ArtificialViscosity, "meu");
-    updatePrimitiveGradient();
-    updateViscousFlux();
-    
-    
     // Mass
     RK_Step1(D, DVx, DVy, K1D);
     // X Momentum
-    field->setFunctionsForVariables(DVxVx_plus_P, "Tauxx", Subtract, "xFlux");
-    field->setFunctionsForVariables(DVxVy, "Tauxy", Subtract, "yFlux");
-    RK_Step1(DVx,"xFlux","yFlux",K1DVx);
+    RK_Step1(DVx,DVxVx_plus_P,DVxVy,K1DVx);
     // Y Momentum
-    field->setFunctionsForVariables(DVxVy, "Tauxy", Subtract, "xFlux");
-    field->setFunctionsForVariables(DVyVy_plus_P, "Tauyy", Subtract, "yFlux");
-    RK_Step1(DVy,"xFlux","yFlux",K1DVy);
+    RK_Step1(DVy,DVxVy,DVyVy_plus_P,K1DVy);
     // Energy
-    field->setFunctionsForVariables(DE_plus_P_Vx, "Eviscousx", Subtract, "xFlux");
-    field->setFunctionsForVariables(DE_plus_P_Vy, "Eviscousy", Subtract, "yFlux");
-    RK_Step1(DE,"xFlux","yFlux",K1DE);
+    RK_Step1(DE,DE_plus_P_Vx,DE_plus_P_Vy,K1DE);
     
     RunShockDetector();
     RunLimiter();
-    //updatePrimitiveVariables(T, P);
-    RunPositivityLimiter(T, P);
+    RunPositivityLimiter();
 
     field->updateBoundary(t);
-    updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables();
    
     
     // Second Step of RK3
     updateInviscidFlux();
-    updateEigenValues(SoundSpeed);
-
-    field->setFunctionsForVariables(Vx_plus_C, Vx_plus_C, ArtificialViscosity, "meu");
-    updatePrimitiveGradient();
-    updateViscousFlux();
+    updateEigenValues();
 
     // Mass
     RK_Step2(D, DVx, DVy, K1D, K2D);
     // X Momentum
-    field->setFunctionsForVariables(DVxVx_plus_P, "Tauxx", Subtract, "xFlux");
-    field->setFunctionsForVariables(DVxVy, "Tauxy", Subtract, "yFlux");
-    RK_Step2(DVx,"xFlux","yFlux",K1DVx, K2DVx);
+    RK_Step2(DVx,DVxVx_plus_P,DVxVy,K1DVx, K2DVx);
     // Y Momentum
-    field->setFunctionsForVariables(DVxVy, "Tauxy", Subtract, "xFlux");
-    field->setFunctionsForVariables(DVyVy_plus_P, "Tauyy", Subtract, "yFlux");
-    RK_Step2(DVy,"xFlux","yFlux",K1DVy, K2DVy);
+    RK_Step2(DVy,DVxVy,DVyVy_plus_P,K1DVy, K2DVy);
     // Energy
-    field->setFunctionsForVariables(DE_plus_P_Vx, "Eviscousx", Subtract, "xFlux");
-    field->setFunctionsForVariables(DE_plus_P_Vy, "Eviscousy", Subtract, "yFlux");
-    RK_Step2(DE,"xFlux","yFlux",K1DE, K2DE);
+    RK_Step2(DE,DE_plus_P_Vx,DE_plus_P_Vy,K1DE, K2DE);
     
     RunShockDetector();
     RunLimiter();
-    //updatePrimitiveVariables(T, P);
-    RunPositivityLimiter(T, P); 
+    RunPositivityLimiter(); 
     
     field->updateBoundary(t);
-    updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables();
 
    // Third (Final) Step of RK3
     updateInviscidFlux();
-    updateEigenValues(SoundSpeed);
-
-    field->setFunctionsForVariables(Vx_plus_C, Vx_plus_C, ArtificialViscosity, "meu");
-    updatePrimitiveGradient();
-    updateViscousFlux();
+    updateEigenValues();
 
     // Mass
     RK_Step3(D, DVx, DVy, K1D, K2D, K3D);
     // X Momentum
-    field->setFunctionsForVariables(DVxVx_plus_P, "Tauxx", Subtract, "xFlux");
-    field->setFunctionsForVariables(DVxVy, "Tauxy", Subtract, "yFlux");
-    RK_Step3(DVx,"xFlux","yFlux",K1DVx, K2DVx, K3DVx);
+    RK_Step3(DVx,DVxVx_plus_P,DVxVy,K1DVx, K2DVx, K3DVx);
     // Y Momentum
-    field->setFunctionsForVariables(DVxVy, "Tauxy", Subtract, "xFlux");
-    field->setFunctionsForVariables(DVyVy_plus_P, "Tauyy", Subtract, "yFlux");
-    RK_Step3(DVy,"xFlux","yFlux",K1DVy, K2DVy, K3DVy);
+    RK_Step3(DVy,DVxVy,DVyVy_plus_P,K1DVy, K2DVy, K3DVy);
     // Energy
-    field->setFunctionsForVariables(DE_plus_P_Vx, "Eviscousx", Subtract, "xFlux");
-    field->setFunctionsForVariables(DE_plus_P_Vy, "Eviscousy", Subtract, "yFlux");
-    RK_Step3(DE,"xFlux","yFlux",K1DE, K2DE, K3DE);
+    RK_Step3(DE,DE_plus_P_Vx,DE_plus_P_Vy,K1DE, K2DE, K3DE);
  
     
    RunShockDetector();
    RunLimiter();
-   //updatePrimitiveVariables(T, P);
-   RunPositivityLimiter(T, P); 
+   RunPositivityLimiter(); 
    
     field->updateBoundary(t);
-    updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables();
 
    t += dt; 
    count += 1;       
@@ -669,17 +730,17 @@ void EulerSolver::Run_LiliaMomentLimiter(string v) {
   return ;
 }
 
-void EulerSolver::RunPositivityLimiter(function<double(double,double)> T ,function<double(double,double)> P) {
+void EulerSolver::RunPositivityLimiter() {
   field->resetPositivity();
   if ( Limiter == "LiliaMoment") {
-    updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables();
     checkPositivity();
     Run_PositivityMomentLimiter(DVx, N+2);
     Run_PositivityMomentLimiter(DVy, N+2);
     Run_PositivityMomentLimiter(DE, N+2);
     Run_PositivityMomentLimiter(D, N+2);
 
-    updatePrimitiveVariables(T, P);
+    updatePrimitiveVariables();
     checkPositivity();
     Run_PositivityMomentLimiter(DVx, 0);
     Run_PositivityMomentLimiter(DVy, 0);
@@ -702,10 +763,6 @@ void EulerSolver::Run_PositivityMomentLimiter(string v, unsigned Index) {
 
 
 void EulerSolver::FindL2Norm(function<double(double, double)> D, function<double(double, double)> U ) {
-  //field->addVariable_withBounary(DAnalytical);
-  //field->addVariable_withBounary(VxAnalytical);
-  
-  //field->addVariable_withoutBounary(ZERO);
   field->scal(0.0,ZERO);
 
   field->initializeVariable(DAnalytical, D);

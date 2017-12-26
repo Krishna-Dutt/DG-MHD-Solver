@@ -89,7 +89,7 @@ public:
      * @Param functionP This is the function used to initialize the `P` pressure as an input.
     */
     /* ----------------------------------------------------------------------------*/
-    void setInitialPressure(function<double(double, double)> P);
+    void setInitialPressure(function<double(double, double)> Pr);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to initialize the Temperature field of the domain  
@@ -97,7 +97,7 @@ public:
      * @Param functionT This is the function used to initialize the `T` temperature as an input.
     */
     /* ----------------------------------------------------------------------------*/
-    void setInitialTemperature(function<double(double, double)> T);
+    void setInitialTemperature(function<double(double, double)> Tp);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to initialize the the veclocity of the domain  
@@ -130,12 +130,11 @@ public:
     void setEnergy();
     /* ----------------------------------------------------------------------------*/
     /**
-     * @Synopsis This is the function used to set and update Internal Energy.
+     * @Synopsis This is the function used to set and update Internal Energy using primitive variables.
      *
-     * @Param functionIE This is the function used to compute Internal Energy, given Density, Temperature and Pressure(??).
     */
     /* ----------------------------------------------------------------------------*/
-    void setInternalEnergy(function<double(double,double,double)> IE);
+    void setInternalEnergyfromPrimitive();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update Internal Energy.
@@ -164,7 +163,7 @@ public:
      * @Param functionT This is the function used to update the Temperature, given Internal Energy and Density.
     */
     /* ----------------------------------------------------------------------------*/
-    void updateTemperature(function<double(double,double)> T);
+    void updateTemperature();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Pressure Field using Equation of State.
@@ -172,7 +171,7 @@ public:
      * @Param functionP This is the function used to update Pressure , given Density and Temperature, using Equation of State.
     */
     /* ----------------------------------------------------------------------------*/
-    void updatePressure(function<double(double,double)> P);
+    void updatePressure();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Primitive Variables Field using updated Conservative Variables.
@@ -181,7 +180,7 @@ public:
      * @Param functionP This is the function used to update Pressure , given Density and Temperature, using Equation of State.
     */
     /* ----------------------------------------------------------------------------*/
-    void updatePrimitiveVariables(function<double(double,double)> T, function<double(double,double)> P);
+    void updatePrimitiveVariables();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Conservative Variables Field using updated Primitive Variables.
@@ -189,7 +188,7 @@ public:
      * @Param functionIE This is the function used to update Internal energy , given Density and Temperature and Pressure(??).
     */
     /* ----------------------------------------------------------------------------*/
-    void updateConservativeVariables(function<double(double,double,double)> IE);
+    void updateConservativeVariables();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  set up Invscid Flux Variables in the domain.
@@ -233,7 +232,7 @@ public:
      * @Param functionSoundSpeed This is the function to obtain the speed of sound
     */
     /* ----------------------------------------------------------------------------*/
-    void setEigenValues(function<double(double,double)> SoundSpeed);
+    void setEigenValues();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Eigen Values stored only at Boundaries in the domain.
@@ -241,7 +240,7 @@ public:
      * @Param functionSoundSpeed This is the function to obtain the speed of sound
     */
     /* ----------------------------------------------------------------------------*/
-    void updateEigenValues(function<double(double,double)> SoundSpeed);
+    void updateEigenValues();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to perform First step of RK3.
@@ -306,7 +305,7 @@ public:
      * @Param functionIE This is the function to obtain Internal energy, given Density, Temperature and Pressure (??).
      */
     /* ----------------------------------------------------------------------------*/
-    void solve(function<double(double,double)> SoundSpeed ,function<double(double,double)> T, function<double(double,double)> P, function<double(double,double,double)> IE);
+    void solve();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function plots the function in vtk fileformat which can be further read by software packages like
@@ -383,7 +382,7 @@ public:
      * @Param functionP This is the function to obtain Pressure, given Density and Temperature, using Equation of state.
      */
     /* ----------------------------------------------------------------------------*/
-    void RunPositivityLimiter(function<double(double,double)> T, function<double(double,double)> P);
+    void RunPositivityLimiter();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis  This function runs  Positivity Limiter, using the Lilia Moment Limiter.
