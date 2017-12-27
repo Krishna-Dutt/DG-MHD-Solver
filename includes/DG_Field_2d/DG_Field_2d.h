@@ -84,6 +84,7 @@ public:
     // Functions to apply linear operations on the variables.
     void axpy(double a, int x, int y);
     void scal(double a, int x);
+    void setFunctionsForVariables(double a, int x, function<void(double, double*, unsigned, unsigned, double*)> f, int z); 
     void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
     void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z);
     void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 

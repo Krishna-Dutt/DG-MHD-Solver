@@ -932,15 +932,40 @@ void DG_Field_2d::axpy(double a, int x, int y) {
  *
  * @param[in]  a     The coefficient `a` of `x`
  * @param[in]  x     The column vector `x`
- * @param[in]  y     The column vector `y`
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::scal(double a, int x) {
-    for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
-            elements[i][j]->scal(a, x);
+    /*for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++) 
+            elements[i][j]->scal(a, x);*/
+    if (!a) {
+        for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i){
+            domainVariable[x][i] = 0;
+        }
+        return ;
+    }
+    
+    for(int i=0 ; i< (N+1)*(N+1)*ne_x*ne_y ; ++i) {
+        domainVariable[x][i] = a * domainVariable[x][i];
+    }
 
     return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable z to f(x).
+ *
+ * @Param a Scaling value for x
+ * @Param x The first parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForVariables(double a, int x, function<void(double, double*, unsigned, unsigned, double*)> f, int z) {
+    f(a, domainVariable[x], 1, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z]);
+
+    return;
 }
 
 /* ----------------------------------------------------------------------------*/

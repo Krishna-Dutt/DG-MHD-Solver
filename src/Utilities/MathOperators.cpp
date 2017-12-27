@@ -64,3 +64,11 @@ void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsign
 }
 
 
+void Copy(double a, double* x, unsigned index, unsigned size, double* z) {
+    for(int i=0; i< size; i+=index) {
+      z[i] = (a * x[i]);
+    }
+
+    return ;
+}
+

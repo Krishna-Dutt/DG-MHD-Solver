@@ -9,4 +9,5 @@ void Subtract(double a, double* x, double b, double* y, unsigned index, unsigned
 void Divide(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z);
 void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z);
 
+void Copy(double a, double* x, unsigned index, unsigned size, double* z);
 #endif

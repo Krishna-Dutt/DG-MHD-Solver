@@ -274,7 +274,7 @@ void EulerSolver::updatePressure() {
 void EulerSolver::updatePrimitiveVariables() {
   updateVelocity();
   setKineticEnergy();
-  setInternalEnergyfromPrimitive();
+  setInternalEnergy();
   updateTemperature();
   updatePressure();
   return ;
@@ -284,7 +284,7 @@ void EulerSolver::updateConservativeVariables() {
   setXMomentum();
   setYMomentum();
   setKineticEnergy();
-  setInternalEnergy();
+  setInternalEnergyfromPrimitive();
   setEnergy();
   return ;
 }
@@ -518,7 +518,7 @@ void EulerSolver::solve() {
     
    RunShockDetector();
    RunLimiter();
-   //RunPositivityLimiter(); 
+   RunPositivityLimiter(); 
    
     field->updateBoundary(t);
     updatePrimitiveVariables();
@@ -542,6 +542,7 @@ void EulerSolver::SetShockDetector(string _ShockDetector) {
 }
 
 void EulerSolver::SetShockDetectorVariables() {
+  
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered(CellMarker);
     field->addVariable_withBounary(CellMarkerG);
@@ -563,8 +564,8 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
 
-  field->updateOutFlowBoundary(Vx, Vy);
-  field->updateCellMarker(D, CellMarker);
+  //field->updateOutFlowBoundary(Vx, Vy);
+  //field->updateCellMarker(D, CellMarker);
 
   return ;
 }
@@ -610,7 +611,8 @@ void EulerSolver::RunLimiter() {
 
 void EulerSolver::Run_LiliaMomentLimiter(int v) {
   field->computeMoments(v, Moment);
-  field->computeMoments(v, ModMoment);
+  //field->computeMoments(v, ModMoment);
+  field->setFunctionsForVariables(1.0, Moment, Copy, ModMoment);
   field->limitMoments(Moment, ModMoment, CellMarker, (N+1)*(N+1)-1);
   field->convertMomentToVariable(ModMoment, v, CellMarker);
 
