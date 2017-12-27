@@ -451,11 +451,11 @@ bool DG_Element_2d::checkPositivity(int v, string level) {
             }
         }
 
-        if (level == "One"){
+       /* if (level == "One"){
             //PositivityMarker = false;
             return false;
         }
-                 
+        */         
     return false;
 }
 
@@ -526,12 +526,12 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
     double Temp1, Temp2, AlphaN;
     double epsilon = 1e-13;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
-    vector<double> Var1, Var2 ;
+    /*vector<double> Var1, Var2 ;
     double M = 50.0;
     double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
     Var1.push_back(M*min_dx*min_dx);
     Var2.push_back(M*min_dx*min_dx);
-
+    */  
     
     // Ensuring that Cell avergae remains the  same after limiting !!
     variable[modm][0] = variable[m][0];

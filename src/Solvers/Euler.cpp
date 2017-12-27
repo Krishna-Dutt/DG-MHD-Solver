@@ -589,7 +589,9 @@ void EulerSolver::SetLimiterVariables() {
 
 
     field->addVariable_withBounary(Moment);
+    field->scal(0.0, Moment);
     field->addVariable_withBounary(ModMoment);
+    field->scal(0.0, ModMoment);
     field->setVanderMandMatrix();
   }
 
@@ -610,7 +612,7 @@ void EulerSolver::RunLimiter() {
 }
 
 void EulerSolver::Run_LiliaMomentLimiter(int v) {
-  field->computeMoments(v, Moment);
+  field->computeMoments(v, Moment, CellMarker);
   //field->computeMoments(v, ModMoment);
   field->setFunctionsForVariables(1.0, Moment, Copy, ModMoment);
   field->limitMoments(Moment, ModMoment, CellMarker, (N+1)*(N+1)-1);
@@ -642,7 +644,7 @@ void EulerSolver::RunPositivityLimiter() {
 }
 
 void EulerSolver::Run_PositivityMomentLimiter(int v, unsigned Index) {
-  field->computeMoments(v, Moment);
+  field->computeMoments(v, Moment, CellMarker);
   field->scal(0.0, ModMoment);
   field->limitMoments(Moment, ModMoment, CellMarker, Index);
   field->convertMomentToVariable(ModMoment, v, CellMarker);

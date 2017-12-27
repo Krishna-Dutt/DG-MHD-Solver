@@ -1091,7 +1091,8 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
     else if(BoundaryPosition == "outflow") {
         AdjustCornerElement(Ind, B);
         for(int i=Ind[0]; i<=Ind[1]; ++i) {
-            if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) >= 1.0) {
+            if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) >= 1.0) 
+            {
                  for(int j=0; j<ConservativeVariables.size(); ++j) {
                      variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
                 }

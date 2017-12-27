@@ -65,7 +65,7 @@ public:
     void setVanderMandMatrix(); // Function to set the VanderMand and its Inverse
 
     // Functions to handle Moment Limiter
-    void computeMoments(int v, int m);
+    void computeMoments(int v, int m, int cm);
     void limitMoments(int m, int modifiedm, int cm, unsigned Index);
     void convertMomentToVariable(int m, int v, int cm);
 

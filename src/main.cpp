@@ -8,21 +8,64 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if ( y > 1e-6) return 0.1;
-  return 0.0;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.0;//0.8939;//-0.7259 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.7276;//0.8939;//-0.7259;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.0 ;
+  }
 }
 
 double V(double x, double y) {
-  return 0.0;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.0 ; //0.8939;//-0.7259 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.0;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.7276 ;//0.8939;//-0.7259 ;
+  }
 }
 
 
 double IDensity(double x, double y) {
-  return 1.4;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8;//1.1; //1.0 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 1.0;//0.5065; //0.5197;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.5313;//1.1 ;//1.0 ;
+  }
+  else {
+    return 1.0; //0.5065; //0.5197 ;
+  }
 }
 
 double IPressure(double x, double y) {
-  return 1.0;
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.0;//1.1; //1.0 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 1.0;//0.35; //0.4;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.4;//1.1; //1.0 ;
+  }
+  else {
+    return 1.0;//0.35; //0.4 ;
+  }
 }
 
 double StateEq(double D, double T) {
@@ -43,6 +86,7 @@ double ITemperature(double x, double y) {
     return 0.35/(R*0.5065);//0.4/(R*0.5197) ;
   }
 }
+
 
 
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
@@ -83,7 +127,7 @@ int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 1;
-    double CFL = 0.1;
+    double CFL = 0.2;
     double time = 0.25;
     EulerSolver* a;
     a = new EulerSolver(200, 200, 1);
@@ -105,7 +149,7 @@ int main() {
    //a->setViscousFlux();
     a->setAuxillaryVariables();
 
-    a->setBoundaryCondtions("periodic", "periodic", "periodic", "periodic");
+    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->solve();

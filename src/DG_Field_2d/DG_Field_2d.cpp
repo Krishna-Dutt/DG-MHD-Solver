@@ -709,12 +709,15 @@ void DG_Field_2d::updateCellMarker(int v, int m) {
  * 
  * @Param v This is the quantity whose moments are to be calculated.
  * @Param m This is the variable used to store the moments.
+ * @Param cm This the cell marker used to identified troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::computeMoments(int v, int m) {
+void DG_Field_2d::computeMoments(int v, int m, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
-      elements[i][j]->computeMoments(v, m);
+        if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
+             elements[i][j]->computeMoments(v, m);
+        }
     }
 
   return ;
@@ -1132,8 +1135,14 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
      for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
            // if ( cellcenterVariable[cm][i*ne_y + j]) 
-            {
-              PositivityMarker[i*ne_y + j] = elements[i][j]->checkPositivity(v, level);
+            { 
+                if ( level == "One" )
+                 {
+                    PositivityMarker[i*ne_y + j] = elements[i][j]->checkPositivity(v, level);
+                }
+                else if(!PositivityMarker[i*ne_y + j] ) {
+                    PositivityMarker[i*ne_y + j] = elements[i][j]->checkPositivity(v, level);
+                }
         } 
             
     return;
