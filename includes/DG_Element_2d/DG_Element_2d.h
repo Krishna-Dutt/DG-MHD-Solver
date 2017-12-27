@@ -56,6 +56,8 @@ protected:
 
     string System; // System of Governing Equations being solved !!
 
+    
+
 public:
 
     double *X, *Y;

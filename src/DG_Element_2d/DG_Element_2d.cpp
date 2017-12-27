@@ -794,12 +794,14 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
     else if(fluxType == "rusanov") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
-        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        zeros(numericalFlux, (N+1)*(N+1)); 
+
         for(int i=0; i<=N; i++){
           // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
             numericalFlux[i*(N+1)+N] = 0.5*(boundaryRight[v][i*(N+1)] + neighboringRight[v][i*(N+1)] + MAX(fabs(boundaryRight[fluxVariable][i*(N+1)]), fabs(neighboringRight[fluxVariable][i*(N+1)]))*(boundaryRight[conserVar][i*(N+1)] - neighboringRight[conserVar][i*(N+1)])  ) ;   
             numericalFlux[i*(N+1)]   = 0.5*(boundaryLeft[v][i*(N+1)]  + neighboringLeft[v][i*(N+1)]  - MAX(fabs(boundaryLeft[fluxVariable][i*(N+1)]), fabs(neighboringLeft[fluxVariable][i*(N+1)]))*(boundaryLeft[conserVar][i*(N+1)] - neighboringLeft[conserVar][i*(N+1)])  ) ;   
         }
+
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
