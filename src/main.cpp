@@ -130,7 +130,7 @@ int main() {
     double CFL = 0.2;
     double time = 0.25;
     EulerSolver* a;
-    a = new EulerSolver(100, 100, 1);
+    a = new EulerSolver(200, 200, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
@@ -154,7 +154,7 @@ int main() {
     a->SetLimiter("LiliaMoment");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("Output3.vtk");
+    //a->plot("Output3.vtk");
     
 
     delete a;
