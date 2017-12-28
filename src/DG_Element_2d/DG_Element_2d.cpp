@@ -341,17 +341,30 @@ void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
   double start = -1.0;
   double end = 1.0;
   
-  if ( Sum(1, N+1, boundaryTop[v]) < 0.0) {
+  /*if ( Sum(1, N+1, boundaryTop[v]) < 0.0) {
     OutFlow[2] = true;
   }
   if ( Sum(1, N+1, boundaryBottom[v]) > 0.0) {
-    OutFlow[1] = true;
+    OutFlow[0] = true;
   }
   
   if ( Sum(N+1, (N+1)*(N+1), boundaryLeft[v]) > 0.0) {
     OutFlow[3] = true;
   }
   if (Sum(N+1, (N+1)*(N+1)-N, boundaryRight[v]) < 0.0) {
+    OutFlow[1] = true;
+  }*/
+  if (lobattoIntegration(start, end, N, 1, boundaryTop[v]) < 0.0) {
+    OutFlow[2] = true;
+  }
+  if (lobattoIntegration(start, end, N, 1, boundaryBottom[v]) > 0.0) {
+    OutFlow[1] = true;
+  }
+  
+  if (lobattoIntegration(start, end, N, N+1, boundaryLeft[u]) > 0.0) {
+    OutFlow[3] = true;
+  }
+  if (lobattoIntegration(start, end, N, N+1, boundaryRight[u]) < 0.0) {
     OutFlow[2] = true;
   }
 
