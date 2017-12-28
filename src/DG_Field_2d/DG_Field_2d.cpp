@@ -836,6 +836,14 @@ void DG_Field_2d::writeVTK(string fileName){
             }
         }
     }
+
+    /*for(k1=0; k1<domainVariable.size(); ++k1) {
+        pFile << "SCALARS\t"<< domainVariable[k1] <<"\tdouble\nLOOKUP_TABLE default\n";
+        for(i=0 ; i<(N+1)*(N+1)*ne_x*ne_y; ++i) {
+            pFile << domainVariable[k1] << endl;
+        }
+    }*/
+
     pFile.close(); // Closing the file.
     return ;
 }

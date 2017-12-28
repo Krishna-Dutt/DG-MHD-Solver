@@ -546,6 +546,7 @@ void EulerSolver::SetShockDetectorVariables() {
   if (ShockDetector == "KXRCF") {
     field->addVariable_CellCentered(CellMarker);
     field->addVariable_withBounary(CellMarkerG);
+    field->scal(0.0, CellMarkerG);
   }
 
   return ;
@@ -564,8 +565,8 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
 
-  //field->updateOutFlowBoundary(Vx, Vy);
-  //field->updateCellMarker(D, CellMarker);
+  field->updateOutFlowBoundary(Vx, Vy);
+  field->updateCellMarker(D, CellMarker);
 
   return ;
 }

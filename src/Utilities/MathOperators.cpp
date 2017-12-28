@@ -72,3 +72,11 @@ void Copy(double a, double* x, unsigned index, unsigned size, double* z) {
     return ;
 }
 
+double Sum(unsigned index, unsigned size, double* z) {
+  double s = 0;
+  for(int i=0; i<size; i+=index) {
+    s += z[i];
+  }
+  
+  return s;
+}
