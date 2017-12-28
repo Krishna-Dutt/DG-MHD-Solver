@@ -24,6 +24,26 @@ private:
     string ShockDetector;
     string Limiter;
 
+    // Primitve Variables
+    int D, Vx, Vy, P, T;
+    // Conservative Variables
+    int DVx, DVy, DE, De, KE;
+    // Inviscid Flux
+    int DVxVx_plus_P, DVxVy, DVyVy_plus_P, DE_plus_P_Vx, DE_plus_P_Vy;
+    // Eigen Values
+    int C, Vx_plus_C, Vy_plus_C;
+    // Aux. Variables // Define all auxillary (needed or not here)
+    int K1D, K1DVx, K1DVy, K1DE, K2D, K2DVx, K2DVy, K2DE, K3D, K3DVx, K3DVy, K3DE, dbydx, dbydy;
+    int DAnalytical, VxAnalytical, ZERO;
+    // Shock Detector
+    int CellMarkerG;
+    // Limiter
+    int Moment, ModMoment;
+    // Add corresponding variables for Characteristic Limiter
+
+   // cell centered variables
+   int Dx, Dt, UMax, CellMarker; 
+
 public:
     /* ----------------------------------------------------------------------------*/
     /**

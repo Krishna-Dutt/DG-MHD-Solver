@@ -38,10 +38,10 @@ public:
 
     void setSystem(string S);
 
-    void addVariable_withBounary(int v);
-    void addVariable_withoutBounary(int v);
-    void addVariable_onlyBounary( int v);
-    void addVariable_CellCentered(int v);
+    int addVariable_withBounary();
+    int addVariable_withoutBounary();
+    int addVariable_onlyBounary();
+    int addVariable_CellCentered();
     void initializeVariable(int v, function<double(double, double)>);
 
     // Functions to set Boundary Conditions

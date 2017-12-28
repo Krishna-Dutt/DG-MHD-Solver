@@ -14,7 +14,12 @@ private:
     double time;
     double dt;
     int no_of_time_steps;
-
+     
+    int D, Vx, Vy, VxD, VyD;
+    int DAnalyt;
+    int DqDt, DVxdDx, DVydDy;
+    int K1, K2, K3, ZERO; 
+    
 public:
     /* ----------------------------------------------------------------------------*/
     /**

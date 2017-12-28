@@ -547,15 +547,14 @@ void DG_Field_2d::updateBoundaryVariables(int v) {
  * @Synopsis  This function adds the variable to each and every element. In this the boundary points are not
  * specifically stored in each element.
  *
- * @Param v This is a int which defines the variable name.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_withBounary(int v) {
+int DG_Field_2d::addVariable_withBounary() {
     double *newVariable = new double[(N+1)*(N+1)*ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
+    int v;
 
-   if (v == 0) domainVariable.clear();
    domainVariable.push_back(newVariable); /// Now assigning the same to the map. 
-   
+   v = domainVariable.size()-1;
     
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -572,7 +571,7 @@ void DG_Field_2d::addVariable_withBounary(int v) {
 
    //scal(0.0, v);
 
-    return ;
+    return v;
 }
 
 
@@ -581,14 +580,14 @@ void DG_Field_2d::addVariable_withBounary(int v) {
  * @Synopsis  This is similar to DG_Field_2d::addVariable_withBoundary. Just the boundary points are not specificaly
  * stored for this variable.
  *
- * @Param v This is the name of the variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_withoutBounary(int v) {
+int DG_Field_2d::addVariable_withoutBounary() {
    double *newVariable = new double[(N+1)*(N+1)*ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
-    
-   if (v == 0) domainVariable.clear();
+   int v;
+   
    domainVariable.push_back(newVariable); /// Now assigning the same to the map. 
+   v = domainVariable.size()-1;
 
    for (int i=0; i < ne_x; i++ ){
        for (int j=0; j<ne_y; j++) {
@@ -598,7 +597,7 @@ void DG_Field_2d::addVariable_withoutBounary(int v) {
    variableNames.push_back(v);
    //scal(0.0, v);
 
-   return ;
+   return v;
 }
 
 
@@ -607,16 +606,16 @@ void DG_Field_2d::addVariable_withoutBounary(int v) {
  * @Synopsis  This is similar to DG_Field_2d::addVariable_withoutBoundary.Just only one value is store at for each cell,
  *  could be considered as cell centered value.
  *
- * @Param v This is the name of the cell centered variable which is to be added.
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::addVariable_CellCentered(int v) {
+int DG_Field_2d::addVariable_CellCentered() {
    double *newVariable = new double[ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
-    
-   if (v == 0) cellcenterVariable.clear();
+   int v;
+
    cellcenterVariable.push_back(newVariable); /// Now assigning the same to the map. 
-   
-   return ;
+   v = cellcenterVariable.size()-1;
+
+   return v;
 }
 
 

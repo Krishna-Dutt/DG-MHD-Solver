@@ -4,68 +4,6 @@
 #include "../../includes/Utilities/MathOperators.h"
 #include "../../includes/Utilities/ThermodynamicFunctions.h"
 
-// Primitve Variables
-#define D   0
-#define Vx  1
-#define Vy  2
-#define P   3
-#define T   4
-
-// Conservative Variables
-#define DVx 5
-#define DVy 6
-#define DE  7
-#define De  8
-#define KE  9
-
-// Inviscid Flux
-#define DVxVx_plus_P 10
-#define DVxVy        11
-#define DVyVy_plus_P 12
-#define DE_plus_P_Vx 13
-#define DE_plus_P_Vy 14
-
-// Eigen Values
-#define C         15
-#define Vx_plus_C 16
-#define Vy_plus_C 17
-
-// Aux. Variables // Define all auxillary (needed or not here)
-#define K1D   18
-#define K1DVx 19
-#define K1DVy 20
-#define K1DE  21
-#define K2D   22
-#define K2DVx 23
-#define K2DVy 24
-#define K2DE  25
-#define K3D   26
-#define K3DVx 27
-#define K3DVy 28
-#define K3DE  29
-#define dbydx 30
-#define dbydy 31
-
-#define DAnalytical  32
-#define VxAnalytical 33
-#define ZERO         34
-
-// Shock Detector
-#define CellMarkerG  35
-
-// Limiter
-#define Moment    36
-#define ModMoment 37
-// Add corresponding variables for Characteristic Limiter
-
-// cell centered variables 
-#define Dx         0 
-#define Dt         1
-#define UMax       2
-#define CellMarker 3
-
-
-
 
 EulerSolver::EulerSolver(int _ne_x, int _ne_y, int _N) {
     ne_x = _ne_x;
@@ -90,11 +28,11 @@ void EulerSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
 }
 
 void EulerSolver::setPrimitiveVariables(){
-  field->addVariable_withBounary(D);
-  field->addVariable_withBounary(Vx);
-  field->addVariable_withBounary(Vy);
-  field->addVariable_withBounary(P);
-  field->addVariable_withBounary(T);
+  D  = field->addVariable_withBounary();
+  Vx = field->addVariable_withBounary();
+  Vy = field->addVariable_withBounary();
+  P  = field->addVariable_withBounary();
+  T  = field->addVariable_withBounary();
   return ;
 }
 
@@ -116,11 +54,11 @@ void EulerSolver::setPrimitiveVariables(){
 
 
 void EulerSolver::setConservativeVariables(){
-  field->addVariable_withBounary(DVx);
-  field->addVariable_withBounary(DVy);
-  field->addVariable_withBounary(DE);
-  field->addVariable_withBounary(De); // Internal Energy, added just for ease of manipulating Energy, Remove later if not required !!
-  field->addVariable_withBounary(KE); // Kinetic Energy , " "
+  DVx = field->addVariable_withBounary();
+  DVy = field->addVariable_withBounary();
+  DE  = field->addVariable_withBounary();
+  De  = field->addVariable_withBounary(); // Internal Energy, added just for ease of manipulating Energy, Remove later if not required !!
+  KE  = field->addVariable_withBounary(); // Kinetic Energy , " "
 
   field->addConservativeVariables(D);
   field->addConservativeVariables(DVx);
@@ -169,11 +107,11 @@ void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
    CFL = _CFL;
    time = _time;
    no_of_time_steps = _no_of_time_steps;
-  field->addVariable_CellCentered(Dx);
-  field->FindMindx(Dx);
-  field->addVariable_CellCentered(Dt);
-  field->addVariable_CellCentered(UMax);
-  field->ResetVariables_CellCentered(UMax, 0.0);
+   Dx   = field->addVariable_CellCentered();
+   field->FindMindx(Dx);
+   Dt   = field->addVariable_CellCentered();
+   UMax = field->addVariable_CellCentered();
+   field->ResetVariables_CellCentered(UMax, 0.0);
 
     return ;
 }
@@ -291,11 +229,11 @@ void EulerSolver::updateConservativeVariables() {
 
 void EulerSolver::setInviscidFlux() {
   //cout << " Calling setInviscidFlux " << endl;
-  field->addVariable_withBounary(DVxVx_plus_P);
-  field->addVariable_withBounary(DVxVy);
-  field->addVariable_withBounary(DVyVy_plus_P);
-  field->addVariable_withBounary(DE_plus_P_Vx);
-  field->addVariable_withBounary(DE_plus_P_Vy);
+  DVxVx_plus_P = field->addVariable_withBounary();
+  DVxVy        = field->addVariable_withBounary();
+  DVyVy_plus_P = field->addVariable_withBounary();
+  DE_plus_P_Vx = field->addVariable_withBounary();
+  DE_plus_P_Vy = field->addVariable_withBounary();
 
   updateInviscidFlux();
   return ;
@@ -347,36 +285,34 @@ void EulerSolver::updateInviscidFlux() {
 
 void EulerSolver::setAuxillaryVariables() {
  // cout << " Calling setAuxillaryVariables " << endl;
-  field->addVariable_withoutBounary(K1D);
-  field->addVariable_withoutBounary(K1DVx);
-  field->addVariable_withoutBounary(K1DVy);
-  field->addVariable_withoutBounary(K1DE);
-  field->addVariable_withoutBounary(K2D);
-  field->addVariable_withoutBounary(K2DVx);
-  field->addVariable_withoutBounary(K2DVy);
-  field->addVariable_withoutBounary(K2DE);
-  field->addVariable_withoutBounary(K3D);
-  field->addVariable_withoutBounary(K3DVx);
-  field->addVariable_withoutBounary(K3DVy);
-  field->addVariable_withoutBounary(K3DE);
-  field->addVariable_withoutBounary(dbydx);
-  field->addVariable_withoutBounary(dbydy);
+  K1D   = field->addVariable_withoutBounary();
+  K1DVx = field->addVariable_withoutBounary();
+  K1DVy = field->addVariable_withoutBounary();
+  K1DE  = field->addVariable_withoutBounary();
+  K2D   = field->addVariable_withoutBounary();
+  K2DVx = field->addVariable_withoutBounary();
+  K2DVy = field->addVariable_withoutBounary();
+  K2DE  = field->addVariable_withoutBounary();
+  K3D   = field->addVariable_withoutBounary();
+  K3DVx = field->addVariable_withoutBounary();
+  K3DVy = field->addVariable_withoutBounary();
+  K3DE  = field->addVariable_withoutBounary();
+  dbydx = field->addVariable_withoutBounary();
+  dbydy = field->addVariable_withoutBounary();
 
-  field->addVariable_withBounary(DAnalytical);
-  field->addVariable_withBounary(VxAnalytical);
+  DAnalytical  = field->addVariable_withBounary();
+  VxAnalytical = field->addVariable_withBounary();
   
-  field->addVariable_withoutBounary(ZERO);
-
-  //field->addVariable_withBounary("xFlux");
-  //field->addVariable_withBounary("yFlux");
+  ZERO = field->addVariable_withoutBounary();
+  
   return ;
 }
 
 void EulerSolver::setEigenValues() {
  // cout << "Calling setEigenValues " << endl;
-  field->addVariable_withBounary(C);
-  field->addVariable_withBounary(Vx_plus_C);
-  field->addVariable_withBounary(Vy_plus_C);// Recheck formulation of eigen value !!
+  C         = field->addVariable_withBounary();
+  Vx_plus_C = field->addVariable_withBounary();
+  Vy_plus_C = field->addVariable_withBounary();// Recheck formulation of eigen value !!
 
   updateEigenValues();
   return ;
@@ -394,12 +330,8 @@ void EulerSolver::RK_Step1(int Var, int FluxX, int FluxY, int K) {
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
-  //field->scal(0.0, K);
-  //field->axpy(-1.0, dbydx, K);
-  //field->axpy(-1.0, dbydy, K);
   field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K);
   
-  //field->axpy(0.5*dt, K, Var);
   field->setFunctionsForVariables(0.5*dt, K, 1.0, Var, Addab, Var);
 
   return;
@@ -409,13 +341,8 @@ void EulerSolver::RK_Step2(int Var, int FluxX, int FluxY, int K1, int K2) {
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
-  //field->scal(0.0, K2);
-  //field->axpy(-1.0, dbydx, K2);
-  //field->axpy(-1.0, dbydy, K2);
   field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K2);
   
-  //field->axpy(-1.5*dt, K1, Var);
-  //field->axpy(2.0*dt, K2, Var);
   field->setFunctionsForVariables(-1.5*dt, K1, 2.0*dt, K2, 1.0, Var, Addabc, Var);
 
   return;
@@ -425,14 +352,8 @@ void EulerSolver::RK_Step3(int Var, int FluxX, int FluxY, int K1, int K2, int K3
   field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
   field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
 
-  //field->scal(0.0, K3);
-  //field->axpy(-1.0, dbydx, K3);
-  //field->axpy(-1.0, dbydy, K3);
   field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K3);
   
-  //field->axpy((7.0/6.0)*dt, K1, Var);
-  //field->axpy(-(4.0/3.0)*dt, K2, Var);
-  //field->axpy((1.0/6.0)*dt, K3, Var);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1, -(4.0/3.0)*dt, K2, (1.0/6.0)*dt, K3, 1.0, Var, Addabcd, Var);
   return;
 }
@@ -441,7 +362,7 @@ void EulerSolver::setTimeStep() {
   field->setFunctionsForCellCenterVariablesfromDomainVariables(1.0, Vx_plus_C, 1.0, Vy_plus_C, Maximum, UMax);
   field->FindTimestep(Dt, Dx, UMax, CFL);
   dt = field->FindMindt(Dt);
-  //dt = CFL * dx/speed;
+
   return ;
 }
 
@@ -544,9 +465,11 @@ void EulerSolver::SetShockDetector(string _ShockDetector) {
 void EulerSolver::SetShockDetectorVariables() {
   
   if (ShockDetector == "KXRCF") {
-    field->addVariable_CellCentered(CellMarker);
-    field->addVariable_withBounary(CellMarkerG);
+    CellMarker  = field->addVariable_CellCentered();
+    CellMarkerG = field->addVariable_withBounary();
+
     field->scal(0.0, CellMarkerG);
+    
   }
 
   return ;
@@ -581,17 +504,18 @@ void EulerSolver::SetLimiter(string _Limiter) {
 
 void EulerSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    /*field->addVariable_CellCentered(CellMarker);
+    /*CellMarker  = field->addVariable_CellCentered();
     field->ResetVariables_CellCentered(CellMarker, 1.5);
-    field->addVariable_withBounary(CellMarkerG);
+    CellMarkerG = field->addVariable_withBounary();
     field->scal(0.0, CellMarkerG);*/
+
     //field->addVariable_CellCentered("Max");
     //field->addVariable_CellCentered("Min");
 
 
-    field->addVariable_withBounary(Moment);
+    Moment    = field->addVariable_withBounary();
     field->scal(0.0, Moment);
-    field->addVariable_withBounary(ModMoment);
+    ModMoment = field->addVariable_withBounary();
     field->scal(0.0, ModMoment);
     field->setVanderMandMatrix();
   }
