@@ -77,12 +77,14 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
 
     System = "EULER";
 
-    OutFlow.resize(0);
+    //OutFlow.resize(0);
     // For Quad element : 0 - Bottom, 1 - Right, 2 - Top, 3 - Left Boundary
+    /*OutFlow.push_back(true);
     OutFlow.push_back(true);
     OutFlow.push_back(true);
     OutFlow.push_back(true);
-    OutFlow.push_back(true);
+    */
+    OutFlow[0] = OutFlow[1] = OutFlow[2] = OutFlow[3] = true;
 
 }
 
@@ -323,7 +325,7 @@ void DG_Element_2d::addVariable_CellCentered(int v) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::ResetMap_OutFlow() {
-    for(int i=0; i< OutFlow.size(); ++i) {
+    for(int i=0; i<4; ++i) {
         OutFlow[i] = false;
     }
     return ;
@@ -341,7 +343,7 @@ void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
   double start = -1.0;
   double end = 1.0;
   
-  /*if ( Sum(1, N+1, boundaryTop[v]) < 0.0) {
+  if ( Sum(1, N+1, boundaryTop[v]) < 0.0) {
     OutFlow[2] = true;
   }
   if ( Sum(1, N+1, boundaryBottom[v]) > 0.0) {
@@ -353,22 +355,7 @@ void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
   }
   if (Sum(N+1, (N+1)*(N+1)-N, boundaryRight[v]) < 0.0) {
     OutFlow[1] = true;
-  }*/
-  if (lobattoIntegration(start, end, N, 1, boundaryTop[v]) < 0.0) {
-    OutFlow[2] = true;
   }
-  if (lobattoIntegration(start, end, N, 1, boundaryBottom[v]) > 0.0) {
-    OutFlow[1] = true;
-  }
-  
-  if (lobattoIntegration(start, end, N, N+1, boundaryLeft[u]) > 0.0) {
-    OutFlow[3] = true;
-  }
-  if (lobattoIntegration(start, end, N, N+1, boundaryRight[u]) < 0.0) {
-    OutFlow[2] = true;
-  }
-
-  
 
   return ;
 }
@@ -392,11 +379,11 @@ double DG_Element_2d::updateCellMarker(int v) {
   
   zeros(NumFlux, N+1);
   if (OutFlow[2]) {
-      Addab(1.0, boundaryTop[v], -1.0, neighboringTop[v], 1, N+1, NumFlux);
+      Addabc(1.0, boundaryTop[v], -1.0, neighboringTop[v], 1.0, NumFlux, 1, N+1, NumFlux);
       OutflowSize += abs(x_end -x_start);
   }
   if (OutFlow[0]) {
-      Addab(1.0, boundaryBottom[v], -1.0, neighboringBottom[v], 1, N+1, NumFlux);
+      Addabc(1.0, boundaryBottom[v], -1.0, neighboringBottom[v], 1.0, NumFlux, 1, N+1, NumFlux);
       OutflowSize += abs(x_end -x_start);
   }
   if (OutFlow[0] || OutFlow[2]) {
@@ -425,6 +412,32 @@ double DG_Element_2d::updateCellMarker(int v) {
   if(OutFlow[1] || OutFlow[3]) {
       VariableFlux += lobattoIntegration(y_start, y_end, N, 1, NumFlux);
   }
+
+  /*if (OutFlow[2]) {
+    VariableFlux += lobattoIntegration(x_start, x_end, N, 1, boundaryTop[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, 1, neighboringTop[v]);
+    OutflowSize += abs(x_end -x_start);
+
+  }
+  if (OutFlow[0]) {
+    VariableFlux += lobattoIntegration(x_start, x_end, N, 1, boundaryBottom[v]);
+    VariableFlux -= lobattoIntegration(x_start, x_end, N, 1, neighboringBottom[v]);
+    OutflowSize += abs(x_end -x_start);
+
+  }
+  if (OutFlow[3]) {
+    VariableFlux += lobattoIntegration(y_start, y_end, N, N+1, boundaryLeft[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, N+1, neighboringLeft[v]);
+    OutflowSize += abs(y_end -y_start);
+
+  }
+  if (OutFlow[1]) {
+    VariableFlux += lobattoIntegration(y_start, y_end, N, N+1, boundaryRight[v]);
+    VariableFlux -= lobattoIntegration(y_start, y_end, N, N+1, neighboringRight[v]);
+    OutflowSize += abs(y_end -y_start);
+
+  }*/
+  
 
   MaxVariable = variable[v][0];
   for (int i = 0; i < (N+1)*(N+1) ; ++i) {

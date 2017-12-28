@@ -154,7 +154,7 @@ int main() {
     a->SetLimiter("LiliaMoment");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    //a->plot("Output3.vtk");
+    a->plot("Output3.vtk");
     
 
     delete a;

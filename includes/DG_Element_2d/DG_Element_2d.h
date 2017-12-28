@@ -77,7 +77,7 @@ public:
     vector<int> boundaryVariables; /// This is the variable which stores the name of all the variables whose boundary and neighboring points are stored. 
     vector<int> variableOnlyAtBoundary; // This stores all the variables which are required only at the Boundaries.
 
-    vector< bool> OutFlow; /// Map to flag outflow boundaries of each cell.
+    bool OutFlow[4]; /// Map to flag outflow boundaries of each cell.
 
     bool PositivityMarker;
    
