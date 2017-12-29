@@ -266,7 +266,7 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 100;
+    int time_steps = 10;
     double CFL = 0.2;
     double time = 0.25;
     EulerSolver* a;

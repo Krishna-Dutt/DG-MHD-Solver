@@ -488,8 +488,8 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
 
-  field->updateOutFlowBoundary(Vx, Vy);
-  field->updateCellMarker(D, CellMarker);
+  //field->updateOutFlowBoundary(Vx, Vy);
+  //field->updateCellMarker(D, CellMarker);
 
   return ;
 }
@@ -521,8 +521,8 @@ void EulerSolver::SetLimiterVariables() {
 
 void EulerSolver::RunLimiter() {
   if ( Limiter == "LiliaMoment") {
-    field->resetPositivity();
-    field->ResetVariables_CellCentered(CellMarker, 1.5);
+    field->resetPositivity(true);
+    
     Run_LiliaMomentLimiter(DVx);
     Run_LiliaMomentLimiter(DVy);
     Run_LiliaMomentLimiter(DE);
@@ -544,9 +544,12 @@ void EulerSolver::Run_LiliaMomentLimiter(int v) {
 }
 
 void EulerSolver::RunPositivityLimiter() {
-  field->resetPositivity();
+  
   if ( Limiter == "LiliaMoment") {
+    field->ResetVariables_CellCentered(CellMarker, 1.5);
+
     updatePrimitiveVariables();
+    field->resetPositivity(false);
     checkPositivity();
     Run_PositivityMomentLimiter(DVx, N+2);
     Run_PositivityMomentLimiter(DVy, N+2);
@@ -555,6 +558,7 @@ void EulerSolver::RunPositivityLimiter() {
     
 
     updatePrimitiveVariables();
+    field->resetPositivity(false);
     checkPositivity();
     Run_PositivityMomentLimiter(DVx, 0);
     Run_PositivityMomentLimiter(DVy, 0);

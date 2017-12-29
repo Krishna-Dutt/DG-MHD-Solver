@@ -101,7 +101,7 @@ public:
 
     // Function to check Positivity of data stored in cell .
     void checkPositivity(int v, int cm, string level);
-    void resetPositivity();
+    void resetPositivity(bool v);
 
 
     // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables

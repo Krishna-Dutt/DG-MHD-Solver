@@ -1142,7 +1142,21 @@ double DG_Field_2d::l2Norm(int v1, int v2) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::checkPositivity(int v, int cm, string level) {
-     for(int i = 0; i < ne_x; i++)
+     int a, k;
+     //if( level == "One")
+      {
+         for(int i=0; i <ne_x; ++i) {
+             for(int j=0; j<ne_y; ++j) {
+                 a = (N+1)*(N+1)*(i*ne_y + j);
+                 k = 0;
+                 while( (k < (N+1)*(N+1)) && !PositivityMarker[i*ne_y + j] ) {
+                     if(domainVariable[v][a + k] < 0) PositivityMarker[i*ne_y + j] = true;
+                     k++;
+                 }
+             }
+         }
+     }
+     /*for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
            // if ( cellcenterVariable[cm][i*ne_y + j]) 
             { 
@@ -1153,7 +1167,7 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
                 else if(!PositivityMarker[i*ne_y + j] ) {
                     PositivityMarker[i*ne_y + j] = elements[i][j]->checkPositivity(v, level);
                 }
-        } 
+        } */
             
     return;
 }
@@ -1161,13 +1175,14 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
 /* ----------------------------------------------------------------------------*/
 /**
  * @Synopsis  This function resets the positivity markers in cell.
- *
+ * 
+ * @Param v Either true or false
  */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::resetPositivity() {
+void DG_Field_2d::resetPositivity( bool v) {
      for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            PositivityMarker[i*ne_y + j] = true;
+            PositivityMarker[i*ne_y + j] = v;
 
     return;
 }
