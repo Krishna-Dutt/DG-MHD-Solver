@@ -766,6 +766,111 @@ void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
   return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to limit the Moments for given variable, using Characteristic Limiter.
+ * 
+ * @Param array V array of indices of moments of Conservative Variables.
+ * @Param C moment of characteristic variables, to store modified moments.
+ * @Param cm This the cell marker used to identified troubled cells.
+ * @Param Index Index correspoding to Characteristic variable.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::limitMoments(int V[], int C, int cm, unsigned Index) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j)  {
+        if ( cellcenterVariable[cm][i*ne_y + j] ) {
+      elements[i][j]->limitMoments(V, C, cm, Index);
+      }
+    }
+
+  return ;
+}
+
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function which sets the Right and Left Eigen Matrix corresponding to directionalong flow
+ * 
+ * @Param dimension Dimension os system of Equations
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setEigenMatrices(unsigned _dimension) {
+  
+  Dimension = _dimension;
+  for (int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+     elements[i][j]->setEigenMatrices(_dimension);
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to find  the Right and Left Eigen Matrix corresponding to direction along flow
+ * 
+ * @Param array V array of strings corresponding to field variables required to compute eigne matrices.
+ * @Param cm Cell Marker ,to identify troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::findEigenMatrices(int V[], int cm) {
+  
+  for (int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j)  {
+        if ( cellcenterVariable[cm][i*ne_y + j] ) {
+            elements[i][j]->findEigenMatrices( V, cm);
+        }
+    }
+
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to compute Characteristic Variables.
+ * 
+ * @Param array V Set of conservative variables..
+ * @Param c The Characteristic Variable.
+ * @Param I Identifier for Characteristic Variable.
+ * @Param cm Cell Marker to identify troubled cell.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::convertVariabletoCharacteristic(int V[], int c, unsigned I, int cm) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j)  {
+        if ( cellcenterVariable[cm][i*ne_y + j] ) {
+              elements[i][j]->convertVariabletoCharacteristic(V, c, I, cm);
+        }
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to compute Conservative  Variables from Characteristic Variables.
+ * 
+ * @Param array C Set of characteristic variables..
+ * @Param v The Conservative Variable.
+ * @Param I Identifier for conservative Variable.
+ * @Param cm Cell Marker to identify troubled cell.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::convertCharacteristictoVariable(int C[], int v, unsigned I, int cm) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j)  {
+        if ( cellcenterVariable[cm][i*ne_y + j] ) {
+             elements[i][j]->convertCharacteristictoVariable(C, v, I, cm);
+        }
+    }
+
+  return ;
+}
+
+
 
 
 /* ----------------------------------------------------------------------------*/

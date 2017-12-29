@@ -571,51 +571,15 @@ void EulerSolver::SetLimiterVariables() {
 }
 
 void EulerSolver::RunLimiter() {
+  field->resetPositivity(true);
+  
   if ( Limiter == "LiliaMoment") {
-    field->resetPositivity(true);
-    
+        
     Run_LiliaMomentLimiter(DVx);
     Run_LiliaMomentLimiter(DVy);
     Run_LiliaMomentLimiter(DE);
     Run_LiliaMomentLimiter(D);
     //Run_LiliaMomentLimiter(T); // If needed, else compute it later using q and P ..
-  }
-
-  return ;
-}
-
-void EulerSolver::Run_LiliaMomentLimiter(int v) {
-  field->computeMoments(v, Moment, CellMarker);
-  //field->computeMoments(v, ModMoment);
-  field->setFunctionsForVariables(1.0, Moment, Copy, ModMoment);
-  field->limitMoments(Moment, ModMoment, CellMarker, (N+1)*(N+1)-1);
-  field->convertMomentToVariable(ModMoment, v, CellMarker);
-
-  return ;
-}
-
-void EulerSolver::RunPositivityLimiter() {
-  
-  if ( Limiter == "LiliaMoment") {
-    field->ResetVariables_CellCentered(CellMarker, 1.5);
-
-    updatePrimitiveVariables();
-    field->resetPositivity(false);
-    checkPositivity();
-    Run_PositivityMomentLimiter(DVx, N+2);
-    Run_PositivityMomentLimiter(DVy, N+2);
-    Run_PositivityMomentLimiter(DE, N+2);
-    Run_PositivityMomentLimiter(D, N+2);
-    
-
-    updatePrimitiveVariables();
-    field->resetPositivity(false);
-    checkPositivity();
-    Run_PositivityMomentLimiter(DVx, 0);
-    Run_PositivityMomentLimiter(DVy, 0);
-    Run_PositivityMomentLimiter(DE, 0);
-    Run_PositivityMomentLimiter(D, 0);
-    //Run_PositivityMomentLimiter(T, N+2); // If needed, else compute it later using q and P ..
   }
 
   else if(Limiter == "CharacteristicLimiter") {
@@ -659,6 +623,43 @@ void EulerSolver::RunPositivityLimiter() {
     field->convertMomentToVariable(HMoment, DE, CellMarker);
   }
 
+
+  return ;
+}
+
+void EulerSolver::Run_LiliaMomentLimiter(int v) {
+  field->computeMoments(v, Moment, CellMarker);
+  //field->computeMoments(v, ModMoment);
+  field->setFunctionsForVariables(1.0, Moment, Copy, ModMoment);
+  field->limitMoments(Moment, ModMoment, CellMarker, (N+1)*(N+1)-1);
+  field->convertMomentToVariable(ModMoment, v, CellMarker);
+
+  return ;
+}
+
+void EulerSolver::RunPositivityLimiter() {
+  
+  if ( Limiter == "LiliaMoment") {
+    field->ResetVariables_CellCentered(CellMarker, 1.5);
+
+    updatePrimitiveVariables();
+    field->resetPositivity(false);
+    checkPositivity();
+    Run_PositivityMomentLimiter(DVx, N+2);
+    Run_PositivityMomentLimiter(DVy, N+2);
+    Run_PositivityMomentLimiter(DE, N+2);
+    Run_PositivityMomentLimiter(D, N+2);
+    
+
+    updatePrimitiveVariables();
+    field->resetPositivity(false);
+    checkPositivity();
+    Run_PositivityMomentLimiter(DVx, 0);
+    Run_PositivityMomentLimiter(DVy, 0);
+    Run_PositivityMomentLimiter(DE, 0);
+    Run_PositivityMomentLimiter(D, 0);
+    //Run_PositivityMomentLimiter(T, N+2); // If needed, else compute it later using q and P ..
+  }
 
   return ;
 }
