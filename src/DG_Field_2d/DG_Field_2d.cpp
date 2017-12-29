@@ -151,7 +151,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             elements[i][j]->setTransposederivateMatrix_y(TransposederivativeMatrix_y);
 
         }
-
+    
     variableNames.resize(0);
     variablesWithBoundaryInfo.resize(0);
     variableOnlyAtBoundary.resize(0);
@@ -546,10 +546,11 @@ void DG_Field_2d::updateBoundaryVariables(int v) {
 /**
  * @Synopsis  This function adds the variable to each and every element. In this the boundary points are not
  * specifically stored in each element.
- *
+ * 
+ * @Param V The name of the variable begin added
  */
 /* ----------------------------------------------------------------------------*/
-int DG_Field_2d::addVariable_withBounary() {
+int DG_Field_2d::addVariable_withBounary(string V) {
     double *newVariable = new double[(N+1)*(N+1)*ne_x*ne_y]; /// Allocating the space for the new variable which is to be created.
     int v;
 
@@ -566,8 +567,9 @@ int DG_Field_2d::addVariable_withBounary() {
            elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
        }
    }
-   variableNames.push_back(v);
+   boundaryVariableNames[v] = V;
    variablesWithBoundaryInfo.push_back(v);
+   variableNames.push_back(v);
 
    //scal(0.0, v);
 
@@ -594,6 +596,7 @@ int DG_Field_2d::addVariable_withoutBounary() {
            elements[i][j]->addVariable_withoutBoundary(v, newVariable + (N+1)*(N+1)*(ne_y*i + j) ); // Adding the variable for the (i, j) th element.
        }
    }
+   
    variableNames.push_back(v);
    //scal(0.0, v);
 
@@ -819,16 +822,16 @@ void DG_Field_2d::writeVTK(string fileName){
     
     pFile << "POINT_DATA\t"<< (N+1)*(N+1)*ne_x*ne_y <<"\n";
     
-    int noOfVars = variableNames.size(); // Getting the number of variables
+    //int noOfVars = variableNames.size(); // Getting the number of variables
     double* currentVariable;
 
-    for(k1=0; k1<noOfVars; k1++) {
-        pFile << "SCALARS\t"<< variableNames[k1] <<"\tdouble\nLOOKUP_TABLE default\n";
+    for(map<int,string>::iterator itr = boundaryVariableNames.begin(); itr!= boundaryVariableNames.end(); ++itr) {
+        pFile << "SCALARS\t"<< itr->second <<"\tdouble\nLOOKUP_TABLE default\n";
         
-        // Writing the value of the POINT_DATA, for the variable[variableNames[k1]] 
+        // Writing the value of the POINT_DATA, for the variable
         for ( j = 0; j < ne_y; j++ ){
             for ( i = 0; i < ne_x; i++ ) {
-                currentVariable = elements[i][j]->variable[variableNames[k1]];
+                currentVariable = elements[i][j]->variable[itr->first];
                 for( k = 0; k < (N+1)*(N+1); k++ ) {
                     pFile << currentVariable[k] << endl;
                 }

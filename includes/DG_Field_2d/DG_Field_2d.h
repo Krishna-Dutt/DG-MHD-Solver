@@ -29,6 +29,7 @@ public:
     vector<double*> cellcenterVariable; // To store variables with only one value per element
     vector<bool> PositivityMarker;
 
+    map<int, string> boundaryVariableNames;
     vector<int> variableNames; // This is stores all the variables which have been added to the field.
     vector<int> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
     vector<int> variableOnlyAtBoundary; // This stores all the variables who are required only at the Boundaries.
@@ -38,7 +39,7 @@ public:
 
     void setSystem(string S);
 
-    int addVariable_withBounary();
+    int addVariable_withBounary(string V);
     int addVariable_withoutBounary();
     int addVariable_onlyBounary();
     int addVariable_CellCentered();

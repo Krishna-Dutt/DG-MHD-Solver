@@ -15,13 +15,13 @@ void AdvectionSolver::setDomain(double _x1, double _y1, double _x2, double _y2) 
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
 
-    D = field->addVariable_withBounary(); // q 0 
+    D = field->addVariable_withBounary("q"); // q 0 
     return ;
 }
 
 void AdvectionSolver::setVelocity(function<double(double, double)>U, function<double(double, double)>V) {
-    Vx = field->addVariable_withBounary(); // u 1
-    Vy = field->addVariable_withBounary(); // v 2
+    Vx = field->addVariable_withBounary("u"); // u 1
+    Vy = field->addVariable_withBounary("v"); // v 2
     field->initializeVariable(Vx, U);
     field->initializeVariable(Vy, V);
     return ;
@@ -63,8 +63,8 @@ void AxpBy(double a, double* x, double b, double* y, unsigned index, unsigned N,
 
 void AdvectionSolver::solve() {
     DqDt = field->addVariable_withoutBounary(); // dqdt 3
-    VxD  = field->addVariable_withBounary(); // uq 4
-    VyD  = field->addVariable_withBounary(); // vq 5
+    VxD  = field->addVariable_withBounary("qu"); // uq 4
+    VyD  = field->addVariable_withBounary("qv"); // vq 5
 
     DVxdDx = field->addVariable_withoutBounary(); // duqdx 6
     DVydDy = field->addVariable_withoutBounary(); // dvqdy 7
@@ -127,7 +127,7 @@ void AdvectionSolver::plot(string filename) {
 }
 
 void AdvectionSolver::FindL2Norm(function<double(double, double)> Density ) {
-  DAnalyt = field->addVariable_withBounary(); // qAnalytical 11
+  DAnalyt = field->addVariable_withBounary("qAnalytic"); // qAnalytical 11
   
   ZERO = field->addVariable_withoutBounary(); // Zero 12
   field->scal(0.0,ZERO);

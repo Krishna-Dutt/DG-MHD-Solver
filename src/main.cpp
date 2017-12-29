@@ -66,9 +66,89 @@ double AnalyticalVelocity(double x, double y) {
 }*/
 
 
-
-
 double U(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.8939;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}
+
+double V(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.0;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.8939 ;
+  }
+}
+
+
+double IDensity(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.1 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.5065 ;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 1.1 ;
+  }
+  else {
+    return 0.5065 ;
+  }
+}
+
+double IPressure(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.1 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.35 ;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 1.1 ;
+  }
+  else {
+    return 0.35 ;
+  }
+}
+
+double StateEq(double D, double T) {
+  return D*R*T;
+}
+
+double ITemperature(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 1.0/(R*1.0) ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 1.0/(R*2.0) ;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 1.0/(R*1.0) ;
+  }
+  else {
+    return 1.0/(R*3.0) ;
+  }
+}
+
+
+
+/*double U(double x, double y) {
   if ( x <= 0.5 && y <= 0.5 ) {
     return 0.0;//0.8939;//-0.7259 ;
   }
@@ -147,6 +227,7 @@ double ITemperature(double x, double y) {
     return 0.35/(R*0.5065);//0.4/(R*0.5197) ;
   }
 }
+*/
 
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
 double AnalyticalDensity(double x, double y) {
@@ -209,7 +290,7 @@ int main() {
    //a->setViscousFlux();
     a->setAuxillaryVariables();
 
-    a->SetShockDetector("KXRC");
+    a->SetShockDetector("KXRCF");
     a->SetLimiter("LiliaMoment");
     a->solve();
     a->FindL2Norm(IDensity, U);
