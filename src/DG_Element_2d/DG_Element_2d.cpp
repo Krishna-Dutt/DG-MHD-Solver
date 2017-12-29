@@ -86,6 +86,12 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
     */
     OutFlow[0] = OutFlow[1] = OutFlow[2] = OutFlow[3] = true;
 
+    RightEigenMatrix = NULL;
+    LeftEigenMatrix  = NULL;
+    
+    Dimension = 4;
+
+
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -152,6 +158,10 @@ void DG_Element_2d::Destroy_Matrices() {
     if ( vanderMandMatrix != NULL){
       delete[] vanderMandMatrix;
       delete[] inverseVanderMandMatrix;
+    }
+    if (RightEigenMatrix != NULL){
+        delete[] RightEigenMatrix;
+        delete[] LeftEigenMatrix;
     }
 
     return ;
@@ -663,6 +673,266 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
 
   return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to limit the Moments for given variable, using Characteristic Limiter.
+ * 
+ * @Param array V array of moments of Conservative Variables.
+ * @Param C   moment of characteristic variables, to store modified moments.
+ * @Param Index Index correspoding to Characteristic variable.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::limitMoments(int V[], int C, unsigned Index) {
+  { 
+    int count, Tempi, Tempj, i, j;
+    double Temp1, Temp2, AlphaN;
+    double epsilon = 1e-13;
+    count = N+1;
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+    vector<double> Var1, Var2 ;
+    double Sum1, Sum2, Sum3, Sum4;
+    
+    if ( N == 1) {
+        epsilon = 0.0 ;
+    }
+    else {
+        epsilon = 1e-16;
+    }
+
+        for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
+          --count;
+          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+          //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
+          //AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
+          for(j=0; j < count; ++j) {
+             Tempi = i-j;
+             Tempj = i - j*(N+1);
+
+             Sum1 = Sum2 = Sum3 = Sum4 = 0;
+             for(int z=0; z<V.size(); ++z) {
+                 Sum1 += LeftEigenMatrix[Index*V.size()+z] * rightNeighbor->variable[V[z]][Tempi-1];
+                 Sum2 += LeftEigenMatrix[Index*V.size()+z] * leftNeighbor->variable[V[z]][Tempi-1]; 
+                 Sum3 += LeftEigenMatrix[Index*V.size()+z] * topNeighbor->variable[V[z]][Tempi-(N+1)];
+                 Sum4 += LeftEigenMatrix[Index*V.size()+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)];   
+             }
+
+             Temp1 = MinMod(variable[C][Tempi], AlphaN*(Sum1 -variable[C][Tempi-1]), AlphaN*(variable[C][Tempi-1] -Sum2), AlphaN*(Sum3 -variable[C][Tempi-(N+1)]), AlphaN*(variable[C][Tempi-(N+1)] -Sum4));
+                          
+             Sum1 = Sum2 = Sum3 = Sum4 = 0;
+             for(int z=0; z<V.size(); ++z) {
+                 Sum1 += LeftEigenMatrix[Index*V.size()+z] * rightNeighbor->variable[V[z]][Tempj-1];
+                 Sum2 += LeftEigenMatrix[Index*V.size()+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum3 += LeftEigenMatrix[Index*V.size()+z] * topNeighbor->variable[V[z]][Tempj-(N+1)];
+                 Sum4 += LeftEigenMatrix[Index*V.size()+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
+             }
+
+             Temp2 = MinMod(variable[C][Tempj], AlphaN*(Sum1 -variable[C][Tempj-1]), AlphaN*(variable[C][Tempj-1] -Sum2), AlphaN*(Sum3 -variable[C][Tempj-(N+1)]), AlphaN*(variable[C][Tempj-(N+1)] -Sum4));
+
+             if (abs(Temp1-variable[C][Tempi]) > epsilon || abs(Temp2-variable[C][Tempj]) > epsilon ) {
+                 variable[C][Tempi] = Temp1;
+                 variable[C][Tempj] = Temp2;
+             }
+             else {
+                 return ;
+             }
+          } 
+             // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
+             Tempi = i-j;
+             Tempj = i - j*(N+1);
+    
+             Sum1 = Sum2 = Sum3 = Sum4 = 0;
+             for(int z=0; z<V.size(); ++z) {
+                 Sum1 += LeftEigenMatrix[Index*V.size()+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
+                 Sum2 += LeftEigenMatrix[Index*V.size()+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
+                 Sum3 += LeftEigenMatrix[Index*V.size()+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum4 += LeftEigenMatrix[Index*V.size()+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
+             }
+            
+             Temp1 = MinMod(variable[C][Tempi], AlphaN*(Sum1 -variable[C][Tempi-(N+1)]), AlphaN*(variable[C][Tempi-(N+1)] -Sum2));
+             Temp2 = MinMod(variable[C][Tempj], AlphaN*(Sum3 -variable[C][Tempj-1]), AlphaN*(variable[C][Tempj-1] -Sum4));
+             
+             if ( abs(Temp1-variable[C][Tempi]) > epsilon || abs(Temp2-variable[C][Tempj]) > epsilon ) {
+                variable[C][Tempi] = Temp1;
+                variable[C][Tempj] = Temp2;
+             }
+             else {
+                 return ;
+             }
+        }
+
+   }
+
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function which sets the Right and Left Eigen Matrix corresponding to directionalong flow
+ * 
+ * @Param dimension No of systme of Equations
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::setEigenMatrices(unsigned dimension) {
+  
+ RightEigenMatrix = new double[dimension*dimension];
+ LeftEigenMatrix = new double[dimension*dimension];
+
+ Dimension = dimension;
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to find  the Right and Left Eigen Matrix corresponding to direction along flow
+ * 
+ * @Param array V array of index corresponding to field variables required to compute eigen matrices.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::findEigenMatrices(int V[]) {
+  double u, v, c, H, P;
+  double epsilon = 1e-10;
+  double q, qn, nx, ny, qe;
+  double DVx, DVy, D, DE, dPdx, dPdy;
+  DVx = variable[V[0]][0];
+  DVy = variable[V[1]][0];
+  D   = variable[V[2]][0];
+  DE  = variable[V[3]][0];
+  dPdx = variable[V[4]][0];
+  dPdy = variable[V[5]][0];
+  
+  u = DVx/D;
+  v = DVy/D;
+  //dPdx = variable["dPdxMoment"][0];
+  //dPdy = variable["dPdyMoment"][0];
+
+ /* if ( abs(u*v) > epsilon || abs(u) > epsilon || abs(v) > epsilon ) {
+      nx = u/sqrt(u*u + v*v);
+      ny = v/sqrt(u*u + v*v);
+  }
+  else 
+  {
+      nx = 1.0; // Asuming 1D flow in x direction
+      ny = 0.0;
+  }*/
+  if (  abs(dPdx) > epsilon || abs(dPdy) > epsilon ) {
+      nx = dPdx/sqrt(dPdx*dPdx + dPdy*dPdy);
+      ny = dPdy/sqrt(dPdx*dPdx + dPdy*dPdy);
+  }
+  else 
+  {
+      nx = 1.0; // Asuming 1D flow in x direction
+      ny = 0.0;
+  }
+
+  qn = u*nx + v*ny ;
+  q = sqrt(u*u + v*v);
+  qe = -u*ny + v*nx;
+  P = (gamma-1.0) * ( DE - 0.5*q*q*D ); // Twice pressure
+  c = sqrt(gamma*P/D);
+  H =  c*c/(gamma-1.0) + 0.5*q*q;  // 0.5 * variable[V[4]][0];// Dividing by 2 to get actual cell average , as normalised Legendre Basis is used to compute moments
+  // Change later if this works
+
+  
+
+  // Setting Right Eigen Matrix
+  RightEigenMatrix[0] = RightEigenMatrix[1] = RightEigenMatrix[2] = 1.0 ;
+  RightEigenMatrix[3] = 0.0;
+  RightEigenMatrix[4] = u - c*nx;
+  RightEigenMatrix[5] = u;
+  RightEigenMatrix[6] = u + c*nx;
+  RightEigenMatrix[7] = -ny;
+  RightEigenMatrix[8] = v - c*ny;
+  RightEigenMatrix[9] = v;
+  RightEigenMatrix[10] = v + c*ny;
+  RightEigenMatrix[11] = nx;
+  RightEigenMatrix[12] = H - qn*c;
+  RightEigenMatrix[13] = 0.5 *q*q;
+  RightEigenMatrix[14] = H + qn*c;
+  RightEigenMatrix[15] = qe;
+
+  /*for(int i=0; i < 4; ++i){
+      for(int j=0; j<4; ++j) 
+      cout << RightEigenMatrix[i*4+j] << " ";
+      cout << "\n";
+  }*/
+
+  // Setting Left Eigen Matrix;
+  //inverse(RightEigenMatrix,LeftEigenMatrix,Dimension*Dimension);
+  LeftEigenMatrix[0] = 0.5 * (0.5*(gamma-1.0)*pow(q/c,2.0) + qn/c);
+  LeftEigenMatrix[1] = -0.5*( (gamma -1.0)*u/(c*c) + nx/c);
+  LeftEigenMatrix[2] = -0.5*( (gamma -1.0)*v/(c*c) + ny/c);
+  LeftEigenMatrix[3] = 0.5 * (gamma-1.0)/(c*c);
+  LeftEigenMatrix[4] = 1.0 - 0.5 * (gamma-1.0)*pow(q/c,2.0);
+  LeftEigenMatrix[5] = (gamma-1.0)*u/(c*c);
+  LeftEigenMatrix[6] = (gamma-1.0)*v/(c*c);
+  LeftEigenMatrix[7] = -(gamma-1.0)/(c*c);
+  LeftEigenMatrix[8] = 0.5 * (0.5*(gamma-1.0)*pow(q/c,2.0) - qn/c);
+  LeftEigenMatrix[9] = -0.5*( (gamma -1.0)*u/(c*c) - nx/c);
+  LeftEigenMatrix[10] = -0.5*( (gamma -1.0)*v/(c*c) - ny/c);
+  LeftEigenMatrix[11] = 0.5 * (gamma-1.0)/(c*c);
+  LeftEigenMatrix[12] = -qe;
+  LeftEigenMatrix[13] = -ny;
+  LeftEigenMatrix[14] = nx;
+  LeftEigenMatrix[15] = 0.0;
+  
+  /*cout << "\n";
+  for(int i=0; i < 4; ++i){
+      for(int j=0; j<4; ++j) 
+      cout << LeftEigenMatrix[i*4+j] << " ";
+      cout << "\n";
+  }*/
+ 
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to compute Characteristic Variables.
+ * 
+ * @Param int V Set of conservative variables..
+ * @Param c The Characteristic Variable.
+ * @Param I Identifier for Characteristic Variable.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::convertVariabletoCharacteristic(int V, int c, unsigned I) {
+    double Sum = 0.0;
+    for(int i=0; i< (N+1)*(N+1); ++i) {
+        Sum = 0.0;
+        for(int j=0; j < V.size(); ++j){
+            Sum += variable[V[j]][i]*LeftEigenMatrix[I+j];
+        }     
+        variable[c][i] = Sum;
+    } 
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to compute Conservative  Variables from Characteristic Variables.
+ * 
+ * @Param array C Set of characteristic variables..
+ * @Param v The Conservative Variable.
+ * @Param I Identifier for conservative Variable.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::convertCharacteristictoVariable(int C[], int v, unsigned I) {
+    double Sum = 0.0;
+    for(int i=0; i< (N+1)*(N+1); ++i) {
+        Sum = 0.0;
+        for(int j=0; j < C.size(); ++j){
+            Sum += variable[C[j]][i]*RightEigenMatrix[I+j];
+        }     
+        variable[v][i] = Sum;
+    }  
+
+    return ;
+}
+
 
 
 /* ----------------------------------------------------------------------------*/

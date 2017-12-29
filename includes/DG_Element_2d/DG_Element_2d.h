@@ -56,7 +56,8 @@ protected:
 
     string System; // System of Governing Equations being solved !!
 
-    
+    double *RightEigenMatrix, *LeftEigenMatrix;
+    unsigned Dimension;    
 
 public:
 
