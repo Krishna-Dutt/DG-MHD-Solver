@@ -7,6 +7,67 @@
 using namespace std;
 
 
+/*double U(double x, double y) {
+  if (x < 0.5) {
+    return 1.0;
+  }
+  else {
+    return 1.0;
+  }
+}
+
+double V(double x, double y) {
+  if (x < 0.5) {
+    return -0.5;
+  }
+  else {
+    return -0.5;
+  }
+}
+
+
+double IDensity(double x, double y) {
+  return 1.0 + 0.2*sin(M_PI*(x+y)) ;
+}
+
+double IPressure(double x, double y) {
+  return 1.0 ;
+}
+
+double StateEq(double D, double T) {
+  return D*R*T;
+}
+
+double ITemperature(double x, double y) {
+   return 1.0/(R*(1.0 + 0.2*sin(M_PI*(x+y)))) ;
+}
+
+// Analytical solutions of Density  at t = 0.2 secs, for 2D Smooth Problem
+double AnalyticalDensity(double x, double y) {
+  double t = 4.0;
+  return 1.0 + 0.2*sin(M_PI*(x+y -t*(0.5) )) ;
+
+  
+}
+
+double AnalyticalVelocity(double x, double y) {
+  if (0.0 <= x && x <= 0.26) {
+    return 0.0 ;
+  }
+  else if (0.26 <= x && x <= 0.485) {
+    return (x-0.26)*(0.926)/(0.485-0.26) ;
+  }
+  else if (0.485 <= x & x <= 0.852) {
+    return 0.926 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}*/
+
+
+
+
 double U(double x, double y) {
   if ( x <= 0.5 && y <= 0.5 ) {
     return 0.0;//0.8939;//-0.7259 ;
@@ -87,8 +148,6 @@ double ITemperature(double x, double y) {
   }
 }
 
-
-
 // Analytical solutions of Density and Pressure at t = 0.2 secs, for 1D Sod's Shock Tube
 double AnalyticalDensity(double x, double y) {
   if (0.0 <= x && x <= 0.26) {
@@ -126,12 +185,13 @@ double AnalyticalVelocity(double x, double y) {
 int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 1;
+    int time_steps = 100;
     double CFL = 0.2;
     double time = 0.25;
     EulerSolver* a;
     a = new EulerSolver(200, 200, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
+    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -149,8 +209,7 @@ int main() {
    //a->setViscousFlux();
     a->setAuxillaryVariables();
 
-    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
-    a->SetShockDetector("KXRCF");
+    a->SetShockDetector("KXRC");
     a->SetLimiter("LiliaMoment");
     a->solve();
     a->FindL2Norm(IDensity, U);

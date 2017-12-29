@@ -12,5 +12,7 @@
 #include <cblas.h>
 #include <fstream>
 
+#define _USE_MATH_DEFINES
+
 using namespace std;
 #endif
