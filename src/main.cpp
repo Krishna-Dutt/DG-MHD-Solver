@@ -268,9 +268,9 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.2;
-    double time = 0.25;
+    double time = 0.0;
     EulerSolver* a;
-    a = new EulerSolver(200, 200, 1);
+    a = new EulerSolver(10, 10, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);

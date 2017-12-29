@@ -521,12 +521,10 @@ void EulerSolver::SetLimiterVariables() {
     uMoment = field->addVariable_withoutBounary();
     vMoment = field->addVariable_withoutBounary();
     qMoment = field->addVariable_withoutBounary();
-    PMoment = field->addVariable_withoutBounary();
     HMoment = field->addVariable_withoutBounary();
     field->scal(0.0, uMoment);
     field->scal(0.0, vMoment);
     field->scal(0.0, qMoment);
-    field->scal(0.0, PMoment);
     field->scal(0.0, HMoment);
 
     Char1 = field->addVariable_withoutBounary();
@@ -544,26 +542,6 @@ void EulerSolver::SetLimiterVariables() {
     dPdyMoment = field->addVariable_withoutBounary();
     field->scal(0.0, dPdxMoment);
     field->scal(0.0, dPdyMoment);
-
-
-    AuxillaryVariables["V"].resize(0);
-    AuxillaryVariables["V"].push_back("qMoment");
-    AuxillaryVariables["V"].push_back("uMoment");
-    AuxillaryVariables["V"].push_back("vMoment");
-    AuxillaryVariables["V"].push_back("HMoment");
-
-    AuxillaryVariables["C"].resize(0);
-    AuxillaryVariables["C"].push_back("Char1");
-    AuxillaryVariables["C"].push_back("Char2");
-    AuxillaryVariables["C"].push_back("Char3");
-    AuxillaryVariables["C"].push_back("Char4");
-
-    AuxillaryVariables["M"].resize(0);
-    AuxillaryVariables["M"].push_back("uMoment");
-    AuxillaryVariables["M"].push_back("vMoment");
-    AuxillaryVariables["M"].push_back("qMoment");
-    AuxillaryVariables["M"].push_back("PMoment");
-    AuxillaryVariables["M"].push_back("HMoment");
 
   }
 
@@ -583,11 +561,13 @@ void EulerSolver::RunLimiter() {
   }
 
   else if(Limiter == "CharacteristicLimiter") {
+    int AuxVarM[6] = {uMoment, vMoment, qMoment, HMoment, dPdxMoment, dPdyMoment};
+    int AuxVarV[4] = {qMoment, uMoment, vMoment, HMoment};
+    int AuxVarC[4] = {Char1, Char2, Char3, Char4};
   
     field->computeMoments(DVx, uMoment, CellMarker);
     field->computeMoments(DVy, vMoment, CellMarker);
     field->computeMoments(D, qMoment, CellMarker);
-    field->computeMoments(P, PMoment, CellMarker);
     field->computeMoments(DE, HMoment, CellMarker);
 
     // Finding gradient of  Density //Pressure
@@ -597,25 +577,25 @@ void EulerSolver::RunLimiter() {
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
 
 
-    field->findEigenMatrices(AuxillaryVariables["M"], CellMarker);
+    field->findEigenMatrices(AuxVarM, CellMarker);
 
     // Find Characteristic Variables 
-    field->convertVariabletoCharacteristic(AuxillaryVariables["V"], "Char1", 0, CellMarker);
-    field->convertVariabletoCharacteristic(AuxillaryVariables["V"], "Char2", 4, CellMarker);
-    field->convertVariabletoCharacteristic(AuxillaryVariables["V"], "Char3", 8, CellMarker);
-    field->convertVariabletoCharacteristic(AuxillaryVariables["V"], "Char4", 12, CellMarker);
+    field->convertVariabletoCharacteristic(AuxVarV, Char1, 0, CellMarker);
+    field->convertVariabletoCharacteristic(AuxVarV, Char2, 4, CellMarker);
+    field->convertVariabletoCharacteristic(AuxVarV, Char3, 8, CellMarker);
+    field->convertVariabletoCharacteristic(AuxVarV, Char4, 12, CellMarker);
 
     // Limiting Characteristic Variables ;
-    field->limitMoments(AuxillaryVariables["V"], Char1, CellMarker, 0);
-    field->limitMoments(AuxillaryVariables["V"], Char2, CellMarker, 1);
-    field->limitMoments(AuxillaryVariables["V"], Char3, CellMarker, 2);
-    field->limitMoments(AuxillaryVariables["V"], Char4, CellMarker, 3);
+    field->limitMoments(AuxVarV, Char1, CellMarker, 0);
+    field->limitMoments(AuxVarV, Char2, CellMarker, 1);
+    field->limitMoments(AuxVarV, Char3, CellMarker, 2);
+    field->limitMoments(AuxVarV, Char4, CellMarker, 3);
 
     // update Conservative Variables
-    field->convertCharacteristictoVariable(AuxillaryVariables["C"], "qMoment", 0, CellMarker);
-    field->convertCharacteristictoVariable(AuxillaryVariables["C"], "uMoment", 4, CellMarker);
-    field->convertCharacteristictoVariable(AuxillaryVariables["C"], "vMoment", 8, CellMarker);
-    field->convertCharacteristictoVariable(AuxillaryVariables["C"], "HMoment", 12, CellMarker);
+    field->convertCharacteristictoVariable(AuxVarC, qMoment, 0, CellMarker);
+    field->convertCharacteristictoVariable(AuxVarC, uMoment, 4, CellMarker);
+    field->convertCharacteristictoVariable(AuxVarC, vMoment, 8, CellMarker);
+    field->convertCharacteristictoVariable(AuxVarC, HMoment, 12, CellMarker);
 
     field->convertMomentToVariable(qMoment, D, CellMarker);
     field->convertMomentToVariable(uMoment, DVx, CellMarker);

@@ -40,9 +40,12 @@ private:
     // Limiter
     int Moment, ModMoment;
     // Add corresponding variables for Characteristic Limiter
+    int uMoment, vMoment, qMoment, HMoment, dPdxMoment, dPdyMoment;
+    int Char1, Char2, Char3, Char4;
+    int dPdx, dPdy;
 
-   // cell centered variables
-   int Dx, Dt, UMax, CellMarker; 
+    // cell centered variables
+    int Dx, Dt, UMax, CellMarker; 
 
 public:
     /* ----------------------------------------------------------------------------*/

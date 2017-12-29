@@ -72,6 +72,13 @@ public:
     void limitMoments(int m, int modifiedm, int cm, unsigned Index);
     void convertMomentToVariable(int m, int v, int cm);
 
+    // Functions to handle Characteristic Moment Limiter
+    void convertCharacteristictoVariable(int *C, int v, unsigned I, int cm);
+    void convertVariabletoCharacteristic(int *V, int c, unsigned I, int cm);
+    void findEigenMatrices(int *V, int cm);
+    void setEigenMatrices(unsigned _dimension);
+    void limitMoments(int *V, int C, int cm, unsigned Index);
+
     // Function to Reset Cell Centered Variables 
     void ResetVariables_CellCentered(int v, double value = 0.0);
     

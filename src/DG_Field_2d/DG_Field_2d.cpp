@@ -776,11 +776,11 @@ void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
  * @Param Index Index correspoding to Characteristic variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::limitMoments(int V[], int C, int cm, unsigned Index) {
+void DG_Field_2d::limitMoments(int *V, int C, int cm, unsigned Index) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-      elements[i][j]->limitMoments(V, C, cm, Index);
+      elements[i][j]->limitMoments(V, C, Index);
       }
     }
 
@@ -815,12 +815,12 @@ void DG_Field_2d::setEigenMatrices(unsigned _dimension) {
  * @Param cm Cell Marker ,to identify troubled cells.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::findEigenMatrices(int V[], int cm) {
+void DG_Field_2d::findEigenMatrices(int *V, int cm) {
   
   for (int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-            elements[i][j]->findEigenMatrices( V, cm);
+            elements[i][j]->findEigenMatrices( V);
         }
     }
 
@@ -838,11 +838,11 @@ void DG_Field_2d::findEigenMatrices(int V[], int cm) {
  * @Param cm Cell Marker to identify troubled cell.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::convertVariabletoCharacteristic(int V[], int c, unsigned I, int cm) {
+void DG_Field_2d::convertVariabletoCharacteristic(int *V, int c, unsigned I, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-              elements[i][j]->convertVariabletoCharacteristic(V, c, I, cm);
+              elements[i][j]->convertVariabletoCharacteristic(V, c, I);
         }
     }
 
@@ -859,11 +859,11 @@ void DG_Field_2d::convertVariabletoCharacteristic(int V[], int c, unsigned I, in
  * @Param cm Cell Marker to identify troubled cell.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::convertCharacteristictoVariable(int C[], int v, unsigned I, int cm) {
+void DG_Field_2d::convertCharacteristictoVariable(int *C, int v, unsigned I, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-             elements[i][j]->convertCharacteristictoVariable(C, v, I, cm);
+             elements[i][j]->convertCharacteristictoVariable(C, v, I);
         }
     }
 

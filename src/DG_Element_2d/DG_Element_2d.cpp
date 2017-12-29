@@ -9,6 +9,7 @@
 #include "../../includes/Utilities/LobattoNodes.h"
 #include "../../includes/Utilities/MinMod.h"
 #include "../../includes/Utilities/MathOperators.h"
+#include "../../includes/Utilities/MaterialProperties.h"
 
 #include <cmath>
 
@@ -683,7 +684,7 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
  * @Param Index Index correspoding to Characteristic variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::limitMoments(int V[], int C, unsigned Index) {
+void DG_Element_2d::limitMoments(int *V, int C, unsigned Index) {
   { 
     int count, Tempi, Tempj, i, j;
     double Temp1, Temp2, AlphaN;
@@ -710,21 +711,21 @@ void DG_Element_2d::limitMoments(int V[], int C, unsigned Index) {
              Tempj = i - j*(N+1);
 
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
-             for(int z=0; z<V.size(); ++z) {
-                 Sum1 += LeftEigenMatrix[Index*V.size()+z] * rightNeighbor->variable[V[z]][Tempi-1];
-                 Sum2 += LeftEigenMatrix[Index*V.size()+z] * leftNeighbor->variable[V[z]][Tempi-1]; 
-                 Sum3 += LeftEigenMatrix[Index*V.size()+z] * topNeighbor->variable[V[z]][Tempi-(N+1)];
-                 Sum4 += LeftEigenMatrix[Index*V.size()+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)];   
+             for(int z=0; z<Dimension; ++z) {
+                 Sum1 += LeftEigenMatrix[Index*Dimension+z] * rightNeighbor->variable[V[z]][Tempi-1];
+                 Sum2 += LeftEigenMatrix[Index*Dimension+z] * leftNeighbor->variable[V[z]][Tempi-1]; 
+                 Sum3 += LeftEigenMatrix[Index*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)];
+                 Sum4 += LeftEigenMatrix[Index*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)];   
              }
 
              Temp1 = MinMod(variable[C][Tempi], AlphaN*(Sum1 -variable[C][Tempi-1]), AlphaN*(variable[C][Tempi-1] -Sum2), AlphaN*(Sum3 -variable[C][Tempi-(N+1)]), AlphaN*(variable[C][Tempi-(N+1)] -Sum4));
                           
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
-             for(int z=0; z<V.size(); ++z) {
-                 Sum1 += LeftEigenMatrix[Index*V.size()+z] * rightNeighbor->variable[V[z]][Tempj-1];
-                 Sum2 += LeftEigenMatrix[Index*V.size()+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
-                 Sum3 += LeftEigenMatrix[Index*V.size()+z] * topNeighbor->variable[V[z]][Tempj-(N+1)];
-                 Sum4 += LeftEigenMatrix[Index*V.size()+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
+             for(int z=0; z<Dimension; ++z) {
+                 Sum1 += LeftEigenMatrix[Index*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1];
+                 Sum2 += LeftEigenMatrix[Index*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum3 += LeftEigenMatrix[Index*Dimension+z] * topNeighbor->variable[V[z]][Tempj-(N+1)];
+                 Sum4 += LeftEigenMatrix[Index*Dimension+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
              }
 
              Temp2 = MinMod(variable[C][Tempj], AlphaN*(Sum1 -variable[C][Tempj-1]), AlphaN*(variable[C][Tempj-1] -Sum2), AlphaN*(Sum3 -variable[C][Tempj-(N+1)]), AlphaN*(variable[C][Tempj-(N+1)] -Sum4));
@@ -742,11 +743,11 @@ void DG_Element_2d::limitMoments(int V[], int C, unsigned Index) {
              Tempj = i - j*(N+1);
     
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
-             for(int z=0; z<V.size(); ++z) {
-                 Sum1 += LeftEigenMatrix[Index*V.size()+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
-                 Sum2 += LeftEigenMatrix[Index*V.size()+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
-                 Sum3 += LeftEigenMatrix[Index*V.size()+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
-                 Sum4 += LeftEigenMatrix[Index*V.size()+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
+             for(int z=0; z<Dimension; ++z) {
+                 Sum1 += LeftEigenMatrix[Index*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
+                 Sum2 += LeftEigenMatrix[Index*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
+                 Sum3 += LeftEigenMatrix[Index*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum4 += LeftEigenMatrix[Index*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
              }
             
              Temp1 = MinMod(variable[C][Tempi], AlphaN*(Sum1 -variable[C][Tempi-(N+1)]), AlphaN*(variable[C][Tempi-(N+1)] -Sum2));
@@ -791,7 +792,7 @@ void DG_Element_2d::setEigenMatrices(unsigned dimension) {
  * @Param array V array of index corresponding to field variables required to compute eigen matrices.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::findEigenMatrices(int V[]) {
+void DG_Element_2d::findEigenMatrices(int *V) {
   double u, v, c, H, P;
   double epsilon = 1e-10;
   double q, qn, nx, ny, qe;
@@ -898,11 +899,11 @@ void DG_Element_2d::findEigenMatrices(int V[]) {
  * @Param I Identifier for Characteristic Variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::convertVariabletoCharacteristic(int V, int c, unsigned I) {
+void DG_Element_2d::convertVariabletoCharacteristic(int *V, int c, unsigned I) {
     double Sum = 0.0;
     for(int i=0; i< (N+1)*(N+1); ++i) {
         Sum = 0.0;
-        for(int j=0; j < V.size(); ++j){
+        for(int j=0; j < Dimension; ++j){
             Sum += variable[V[j]][i]*LeftEigenMatrix[I+j];
         }     
         variable[c][i] = Sum;
@@ -920,11 +921,11 @@ void DG_Element_2d::convertVariabletoCharacteristic(int V, int c, unsigned I) {
  * @Param I Identifier for conservative Variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::convertCharacteristictoVariable(int C[], int v, unsigned I) {
+void DG_Element_2d::convertCharacteristictoVariable(int *C, int v, unsigned I) {
     double Sum = 0.0;
     for(int i=0; i< (N+1)*(N+1); ++i) {
         Sum = 0.0;
-        for(int j=0; j < C.size(); ++j){
+        for(int j=0; j < Dimension; ++j){
             Sum += variable[C[j]][i]*RightEigenMatrix[I+j];
         }     
         variable[v][i] = Sum;
@@ -1637,7 +1638,7 @@ void DG_Element_2d::updateBoundaryVariables(int v) {
  * @Param B This is the pointer to BottomNeighbour.
 */
 /* ----------------------------------------------------------------------------*/
-double DG_Element_2d::BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B) {
+double DG_Element_2d::BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* Right, DG_Element_2d* Left, DG_Element_2d* Top, DG_Element_2d* Bottom) {
     return 0.0 ;
 }
 
