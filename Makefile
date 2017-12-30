@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := EulerKXRCF
+EXECUTABLE := EulerChar
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths

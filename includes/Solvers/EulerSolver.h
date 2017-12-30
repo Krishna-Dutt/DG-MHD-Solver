@@ -23,6 +23,7 @@ private:
 
     string ShockDetector;
     string Limiter;
+    int Dimension; //Dimension of sysyem of Equations;
 
     // Primitve Variables
     int D, Vx, Vy, P, T;

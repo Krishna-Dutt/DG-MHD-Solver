@@ -23,6 +23,7 @@ void EulerSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
     field->setSystem("EULER");
+    Dimension = 4;
 
    return ;
 }
@@ -488,8 +489,8 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
 
-  //field->updateOutFlowBoundary(Vx, Vy);
-  //field->updateCellMarker(D, CellMarker);
+  field->updateOutFlowBoundary(Vx, Vy);
+  field->updateCellMarker(D, CellMarker);
 
   return ;
 }
@@ -516,8 +517,13 @@ void EulerSolver::SetLimiterVariables() {
     field->setVanderMandMatrix();
   }
   else if (Limiter == "CharacteristicLimiter") {
-    field->setEigenMatrices(4);
+    field->setEigenMatrices(Dimension);
     field->setVanderMandMatrix();
+    Moment    = field->addVariable_withBounary("moment");
+    field->scal(0.0, Moment);
+    ModMoment = field->addVariable_withBounary("modmoment");
+    field->scal(0.0, ModMoment);
+    // Change later by adding separate settings for positivity limiter!!
     uMoment = field->addVariable_withoutBounary();
     vMoment = field->addVariable_withoutBounary();
     qMoment = field->addVariable_withoutBounary();
@@ -619,7 +625,7 @@ void EulerSolver::Run_LiliaMomentLimiter(int v) {
 
 void EulerSolver::RunPositivityLimiter() {
   
-  if ( Limiter == "LiliaMoment") {
+  if ( Limiter == "LiliaMoment" || Limiter == "CharacteristicLimiter") {
     field->ResetVariables_CellCentered(CellMarker, 1.5);
 
     updatePrimitiveVariables();
