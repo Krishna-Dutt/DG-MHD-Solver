@@ -489,8 +489,8 @@ void EulerSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
 
-  field->updateOutFlowBoundary(Vx, Vy);
-  field->updateCellMarker(D, CellMarker);
+  //field->updateOutFlowBoundary(Vx, Vy);
+  //field->updateCellMarker(D, CellMarker);
 
   return ;
 }
@@ -586,11 +586,8 @@ void EulerSolver::RunLimiter() {
     field->findEigenMatrices(AuxVarM, CellMarker);
 
     // Find Characteristic Variables 
-    field->convertVariabletoCharacteristic(AuxVarV, Char1, 0, CellMarker);
-    field->convertVariabletoCharacteristic(AuxVarV, Char2, 4, CellMarker);
-    field->convertVariabletoCharacteristic(AuxVarV, Char3, 8, CellMarker);
-    field->convertVariabletoCharacteristic(AuxVarV, Char4, 12, CellMarker);
-
+    field->convertVariabletoCharacteristic(AuxVarV, AuxVarC, 0, CellMarker);
+    
     // Limiting Characteristic Variables ;
     field->limitMoments(AuxVarV, Char1, CellMarker, 0);
     field->limitMoments(AuxVarV, Char2, CellMarker, 1);
@@ -598,11 +595,8 @@ void EulerSolver::RunLimiter() {
     field->limitMoments(AuxVarV, Char4, CellMarker, 3);
 
     // update Conservative Variables
-    field->convertCharacteristictoVariable(AuxVarC, qMoment, 0, CellMarker);
-    field->convertCharacteristictoVariable(AuxVarC, uMoment, 4, CellMarker);
-    field->convertCharacteristictoVariable(AuxVarC, vMoment, 8, CellMarker);
-    field->convertCharacteristictoVariable(AuxVarC, HMoment, 12, CellMarker);
-
+    field->convertCharacteristictoVariable(AuxVarC, AuxVarV, 0, CellMarker);
+    
     field->convertMomentToVariable(qMoment, D, CellMarker);
     field->convertMomentToVariable(uMoment, DVx, CellMarker);
     field->convertMomentToVariable(vMoment, DVy, CellMarker);

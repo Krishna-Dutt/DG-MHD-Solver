@@ -161,6 +161,9 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     PositivityMarker.resize(0);
     for(int i =0 ; i < ne_x*ne_y ; ++i) 
        PositivityMarker.push_back(true);
+    
+    RightEigenMatrix = NULL;
+    LeftEigenMatrix = NULL;
 }
 
 /* ----------------------------------------------------------------------------*/
@@ -211,6 +214,12 @@ void DG_Field_2d::setVanderMandMatrix() {
 DG_Field_2d::~DG_Field_2d() {
   // To explicitly deallocate memory associated with the DG Matrices, shared by all elements
   elements[0][0]->Destroy_Matrices();
+
+  if(RightEigenMatrix != NULL) {
+      delete[] RightEigenMatrix;
+      delete[] LeftEigenMatrix;
+  }
+
   for(int i=0; i < domainVariable.size(); ++i) {
       delete[] domainVariable[i];
   }
@@ -799,9 +808,12 @@ void DG_Field_2d::limitMoments(int *V, int C, int cm, unsigned Index) {
 void DG_Field_2d::setEigenMatrices(unsigned _dimension) {
   
   Dimension = _dimension;
+  RightEigenMatrix = new double[Dimension*Dimension*ne_x*ne_y];
+  LeftEigenMatrix = new double[Dimension*Dimension*ne_x*ne_y];
+
   for (int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j) {
-     elements[i][j]->setEigenMatrices(_dimension);
+     elements[i][j]->setEigenMatrices(_dimension, (RightEigenMatrix + Dimension*Dimension*(i*ne_y + j)), (LeftEigenMatrix + Dimension*Dimension*(i*ne_y + j)));
     }
 
   return ;
@@ -833,16 +845,16 @@ void DG_Field_2d::findEigenMatrices(int *V, int cm) {
  * @Synopsis  Function to compute Characteristic Variables.
  * 
  * @Param array V Set of conservative variables..
- * @Param c The Characteristic Variable.
+ * @Param array C The Characteristic Variable.
  * @Param I Identifier for Characteristic Variable.
  * @Param cm Cell Marker to identify troubled cell.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::convertVariabletoCharacteristic(int *V, int c, unsigned I, int cm) {
+void DG_Field_2d::convertVariabletoCharacteristic(int *V, int *C, unsigned I, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-              elements[i][j]->convertVariabletoCharacteristic(V, c, I);
+              elements[i][j]->convertVariabletoCharacteristic(V, C, I);
         }
     }
 
@@ -854,16 +866,16 @@ void DG_Field_2d::convertVariabletoCharacteristic(int *V, int c, unsigned I, int
  * @Synopsis  Function to compute Conservative  Variables from Characteristic Variables.
  * 
  * @Param array C Set of characteristic variables..
- * @Param v The Conservative Variable.
+ * @Param array V The Conservative Variable.
  * @Param I Identifier for conservative Variable.
  * @Param cm Cell Marker to identify troubled cell.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::convertCharacteristictoVariable(int *C, int v, unsigned I, int cm) {
+void DG_Field_2d::convertCharacteristictoVariable(int *C, int *V, unsigned I, int cm) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-             elements[i][j]->convertCharacteristictoVariable(C, v, I);
+             elements[i][j]->convertCharacteristictoVariable(C, V, I);
         }
     }
 

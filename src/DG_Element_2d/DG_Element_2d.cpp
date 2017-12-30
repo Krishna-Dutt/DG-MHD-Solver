@@ -160,10 +160,6 @@ void DG_Element_2d::Destroy_Matrices() {
       delete[] vanderMandMatrix;
       delete[] inverseVanderMandMatrix;
     }
-    if (RightEigenMatrix != NULL){
-        delete[] RightEigenMatrix;
-        delete[] LeftEigenMatrix;
-    }
 
     return ;
 }
@@ -772,13 +768,15 @@ void DG_Element_2d::limitMoments(int *V, int C, unsigned Index) {
 /**
  * @Synopsis  This is the function which sets the Right and Left Eigen Matrix corresponding to directionalong flow
  * 
- * @Param dimension No of systme of Equations
+ * @Param dimension No of system of Equations
+ * @Param REMp Pointer to Right Eigen Matrix
+ * @Param LEMp Pointer to Left Eigen Matrix
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::setEigenMatrices(unsigned dimension) {
+void DG_Element_2d::setEigenMatrices(unsigned dimension, double *REMp, double *LEMp) {
   
- RightEigenMatrix = new double[dimension*dimension];
- LeftEigenMatrix = new double[dimension*dimension];
+ RightEigenMatrix = REMp;
+ LeftEigenMatrix = LEMp;
 
  Dimension = dimension;
 
@@ -894,20 +892,23 @@ void DG_Element_2d::findEigenMatrices(int *V) {
 /**
  * @Synopsis  Function to compute Characteristic Variables.
  * 
- * @Param int V Set of conservative variables..
- * @Param c The Characteristic Variable.
+ * @Param array V Set of conservative variables..
+ * @Param array C The Characteristic Variable.
  * @Param I Identifier for Characteristic Variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::convertVariabletoCharacteristic(int *V, int c, unsigned I) {
+void DG_Element_2d::convertVariabletoCharacteristic(int *V, int *C, unsigned I) {
     double Sum = 0.0;
-    for(int i=0; i< (N+1)*(N+1); ++i) {
+    for(int k=0; k < Dimension; ++k) {
+        for(int i=0; i< (N+1)*(N+1); ++i) {
         Sum = 0.0;
         for(int j=0; j < Dimension; ++j){
-            Sum += variable[V[j]][i]*LeftEigenMatrix[I+j];
+            Sum += variable[V[j]][i]*LeftEigenMatrix[k*Dimension +j];
         }     
-        variable[c][i] = Sum;
+        variable[C[k]][i] = Sum;
     } 
+    }
+    
 
     return ;
 }
@@ -917,20 +918,22 @@ void DG_Element_2d::convertVariabletoCharacteristic(int *V, int c, unsigned I) {
  * @Synopsis  Function to compute Conservative  Variables from Characteristic Variables.
  * 
  * @Param array C Set of characteristic variables..
- * @Param v The Conservative Variable.
+ * @Param array V The Conservative Variable.
  * @Param I Identifier for conservative Variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::convertCharacteristictoVariable(int *C, int v, unsigned I) {
+void DG_Element_2d::convertCharacteristictoVariable(int *C, int *V, unsigned I) {
     double Sum = 0.0;
-    for(int i=0; i< (N+1)*(N+1); ++i) {
-        Sum = 0.0;
-        for(int j=0; j < Dimension; ++j){
-            Sum += variable[C[j]][i]*RightEigenMatrix[I+j];
-        }     
-        variable[v][i] = Sum;
-    }  
-
+    for(int k=0; k < Dimension; ++k) {
+        for(int i=0; i< (N+1)*(N+1); ++i) {
+         Sum = 0.0;
+         for(int j=0; j < Dimension; ++j){
+            Sum += variable[C[j]][i]*RightEigenMatrix[k*Dimension +j];
+          }     
+         variable[V[k]][i] = Sum;
+        } 
+    }
+     
     return ;
 }
 

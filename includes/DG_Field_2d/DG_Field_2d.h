@@ -31,6 +31,8 @@ public:
     vector<double*> cellcenterVariable; // To store variables with only one value per element
     vector<bool> PositivityMarker;
 
+    double *RightEigenMatrix, *LeftEigenMatrix;
+
     map<int, string> boundaryVariableNames;
     vector<int> variableNames; // This is stores all the variables which have been added to the field.
     vector<int> variablesWithBoundaryInfo; // This stores all the variables whose boundary info. is also known.
@@ -73,8 +75,8 @@ public:
     void convertMomentToVariable(int m, int v, int cm);
 
     // Functions to handle Characteristic Moment Limiter
-    void convertCharacteristictoVariable(int *C, int v, unsigned I, int cm);
-    void convertVariabletoCharacteristic(int *V, int c, unsigned I, int cm);
+    void convertCharacteristictoVariable(int *C, int *V, unsigned I, int cm);
+    void convertVariabletoCharacteristic(int *V, int *C, unsigned I, int cm);
     void findEigenMatrices(int *V, int cm);
     void setEigenMatrices(unsigned _dimension);
     void limitMoments(int *V, int C, int cm, unsigned Index);
