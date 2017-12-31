@@ -79,7 +79,7 @@ public:
     void convertVariabletoCharacteristic(int *V, int *C, unsigned I, int cm);
     void findEigenMatrices(int *V, int cm);
     void setEigenMatrices(unsigned _dimension);
-    void limitMoments(int *V, int C, int cm, unsigned Index);
+    void limitMoments(int *V, int *C, int cm, unsigned Index);
 
     // Function to Reset Cell Centered Variables 
     void ResetVariables_CellCentered(int v, double value = 0.0);

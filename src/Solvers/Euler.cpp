@@ -589,11 +589,8 @@ void EulerSolver::RunLimiter() {
     field->convertVariabletoCharacteristic(AuxVarV, AuxVarC, 0, CellMarker);
     
     // Limiting Characteristic Variables ;
-    field->limitMoments(AuxVarV, Char1, CellMarker, 0);
-    field->limitMoments(AuxVarV, Char2, CellMarker, 1);
-    field->limitMoments(AuxVarV, Char3, CellMarker, 2);
-    field->limitMoments(AuxVarV, Char4, CellMarker, 3);
-
+    field->limitMoments(AuxVarV, AuxVarC, CellMarker, 0);
+    
     // update Conservative Variables
     field->convertCharacteristictoVariable(AuxVarC, AuxVarV, 0, CellMarker);
     

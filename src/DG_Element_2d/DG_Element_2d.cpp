@@ -676,12 +676,11 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
  * @Synopsis  Function to limit the Moments for given variable, using Characteristic Limiter.
  * 
  * @Param array V array of moments of Conservative Variables.
- * @Param C   moment of characteristic variables, to store modified moments.
+ * @Param array C moment of characteristic variables, to store modified moments.
  * @Param Index Index correspoding to Characteristic variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Element_2d::limitMoments(int *V, int C, unsigned Index) {
-  { 
+void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
     int count, Tempi, Tempj, i, j;
     double Temp1, Temp2, AlphaN;
     double epsilon = 1e-13;
@@ -696,69 +695,78 @@ void DG_Element_2d::limitMoments(int *V, int C, unsigned Index) {
     else {
         epsilon = 1e-16;
     }
+    
+    int counter = 0;
+    for(int temp=0; temp< Dimension; ++temp) {
+        count = N+1;
+        counter = 0;
 
-        for(i=(N+1)*(N+1)-1; i > 0; i = i - (N+2)) {
+        for(i=(N+1)*(N+1)-1; (i > 0) && (counter == 0); i = i - (N+2)) {
           --count;
+
           AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
           //AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
-          for(j=0; j < count; ++j) {
+          for(j=0; (j < count) && (counter == 0); ++j) {
              Tempi = i-j;
              Tempj = i - j*(N+1);
 
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
              for(int z=0; z<Dimension; ++z) {
-                 Sum1 += LeftEigenMatrix[Index*Dimension+z] * rightNeighbor->variable[V[z]][Tempi-1];
-                 Sum2 += LeftEigenMatrix[Index*Dimension+z] * leftNeighbor->variable[V[z]][Tempi-1]; 
-                 Sum3 += LeftEigenMatrix[Index*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)];
-                 Sum4 += LeftEigenMatrix[Index*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)];   
+                 Sum1 += LeftEigenMatrix[temp*Dimension+z] * rightNeighbor->variable[V[z]][Tempi-1];
+                 Sum2 += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempi-1]; 
+                 Sum3 += LeftEigenMatrix[temp*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)];
+                 Sum4 += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)];   
              }
 
-             Temp1 = MinMod(variable[C][Tempi], AlphaN*(Sum1 -variable[C][Tempi-1]), AlphaN*(variable[C][Tempi-1] -Sum2), AlphaN*(Sum3 -variable[C][Tempi-(N+1)]), AlphaN*(variable[C][Tempi-(N+1)] -Sum4));
+             Temp1 = MinMod(variable[C[temp]][Tempi], AlphaN*(Sum1 -variable[C[temp]][Tempi-1]), AlphaN*(variable[C[temp]][Tempi-1] -Sum2), AlphaN*(Sum3 -variable[C[temp]][Tempi-(N+1)]), AlphaN*(variable[C[temp]][Tempi-(N+1)] -Sum4));
                           
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
              for(int z=0; z<Dimension; ++z) {
-                 Sum1 += LeftEigenMatrix[Index*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1];
-                 Sum2 += LeftEigenMatrix[Index*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
-                 Sum3 += LeftEigenMatrix[Index*Dimension+z] * topNeighbor->variable[V[z]][Tempj-(N+1)];
-                 Sum4 += LeftEigenMatrix[Index*Dimension+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
+                 Sum1 += LeftEigenMatrix[temp*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1];
+                 Sum2 += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum3 += LeftEigenMatrix[temp*Dimension+z] * topNeighbor->variable[V[z]][Tempj-(N+1)];
+                 Sum4 += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
              }
 
-             Temp2 = MinMod(variable[C][Tempj], AlphaN*(Sum1 -variable[C][Tempj-1]), AlphaN*(variable[C][Tempj-1] -Sum2), AlphaN*(Sum3 -variable[C][Tempj-(N+1)]), AlphaN*(variable[C][Tempj-(N+1)] -Sum4));
+             Temp2 = MinMod(variable[C[temp]][Tempj], AlphaN*(Sum1 -variable[C[temp]][Tempj-1]), AlphaN*(variable[C[temp]][Tempj-1] -Sum2), AlphaN*(Sum3 -variable[C[temp]][Tempj-(N+1)]), AlphaN*(variable[C[temp]][Tempj-(N+1)] -Sum4));
 
-             if (abs(Temp1-variable[C][Tempi]) > epsilon || abs(Temp2-variable[C][Tempj]) > epsilon ) {
-                 variable[C][Tempi] = Temp1;
-                 variable[C][Tempj] = Temp2;
+             if (abs(Temp1-variable[C[temp]][Tempi]) > epsilon || abs(Temp2-variable[C[temp]][Tempj]) > epsilon ) {
+                 variable[C[temp]][Tempi] = Temp1;
+                 variable[C[temp]][Tempj] = Temp2;
              }
              else {
-                 return ;
+                 counter = 1.0 ;
              }
           } 
              // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
+           if(counter == 0) {
              Tempi = i-j;
              Tempj = i - j*(N+1);
     
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
              for(int z=0; z<Dimension; ++z) {
-                 Sum1 += LeftEigenMatrix[Index*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
-                 Sum2 += LeftEigenMatrix[Index*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
-                 Sum3 += LeftEigenMatrix[Index*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
-                 Sum4 += LeftEigenMatrix[Index*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum1 += LeftEigenMatrix[temp*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
+                 Sum2 += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
+                 Sum3 += LeftEigenMatrix[temp*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
+                 Sum4 += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
              }
             
-             Temp1 = MinMod(variable[C][Tempi], AlphaN*(Sum1 -variable[C][Tempi-(N+1)]), AlphaN*(variable[C][Tempi-(N+1)] -Sum2));
-             Temp2 = MinMod(variable[C][Tempj], AlphaN*(Sum3 -variable[C][Tempj-1]), AlphaN*(variable[C][Tempj-1] -Sum4));
+             Temp1 = MinMod(variable[C[temp]][Tempi], AlphaN*(Sum1 -variable[C[temp]][Tempi-(N+1)]), AlphaN*(variable[C[temp]][Tempi-(N+1)] -Sum2));
+             Temp2 = MinMod(variable[C[temp]][Tempj], AlphaN*(Sum3 -variable[C[temp]][Tempj-1]), AlphaN*(variable[C[temp]][Tempj-1] -Sum4));
              
-             if ( abs(Temp1-variable[C][Tempi]) > epsilon || abs(Temp2-variable[C][Tempj]) > epsilon ) {
-                variable[C][Tempi] = Temp1;
-                variable[C][Tempj] = Temp2;
+             if ( abs(Temp1-variable[C[temp]][Tempi]) > epsilon || abs(Temp2-variable[C[temp]][Tempj]) > epsilon ) {
+                variable[C[temp]][Tempi] = Temp1;
+                variable[C[temp]][Tempj] = Temp2;
              }
              else {
-                 return ;
+                 counter = 1.0 ;
              }
+           }  
+             
         }
 
-   }
+    }
 
   return ;
 }

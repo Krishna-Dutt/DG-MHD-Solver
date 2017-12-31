@@ -785,7 +785,7 @@ void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
  * @Param Index Index correspoding to Characteristic variable.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_Field_2d::limitMoments(int *V, int C, int cm, unsigned Index) {
+void DG_Field_2d::limitMoments(int *V, int *C, int cm, unsigned Index) {
   for(int i=0; i < ne_x; ++i)
     for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {

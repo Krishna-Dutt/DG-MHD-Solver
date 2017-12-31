@@ -115,7 +115,7 @@ public:
     void convertVariabletoCharacteristic(int *V, int *C, unsigned I);
     void findEigenMatrices(int *V);
     void setEigenMatrices(unsigned _dimension, double *REMp, double *LEMp);
-    virtual void limitMoments(int *V, int C, unsigned Index);
+    virtual void limitMoments(int *V, int *C, unsigned Index);
 
     // Functions to manipulate Cell Centered Variables.
     void ResetVariables_CellCentered(int v, double value = 0.0);
