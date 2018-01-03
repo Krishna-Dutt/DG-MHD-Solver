@@ -270,7 +270,7 @@ int main() {
     double CFL = 0.2;
     double time = 0.25;
     EulerSolver* a;
-    a = new EulerSolver(100, 100, 1);
+    a = new EulerSolver(130, 130, 2);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);

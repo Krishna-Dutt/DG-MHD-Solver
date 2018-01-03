@@ -553,6 +553,91 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This function limits the moments 
+ * using Lilia's Moment Limiter.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param modm This is the variable to store modified moments.
+ * @Param cm This is the cell marker used to identified troubled cells.
+ * @Param Index This is the index to start the limiting process.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned size ) {
+
+   // Checking if cell marker is not equal to zero
+    int count, Tempi, Tempj, i, j, m, modm;
+    count = N+1;
+    double Temp1, Temp2, AlphaN;
+    double epsilon = 1e-13;
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+    
+    if ( N == 1) {
+        epsilon = 0.0 ;
+    }
+    else {
+        epsilon = 1e-16;
+    }
+    int counter = 0;
+    for(int temp = 0 ; temp<size; ++temp) {
+        m = M[temp]; modm = Modm[temp];
+        // Ensuring that Cell avergae remains the  same after limiting !!
+        variable[modm][0] = variable[m][0];
+        count = N+1;
+        counter = 0;
+        AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));
+        for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
+          --count;
+          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+          //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
+          //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
+          for(j=0; j < count && counter == 0; ++j) {
+             Tempi = i-j;
+             Tempj = i - j*(N+1);
+             Temp1 = BoundaryMinMod(m, Tempi, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
+             Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, topNeighbor, bottomNeighbor);
+             // Original minmod detector
+             //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+             //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       
+             if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+                 variable[modm][Tempi] = Temp1;
+                 variable[modm][Tempj] = Temp2;
+             }
+             else 
+             {
+               counter = 1; // Need to exit both loops
+             }
+          }
+          // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
+          if(counter == 0) {
+                Tempi = i-j;
+                Tempj = i - j*(N+1);
+                Temp1 = BoundaryMinMod(m, Tempi, AlphaN, this, this, topNeighbor, bottomNeighbor);
+                Temp2 = BoundaryMinMod(m, Tempj, AlphaN, rightNeighbor, leftNeighbor, this, this);
+       
+                // Original Detector
+                //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+                //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       
+                if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+                    variable[modm][Tempi] = Temp1;
+                    variable[modm][Tempj] = Temp2;
+                 }
+                else //if( Temp1 !=0 && Temp2 !=0)
+                 {
+                   counter = 1; // Need to exit both loops
+                 }
+           }
+        }
+    }
+
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  Function to limit the Moments for given variable, using Characteristic Limiter.
  * 
  * @Param array V array of moments of Conservative Variables.

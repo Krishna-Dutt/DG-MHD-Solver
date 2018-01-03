@@ -673,6 +673,122 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This function computes the moments for a given variable using VandeMandMatrix with Legendre Basis.
+ *
+ * @Param v This is the variable whose moments are to be captured.
+ * @Param m This is the variable used to store the computed moments.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::computeMoments(int *v, int *m, unsigned size) {
+  /// Multiplying inverse of VanderMand Matrix with the variable array to get the corresponding moments.
+  for(int i=0; i< size; ++i) {
+      cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, inverseVanderMandMatrix,(N+1)*(N+1), variable[v[i]],1,0,variable[m[i]],1);
+  }
+  
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function computes the nodals values of the variable given its moments
+ * using VandeMandMatrix with Legendre Basis.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param v This is the variable whose nodal values are to be computed.
+ * @Param cm This is the cell marker used to identify troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::convertMomentToVariable(int *m, int *v, unsigned size) {
+  /// Multiplying  VanderMand Matrix with the moments to obtained the nodal values of the variable.
+  for(int i=0; i< size; ++i) {
+      cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 1.0, vanderMandMatrix,(N+1)*(N+1), variable[m[i]],1,0,variable[v[i]],1);
+  }
+  
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function limits the moments 
+ * using Lilia's Moment Limiter.
+ *
+ * @Param m This gives the moments of the variable
+ * @Param modm This is the variable to store modified moments.
+ * @Param cm This is the cell marker used to identified troubled cells.
+ * @Param Index This is the index to start the limiting process.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned size ) {
+
+   // Checking if cell marker is not equal to zero
+    int count, Tempi, Tempj, i, j, m, modm;
+    count = N+1;
+    double Temp1, Temp2, AlphaN;
+    double epsilon = 1e-13;
+    AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
+
+    if ( N == 1) {
+        epsilon = 0.0 ;
+    }
+    else {
+        epsilon = 1e-16;
+    }
+    int counter = 0;
+    for(int temp = 0 ; temp<size; ++temp) {
+        m = M[temp]; modm = Modm[temp];
+        // Ensuring that Cell avergae remains the  same after limiting !!
+        variable[modm][0] = variable[m][0];
+
+        count = N+1;
+        counter = 0;
+        AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));
+        for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
+          --count;
+          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+          for(j=0; j < count && counter == 0; ++j) {
+             Tempi = i-j;
+             Tempj = i - j*(N+1);
+             // Original minmod detector
+             Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+             Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       
+             if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+                 variable[modm][Tempi] = Temp1;
+                 variable[modm][Tempj] = Temp2;
+             }
+             else 
+             {
+               counter = 1; // Need to exit both loops
+             }
+          }
+          // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
+          if(counter == 0) {
+                Tempi = i-j;
+                Tempj = i - j*(N+1);
+                // Original Detector
+                Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
+                Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       
+                if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+                    variable[modm][Tempi] = Temp1;
+                    variable[modm][Tempj] = Temp2;
+                 }
+                else //if( Temp1 !=0 && Temp2 !=0)
+                 {
+                   counter = 1; // Need to exit both loops
+                 }
+           }
+        }
+    }
+
+  return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  Function to limit the Moments for given variable, using Characteristic Limiter.
  * 
  * @Param array V array of moments of Conservative Variables.
@@ -1190,6 +1306,155 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
         /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
         cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
 
+        delete[] numericalFlux;
+        delete[] auxillaryVariable;
+    }
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `x` and then store it in the
+ * variable `vDash`. The function also takes `fluxType` as an input which would describe the numerical scheme that
+ * should be used in order to obtain the derivative.
+ *
+ * @Param v         Variable which is to be differentiated.
+ * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param conserVar Corresponding Conservative variable.
+ * @Param fluxType  The type of flux that is to be used. eg "central"
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxType, int *FluxVariable, unsigned size) {
+    double dy = (y_end - y_start);
+    double dx = (x_end - x_start);
+    
+    if(fluxType == "central") {
+        int v, vDash, conserVar, fluxVariable = FluxVariable[0];
+        double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+        double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
+        
+        for(int temp =0 ; temp < size; ++temp) {
+            v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
+            zeros(numericalFlux, (N+1)*(N+1));                                                       
+            for(int i=0; i<=N; i++){
+               numericalFlux[i*(N+1)+N]    = 0.5*( boundaryRight[v][i*(N+1)]    + neighboringRight[v][i*(N+1)] ) ;   
+               numericalFlux[i*(N+1)]    = 0.5*( boundaryLeft[v][i*(N+1)]     + neighboringLeft[v][i*(N+1)] ) ;  
+            }
+            /// vDash = -0.5*dy*D*v
+            cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+
+            /// Adding the numeical Flux terms as necessary.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, fluxMatrix_right,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, fluxMatrix_left,    (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+
+            /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
+        }
+        
+        delete[] numericalFlux;
+        delete[] auxillaryVariable;
+    }
+
+    else if(fluxType == "rusanov") {
+        int v, vDash, conserVar, fluxVariable = FluxVariable[0];
+        double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+        double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
+        
+        for(int temp =0 ; temp < size; ++temp) {
+            v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
+            zeros(numericalFlux, (N+1)*(N+1)); 
+
+            for(int i=0; i<=N; i++){
+               // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
+               numericalFlux[i*(N+1)+N] = 0.5*(boundaryRight[v][i*(N+1)] + neighboringRight[v][i*(N+1)] + MAX(fabs(boundaryRight[fluxVariable][i*(N+1)]), fabs(neighboringRight[fluxVariable][i*(N+1)]))*(boundaryRight[conserVar][i*(N+1)] - neighboringRight[conserVar][i*(N+1)])  ) ;   
+               numericalFlux[i*(N+1)]   = 0.5*(boundaryLeft[v][i*(N+1)]  + neighboringLeft[v][i*(N+1)]  - MAX(fabs(boundaryLeft[fluxVariable][i*(N+1)]), fabs(neighboringLeft[fluxVariable][i*(N+1)]))*(boundaryLeft[conserVar][i*(N+1)] - neighboringLeft[conserVar][i*(N+1)])  ) ;   
+            }
+
+            /// vDash = -0.5*dy*D*v
+            cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+
+            /// Adding the numeical Flux terms as necessary.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dy, fluxMatrix_right,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dy, fluxMatrix_left,    (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+
+            /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
+        }
+    
+        delete[] numericalFlux;
+        delete[] auxillaryVariable;
+
+    }
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `y` and then store it in the
+ * variable `vDash`. The function also takes `fluxType` as an input which would describe the numerical scheme that
+ * should be used in order to obtain the derivative.
+ *
+ * @Param v         Variable which is to be differentiated.
+ * @Param vDash     Variable in which the derivative is to be stored.
+ * @Param conserVar Corresponding Conservative variable.
+ * @Param fluxType  The type of flux that is to be used. eg "central"
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxType, int *FluxVariable, unsigned size) {
+    double dy = (y_end - y_start);
+    double dx = (x_end - x_start);
+
+    if(fluxType == "central") {
+        int v, vDash, conserVar, fluxVariable = FluxVariable[0];
+        double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+        double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
+        
+        for(int temp =0 ; temp < size; ++temp) {
+            v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
+            zeros(numericalFlux, (N+1)*(N+1));                                                       
+            for(int i=0; i<=N; i++){
+               numericalFlux[N*(N+1)+i]    = 0.5*( boundaryTop[v][i]    + neighboringTop[v][i] ) ;   
+               numericalFlux[i]            = 0.5*( boundaryBottom[v][i]     + neighboringBottom[v][i] ) ;  
+            }
+            /// vDash = -0.5*dy*D*v
+            cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+
+            /// Adding the numeical Flux terms as necessary.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, fluxMatrix_top,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, fluxMatrix_bottom,    (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+
+            /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
+        }
+        
+        delete[] numericalFlux;
+        delete[] auxillaryVariable;
+    }
+    
+    else if(fluxType == "rusanov") {
+        int v, vDash, conserVar, fluxVariable = FluxVariable[0];
+        double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
+        double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
+        
+        for(int temp =0 ; temp < size; ++temp) {
+            v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
+            zeros(numericalFlux, (N+1)*(N+1));                                                       
+            for(int i=0; i<=N; i++){
+               // Normals nx, ny have been incorporated into the signs, need to set them separately !!
+               numericalFlux[N*(N+1)+i]= 0.5*(boundaryTop[v][i] + neighboringTop[v][i] + MAX(fabs(boundaryTop[fluxVariable][i]), fabs(neighboringTop[fluxVariable][i]))*(boundaryTop[conserVar][i] - neighboringTop[conserVar][i]));
+               numericalFlux[i]        = 0.5*(boundaryBottom[v][i] + neighboringBottom[v][i] - MAX(fabs(boundaryBottom[fluxVariable][i]), fabs(neighboringBottom[fluxVariable][i]))*(boundaryBottom[conserVar][i] - neighboringBottom[conserVar][i])); 
+            }
+            /// vDash = -0.5*dy*D*v
+            cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
+
+            /// Adding the numeical Flux terms as necessary.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  0.5*dx, fluxMatrix_top,   (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1),  -0.5*dx, fluxMatrix_bottom,    (N+1)*(N+1), numericalFlux, 1, 1, auxillaryVariable, 1);
+
+            /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
+            cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
+
+        }
         delete[] numericalFlux;
         delete[] auxillaryVariable;
     }

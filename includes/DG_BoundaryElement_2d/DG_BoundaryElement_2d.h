@@ -79,10 +79,13 @@ public:
 
         // Methods for handling Moment Limiter !!
         void limitMoments(int m, int modm, unsigned Index);
+        void limitMoments(int *m, int *modifiedm, unsigned Index, unsigned size);
+    
         double BoundaryMinMod(int m, int Index, double Alpha, DG_Element_2d* R, DG_Element_2d* L, DG_Element_2d* T, DG_Element_2d* B);
 
         // Methods to handle Charactieristic Moment Limiter
         void limitMoments(int *V, int *C, unsigned Index);
+        
 
         // Reworked Methods to update Boundary ,considering the enitre system of equation rather than individual variables
 

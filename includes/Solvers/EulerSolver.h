@@ -34,12 +34,14 @@ private:
     // Eigen Values
     int C, Vx_plus_C, Vy_plus_C;
     // Aux. Variables // Define all auxillary (needed or not here)
-    int K1D, K1DVx, K1DVy, K1DE, K2D, K2DVx, K2DVy, K2DE, K3D, K3DVx, K3DVy, K3DE, dbydx, dbydy;
+    int K1D, K1DVx, K1DVy, K1DE, K2D, K2DVx, K2DVy, K2DE, K3D, K3DVx, K3DVy, K3DE;
+    int dbydxD, dbydyD, dbydxDVx, dbydyDVx, dbydxDVy, dbydyDVy, dbydxDE, dbydyDE;
     int DAnalytical, VxAnalytical, ZERO;
     // Shock Detector
     int CellMarkerG;
     // Limiter
     int Moment, ModMoment;
+    int qModMoment, uModMoment, vModMoment, HModMoment;
     // Add corresponding variables for Characteristic Limiter
     int uMoment, vMoment, qMoment, HMoment, dPdxMoment, dPdyMoment;
     int Char1, Char2, Char3, Char4;
@@ -279,7 +281,7 @@ public:
      * @Param K Coefficient K1
      */
     /* ----------------------------------------------------------------------------*/
-    void RK_Step1(int Var, int FluxX, int FluxY, int K);
+    void RK_Step1();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to perform Second step of RK3.
@@ -291,7 +293,7 @@ public:
      * @Param K2 Coefficient K2
      */
     /* ----------------------------------------------------------------------------*/
-    void RK_Step2(int Var, int FluxX, int FluxY, int K1, int K2);
+    void RK_Step2();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to perform Third step of RK3.
@@ -304,7 +306,7 @@ public:
      * @Param K3 Coefficient K3
      */
     /* ----------------------------------------------------------------------------*/
-    void RK_Step3(int Var, int FluxX, int FluxY, int K1, int K2, int K3);
+    void RK_Step3();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis   This function is used to set important solver parameters like dt, and no. of time steps.

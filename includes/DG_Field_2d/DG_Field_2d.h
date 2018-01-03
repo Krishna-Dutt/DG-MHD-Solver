@@ -73,6 +73,10 @@ public:
     void computeMoments(int v, int m, int cm);
     void limitMoments(int m, int modifiedm, int cm, unsigned Index);
     void convertMomentToVariable(int m, int v, int cm);
+    void computeMoments(int *v, int *m, int cm, unsigned size);
+    void limitMoments(int *m, int *modifiedm, int cm, unsigned Index, unsigned size);
+    void convertMomentToVariable(int *m, int *v, int cm, unsigned size);
+
 
     // Functions to handle Characteristic Moment Limiter
     void convertCharacteristictoVariable(int *C, int *V, unsigned I, int cm);
@@ -88,6 +92,11 @@ public:
     void delByDelX(int v, int vDash,int conserVar, string fluxType, int fluxVariable);
 
     void delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable);
+
+    void delByDelX(int *v, int *vDash,int *conserVar, string fluxType, int *fluxVariable, unsigned size);
+
+    void delByDelY(int *v, int *vDash, int *conserVar, string fluxType, int *fluxVariable, unsigned size);
+
 
     void delByDelX(int v, int vDash, string fluxType);
 

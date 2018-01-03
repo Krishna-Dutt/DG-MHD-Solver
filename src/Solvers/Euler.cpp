@@ -298,8 +298,14 @@ void EulerSolver::setAuxillaryVariables() {
   K3DVx = field->addVariable_withoutBounary();
   K3DVy = field->addVariable_withoutBounary();
   K3DE  = field->addVariable_withoutBounary();
-  dbydx = field->addVariable_withoutBounary();
-  dbydy = field->addVariable_withoutBounary();
+  dbydxD = field->addVariable_withoutBounary();
+  dbydyD = field->addVariable_withoutBounary();
+  dbydxDVx = field->addVariable_withoutBounary();
+  dbydyDVx = field->addVariable_withoutBounary();
+  dbydxDVy = field->addVariable_withoutBounary();
+  dbydyDVy = field->addVariable_withoutBounary();
+  dbydxDE = field->addVariable_withoutBounary();
+  dbydyDE = field->addVariable_withoutBounary();
 
   DAnalytical  = field->addVariable_withBounary("qAnalytic");
   VxAnalytical = field->addVariable_withBounary("uAnalytic");
@@ -327,35 +333,79 @@ void EulerSolver::updateEigenValues() {
   return ;
 }
 
-void EulerSolver::RK_Step1(int Var, int FluxX, int FluxY, int K) {
-  field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
-  field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
+void EulerSolver::RK_Step1() {
+  int FluxX[] = {DVx, DVxVx_plus_P, DVxVy, DE_plus_P_Vx};
+  int FluxY[] = {DVy, DVxVy, DVyVy_plus_P, DE_plus_P_Vy};
+  int FluxVarx[] = {Vx_plus_C};
+  int FluxVary[] = {Vy_plus_C};
+  int Var[] = {D, DVx, DVy, DE};
+  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDE};
+  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDE};
 
-  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K);
+  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 4);
+  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 4);
+
+  field->setFunctionsForVariables(-1.0, dbydxD, -1.0, dbydyD, Addab, K1D);
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K1DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K1DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K1DE);
   
-  field->setFunctionsForVariables(0.5*dt, K, 1.0, Var, Addab, Var);
+  field->setFunctionsForVariables(0.5*dt, K1D, 1.0, D, Addab, D);
+  field->setFunctionsForVariables(0.5*dt, K1DVx, 1.0, DVx, Addab, DVx);
+  field->setFunctionsForVariables(0.5*dt, K1DVy, 1.0, DVy, Addab, DVy);
+  field->setFunctionsForVariables(0.5*dt, K1DE, 1.0, DE, Addab, DE);
 
   return;
 }
 
-void EulerSolver::RK_Step2(int Var, int FluxX, int FluxY, int K1, int K2) {
-  field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
-  field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
+void EulerSolver::RK_Step2() {
+  int FluxX[] = {DVx, DVxVx_plus_P, DVxVy, DE_plus_P_Vx};
+  int FluxY[] = {DVy, DVxVy, DVyVy_plus_P, DE_plus_P_Vy};
+  int FluxVarx[] = {Vx_plus_C};
+  int FluxVary[] = {Vy_plus_C};
+  int Var[] = {D, DVx, DVy, DE};
+  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDE};
+  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDE};
 
-  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K2);
+  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 4);
+  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 4);
   
-  field->setFunctionsForVariables(-1.5*dt, K1, 2.0*dt, K2, 1.0, Var, Addabc, Var);
+  field->setFunctionsForVariables(-1.0, dbydxD, -1.0, dbydyD, Addab, K2D);
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K2DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K2DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K2DE);
+  
+  field->setFunctionsForVariables(-1.5*dt, K1D, 2.0*dt, K2D, 1.0, D, Addabc, D);
+  field->setFunctionsForVariables(-1.5*dt, K1DVx, 2.0*dt, K2DVx, 1.0, DVx, Addabc, DVx);
+  field->setFunctionsForVariables(-1.5*dt, K1DVy, 2.0*dt, K2DVy, 1.0, DVy, Addabc, DVy);
+  field->setFunctionsForVariables(-1.5*dt, K1DE, 2.0*dt, K2DE, 1.0, DE, Addabc, DE);
 
   return;
 }
 
-void EulerSolver::RK_Step3(int Var, int FluxX, int FluxY, int K1, int K2, int K3) {
-  field->delByDelX(FluxX, dbydx, Var, "rusanov", Vx_plus_C);
-  field->delByDelY(FluxY, dbydy, Var, "rusanov", Vy_plus_C);
+void EulerSolver::RK_Step3() {
+  int FluxX[] = {DVx, DVxVx_plus_P, DVxVy, DE_plus_P_Vx};
+  int FluxY[] = {DVy, DVxVy, DVyVy_plus_P, DE_plus_P_Vy};
+  int FluxVarx[] = {Vx_plus_C};
+  int FluxVary[] = {Vy_plus_C};
+  int Var[] = {D, DVx, DVy, DE};
+  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDE};
+  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDE};
 
-  field->setFunctionsForVariables(-1.0, dbydx, -1.0, dbydy, Addab, K3);
+  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 4);
+  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 4);
+
+  field->setFunctionsForVariables(-1.0, dbydxD, -1.0, dbydyD, Addab, K3D);
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K3DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K3DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K3DE);
   
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1, -(4.0/3.0)*dt, K2, (1.0/6.0)*dt, K3, 1.0, Var, Addabcd, Var);
+  
+  field->setFunctionsForVariables((7.0/6.0)*dt, K1D, -(4.0/3.0)*dt, K2D, (1.0/6.0)*dt, K3D, 1.0, D, Addabcd, D);
+  field->setFunctionsForVariables((7.0/6.0)*dt, K1DVx, -(4.0/3.0)*dt, K2DVx, (1.0/6.0)*dt, K3DVx, 1.0, DVx, Addabcd, DVx);
+  field->setFunctionsForVariables((7.0/6.0)*dt, K1DVy, -(4.0/3.0)*dt, K2DVy, (1.0/6.0)*dt, K3DVy, 1.0, DVy, Addabcd, DVy);
+  field->setFunctionsForVariables((7.0/6.0)*dt, K1DE, -(4.0/3.0)*dt, K2DE, (1.0/6.0)*dt, K3DE, 1.0, DE, Addabcd, DE);
+
   return;
 }
 
@@ -387,14 +437,8 @@ void EulerSolver::solve() {
       cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
       count = 0;
     }
-    // Mass
-    RK_Step1(D, DVx, DVy, K1D);
-    // X Momentum
-    RK_Step1(DVx,DVxVx_plus_P,DVxVy,K1DVx);
-    // Y Momentum
-    RK_Step1(DVy,DVxVy,DVyVy_plus_P,K1DVy);
-    // Energy
-    RK_Step1(DE,DE_plus_P_Vx,DE_plus_P_Vy,K1DE);
+
+    RK_Step1();
     
     RunShockDetector();
     RunLimiter();
@@ -407,15 +451,8 @@ void EulerSolver::solve() {
     // Second Step of RK3
     updateInviscidFlux();
     updateEigenValues();
-
-    // Mass
-    RK_Step2(D, DVx, DVy, K1D, K2D);
-    // X Momentum
-    RK_Step2(DVx,DVxVx_plus_P,DVxVy,K1DVx, K2DVx);
-    // Y Momentum
-    RK_Step2(DVy,DVxVy,DVyVy_plus_P,K1DVy, K2DVy);
-    // Energy
-    RK_Step2(DE,DE_plus_P_Vx,DE_plus_P_Vy,K1DE, K2DE);
+    
+    RK_Step2();
     
     RunShockDetector();
     RunLimiter();
@@ -428,15 +465,7 @@ void EulerSolver::solve() {
     updateInviscidFlux();
     updateEigenValues();
 
-    // Mass
-    RK_Step3(D, DVx, DVy, K1D, K2D, K3D);
-    // X Momentum
-    RK_Step3(DVx,DVxVx_plus_P,DVxVy,K1DVx, K2DVx, K3DVx);
-    // Y Momentum
-    RK_Step3(DVy,DVxVy,DVyVy_plus_P,K1DVy, K2DVy, K3DVy);
-    // Energy
-    RK_Step3(DE,DE_plus_P_Vx,DE_plus_P_Vy,K1DE, K2DE, K3DE);
- 
+    RK_Step3();
     
    RunShockDetector();
    RunLimiter();
@@ -514,6 +543,22 @@ void EulerSolver::SetLimiterVariables() {
     field->scal(0.0, Moment);
     ModMoment = field->addVariable_withBounary("modmoment");
     field->scal(0.0, ModMoment);
+    uMoment = field->addVariable_withoutBounary();
+    vMoment = field->addVariable_withoutBounary();
+    qMoment = field->addVariable_withoutBounary();
+    HMoment = field->addVariable_withoutBounary();
+    uModMoment = field->addVariable_withoutBounary();
+    vModMoment = field->addVariable_withoutBounary();
+    qModMoment = field->addVariable_withoutBounary();
+    HModMoment = field->addVariable_withoutBounary();
+    field->scal(0.0, uMoment);
+    field->scal(0.0, vMoment);
+    field->scal(0.0, qMoment);
+    field->scal(0.0, HMoment);
+    field->scal(0.0, uModMoment);
+    field->scal(0.0, vModMoment);
+    field->scal(0.0, qModMoment);
+    field->scal(0.0, HModMoment);
     field->setVanderMandMatrix();
   }
   else if (Limiter == "CharacteristicLimiter") {
@@ -532,6 +577,15 @@ void EulerSolver::SetLimiterVariables() {
     field->scal(0.0, vMoment);
     field->scal(0.0, qMoment);
     field->scal(0.0, HMoment);
+    uModMoment = field->addVariable_withoutBounary();
+    vModMoment = field->addVariable_withoutBounary();
+    qModMoment = field->addVariable_withoutBounary();
+    HModMoment = field->addVariable_withoutBounary();
+    field->scal(0.0, uModMoment);
+    field->scal(0.0, vModMoment);
+    field->scal(0.0, qModMoment);
+    field->scal(0.0, HModMoment);
+    
 
     Char1 = field->addVariable_withoutBounary();
     Char2 = field->addVariable_withoutBounary();
@@ -559,11 +613,25 @@ void EulerSolver::RunLimiter() {
   
   if ( Limiter == "LiliaMoment") {
         
-    Run_LiliaMomentLimiter(DVx);
+    /*Run_LiliaMomentLimiter(DVx);
     Run_LiliaMomentLimiter(DVy);
     Run_LiliaMomentLimiter(DE);
     Run_LiliaMomentLimiter(D);
+    */
     //Run_LiliaMomentLimiter(T); // If needed, else compute it later using q and P ..
+    int Var[] ={D, DVx, DVy, DE};
+    int Mom[] = {qMoment, uMoment, vMoment, HMoment};
+    int ModMom[] = {qModMoment, uModMoment, vModMoment, HModMoment}; 
+    field->computeMoments(Var, Mom, CellMarker, 4);
+    //field->computeMoments(v, ModMoment);
+    field->setFunctionsForVariables(1.0, qMoment, Copy, qModMoment);
+    field->setFunctionsForVariables(1.0, uMoment, Copy, uModMoment);
+    field->setFunctionsForVariables(1.0, vMoment, Copy, vModMoment);
+    field->setFunctionsForVariables(1.0, HMoment, Copy, HModMoment);
+
+    field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 4);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 4);
+
   }
 
   else if(Limiter == "CharacteristicLimiter") {
@@ -617,25 +685,44 @@ void EulerSolver::Run_LiliaMomentLimiter(int v) {
 void EulerSolver::RunPositivityLimiter() {
   
   if ( Limiter == "LiliaMoment" || Limiter == "CharacteristicLimiter") {
+    int Var[] ={D, DVx, DVy, DE};
+    int Mom[] = {qMoment, uMoment, vMoment, HMoment};
+    int ModMom[] = {qModMoment, uModMoment, vModMoment, HModMoment}; 
+
     field->ResetVariables_CellCentered(CellMarker, 1.5);
 
     updatePrimitiveVariables();
     field->resetPositivity(false);
     checkPositivity();
-    Run_PositivityMomentLimiter(DVx, N+2);
+    /*Run_PositivityMomentLimiter(DVx, N+2);
     Run_PositivityMomentLimiter(DVy, N+2);
     Run_PositivityMomentLimiter(DE, N+2);
-    Run_PositivityMomentLimiter(D, N+2);
-    
+    Run_PositivityMomentLimiter(D, N+2);*/
+
+    field->computeMoments(Var, Mom, CellMarker, 4);
+    field->scal(0.0, qModMoment);
+    field->scal(0.0, uModMoment);
+    field->scal(0.0, vModMoment);
+    field->scal(0.0, HModMoment);
+    field->limitMoments(Mom, ModMom, CellMarker, N+2, 4);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 4);
+
 
     updatePrimitiveVariables();
     field->resetPositivity(false);
     checkPositivity();
-    Run_PositivityMomentLimiter(DVx, 0);
+    /*Run_PositivityMomentLimiter(DVx, 0);
     Run_PositivityMomentLimiter(DVy, 0);
     Run_PositivityMomentLimiter(DE, 0);
-    Run_PositivityMomentLimiter(D, 0);
+    Run_PositivityMomentLimiter(D, 0);*/
     //Run_PositivityMomentLimiter(T, N+2); // If needed, else compute it later using q and P ..
+    field->computeMoments(Var, Mom, CellMarker, 4);
+    field->scal(0.0, qModMoment);
+    field->scal(0.0, uModMoment);
+    field->scal(0.0, vModMoment);
+    field->scal(0.0, HModMoment);
+    field->limitMoments(Mom, ModMom, CellMarker, 0, 4);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 4);
   }
 
   return ;

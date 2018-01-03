@@ -777,6 +777,67 @@ void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  Function to compute the Moments for given variable.
+ * 
+ * @Param v This is the quantity whose moments are to be calculated.
+ * @Param m This is the variable used to store the moments.
+ * @Param cm This the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::computeMoments(int *v, int *m, int cm, unsigned size) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+        if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
+             elements[i][j]->computeMoments(v, m, size);
+        }
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to limit the Moments for given variable.
+ * 
+ * @Param m This is gives the moments to be limited.
+ * @Param modifiedm This is the variable to store the modified moments.
+ * @Param cm This the cell marker used to identified troubled cells.
+ * @Param Index This is the index at which to start limiting .
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::limitMoments(int *m, int *modifiedm, int cm, unsigned Index, unsigned size) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+        if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
+            elements[i][j]->limitMoments(m, modifiedm, Index, size);
+        }
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to obtain value of the variable from the moments.
+ * 
+ * @Param m This is gives the moments of the variable.
+ * @Param v This is the variable /quantity to be obtained.
+ * @Param cm This the cell marker used to identified troubled cells.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::convertMomentToVariable(int *m, int *v, int cm, unsigned size) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+        if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j] ) {
+            elements[i][j]->convertMomentToVariable(m, v, size);
+        }
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  Function to limit the Moments for given variable, using Characteristic Limiter.
  * 
  * @Param array V array of indices of moments of Conservative Variables.
@@ -1002,6 +1063,43 @@ void DG_Field_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, in
 
     return ;
 }
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to operate the partial derivative of the variable w.r.t. x.
+ *
+ * @Param v The variable which is to be differentiated
+ * @Param vDash The variable in which the differentiated value is to be stored.
+ * @Param conserVar The correpsonding conservative/dependent variable.
+ * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxType, int *fluxVariable, unsigned size) {
+    for(int i = 0; i < ne_x; i++ )
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->delByDelX(V, VDash, ConserVar, fluxType, fluxVariable, size);
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function to operate the partial derivative of the variable w.r.t. y.
+ *
+ * @Param v The variable which is to be differentiated
+ * @Param vDash The variable in which the differentiated value is to be stored.
+ * @Param conserVar The corresponding conservative/Dependent Variable.
+ * @Param fluxType The numerical flux type which is to be implemented while computing the derivative.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxType, int *fluxVariable, unsigned size) {
+    for(int i = 0; i < ne_x; i++ )
+        for(int j = 0; j < ne_y; j++)
+            elements[i][j]->delByDelY(V, VDash, ConserVar, fluxType, fluxVariable, size);
+
+    return ;
+}
+
 
 /* ----------------------------------------------------------------------------*/
 /**
