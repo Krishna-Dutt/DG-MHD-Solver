@@ -1166,15 +1166,16 @@ void DG_Field_2d::scal(double a, int x) {
     /*for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++) 
             elements[i][j]->scal(a, x);*/
+    double *domVar = domainVariable[x];
     if (!a) {
         for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i){
-            domainVariable[x][i] = 0;
+            domVar[i] = 0;
         }
         return ;
     }
     
     for(int i=0 ; i< (N+1)*(N+1)*ne_x*ne_y ; ++i) {
-        domainVariable[x][i] = a * domainVariable[x][i];
+        domVar[i] = a * domVar[x][i];
     }
 
     return ;
@@ -1360,12 +1361,13 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
      int a, k;
      //if( level == "One")
       {
+         double *domVar = domainVariable[v]; 
          for(int i=0; i <ne_x; ++i) {
              for(int j=0; j<ne_y; ++j) {
                  a = (N+1)*(N+1)*(i*ne_y + j);
                  k = 0;
                  while( (k < (N+1)*(N+1)) && !PositivityMarker[i*ne_y + j] ) {
-                     if(domainVariable[v][a + k] < 0) PositivityMarker[i*ne_y + j] = true;
+                     if(domVar[a + k] < 0) PositivityMarker[i*ne_y + j] = true;
                      k++;
                  }
              }
@@ -1451,9 +1453,10 @@ void DG_Field_2d::updateBoundary(double time) {
  */
 /* ----------------------------------------------------------------------------*/
 double DG_Field_2d::FindMax(int v) {
-    double Max = domainVariable[v][0]; 
+    double *domVar = domainVariable[v];
+    double Max = domVar[0]; 
     for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i) {
-        Max  = max(Max, domainVariable[v][i]);
+        Max  = max(Max, domVar[i]);
     }
     return Max;
 }
@@ -1494,10 +1497,11 @@ void DG_Field_2d::FindMindx(int dx) {
  */
 /* ----------------------------------------------------------------------------*/
 double DG_Field_2d::FindMindt(int dt) {
-    double Mini = cellcenterVariable[dt][0];
+    double *CCVar = cellcenterVariable[dt];
+    double Mini = CCVar[0];
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            Mini = min(cellcenterVariable[dt][i*ne_y + j] , Mini);
+            Mini = min(CCVar[dt][i*ne_y + j] , Mini);
 
     return Mini;
 }
@@ -1513,9 +1517,10 @@ double DG_Field_2d::FindMindt(int dt) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::FindTimestep(int dt, int dx, int U, double CFL) {
+    double *CCVar_dt = cellcenterVariable[dt], *CCVar_dx = cellcenterVariable[dx], *CCVarU = cellcenterVariable[U];
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            cellcenterVariable[dt][i*ne_y + j] = CFL * (cellcenterVariable[dx][i*ne_y + j]/ cellcenterVariable[U][i*ne_y + j] );
+            CCVar_dt[i*ne_y + j] = CFL * (CCVar_dx[i*ne_y + j]/ CCVarU[i*ne_y + j] );
 
     return ;
 }

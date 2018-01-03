@@ -445,10 +445,10 @@ double DG_Element_2d::updateCellMarker(int v) {
 
   }*/
   
-
-  MaxVariable = variable[v][0];
+  double *Var = variable[v];
+  MaxVariable = Var[0];
   for (int i = 0; i < (N+1)*(N+1) ; ++i) {
-    MaxVariable = MAX(MaxVariable,variable[v][i]);
+    MaxVariable = MAX(MaxVariable,Var[i]);
   }
 
 
@@ -464,9 +464,9 @@ double DG_Element_2d::updateCellMarker(int v) {
     Marker = 0.0;
   }
   
-  for(int b=0; b <(N+1)*(N+1); ++b) {
+  /*for(int b=0; b <(N+1)*(N+1); ++b) {
       variable[35][b] = Marker; // CellMarkerG
-  }
+  }*/
  
  delete[] NumFlux;
 
@@ -565,12 +565,11 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
     double Temp1, Temp2, AlphaN;
     double epsilon = 1e-13;
     AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));  // Similar to a diffusion coefficient
-    /*vector<double> Var1, Var2 ;
-    double M = 50.0;
-    double min_dx = min(abs(X[0]-X[1]), abs(Y[0]-Y[1]));
-    Var1.push_back(M*min_dx*min_dx);
-    Var2.push_back(M*min_dx*min_dx);
-    */  
+    double *VarM = variable[m], *VarModM = variable[modm]; 
+    double *RNVarM = rightNeighbor->variable[m];
+    double *LNVarM = leftNeighbor->variable[m];
+    double *TNVarM = topNeighbor->variable[m];
+    double *BNVarM = bottomNeighbor->variable[m];
     
     // Ensuring that Cell avergae remains the  same after limiting !!
     variable[modm][0] = variable[m][0];
@@ -589,40 +588,13 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
 
-       /*Var1.resize(0);
-       Var2.resize(0);
-       Var1.push_back(variable[m][Tempi]);
-       Var2.push_back(variable[m][Tempj]);
-
-       //if (abs(rightNeighbor->variable[m][Tempi]) > epsilon ) 
-       Var1.push_back(AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]));
-       //if (abs(leftNeighbor->variable[m][Tempi]) > epsilon) 
-       Var1.push_back(AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]));
-       //if (abs(topNeighbor->variable[m][Tempi]) > epsilon ) 
-       Var1.push_back(AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]));
-       //if (abs(bottomNeighbor->variable[m][Tempi]) > epsilon) 
-       Var1.push_back(AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)])); 
-       
-       //if (abs(rightNeighbor->variable[m][Tempj]) > epsilon ) 
-       Var2.push_back(AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]));
-       //if (abs(leftNeighbor->variable[m][Tempj]) > epsilon) 
-       Var2.push_back(AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
-       //if (abs(topNeighbor->variable[m][Tempj]) > epsilon ) 
-       Var2.push_back(AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]));
-       //if (abs(bottomNeighbor->variable[m][Tempj]) > epsilon) 
-       Var2.push_back(AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)])); 
-       
-       Temp1 = MinMod(Var1);
-       Temp2 = MinMod(Var2);
-       */
-
        // Original minmod detector
-       Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+       Temp1 = MinMod(VarM[Tempi], AlphaN*(RNVarM[Tempi-1] -VarM[Tempi-1]), AlphaN*(VarM[Tempi-1] -LNVarM[Tempi-1]) , AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
+       Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]) , AlphaN*(TNVarM[Tempj-(N+1)] -VarM[Tempj-(N+1)]), AlphaN*(VarM[Tempj-(N+1)] -BNVarM[Tempj-(N+1)]));
        
-       if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
-         variable[modm][Tempi] = Temp1;
-         variable[modm][Tempj] = Temp2;
+       if (abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+         VarModM[Tempi] = Temp1;
+         VarModM[Tempj] = Temp2;
        }
        else 
        {
@@ -633,32 +605,13 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
        Tempi = i-j;
        Tempj = i - j*(N+1);
 
-
-       /*Var1.resize(0);
-       Var2.resize(0);
-       Var1.push_back(variable[m][Tempi]);
-       Var2.push_back(variable[m][Tempj]);
-
-       //if (abs(topNeighbor->variable[m][Tempi]) > epsilon ) 
-       Var1.push_back(AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]));
-       //if (abs(bottomNeighbor->variable[m][Tempi]) > epsilon) 
-       Var1.push_back(AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)])); 
-       
-       //if (abs(rightNeighbor->variable[m][Tempj]) > epsilon ) 
-       Var2.push_back(AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]));
-       //if (abs(leftNeighbor->variable[m][Tempj]) > epsilon) 
-       Var2.push_back(AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
-       
-       Temp1 = MinMod(Var1);
-       Temp2 = MinMod(Var2);
-       */
        // Original Detector
-       Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-       Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+       Temp1 = MinMod(VarM[Tempi], AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
+       Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]));
        
-       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
-         variable[modm][Tempi] = Temp1;
-         variable[modm][Tempj] = Temp2;
+       if ( abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+         VarModM[Tempi] = Temp1;
+         VarModM[Tempj] = Temp2;
        }
        else //if( Temp1 !=0 && Temp2 !=0)
        {
@@ -738,6 +691,12 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
     int counter = 0;
     for(int temp = 0 ; temp<size; ++temp) {
         m = M[temp]; modm = Modm[temp];
+        double *VarM = variable[m], *VarModM = variable[modm]; 
+        double *RNVarM = rightNeighbor->variable[m];
+        double *LNVarM = leftNeighbor->variable[m];
+        double *TNVarM = topNeighbor->variable[m];
+        double *BNVarM = bottomNeighbor->variable[m];
+    
         // Ensuring that Cell avergae remains the  same after limiting !!
         variable[modm][0] = variable[m][0];
 
@@ -751,13 +710,13 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
              Tempi = i-j;
              Tempj = i - j*(N+1);
              // Original minmod detector
-             Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-             Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
+             Temp1 = MinMod(VarM[Tempi], AlphaN*(RNVarM[Tempi-1] -VarM[Tempi-1]), AlphaN*(VarM[Tempi-1] -LNVarM[Tempi-1]) , AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
+             Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]) , AlphaN*(TNVarM[Tempj-(N+1)] -VarM[Tempj-(N+1)]), AlphaN*(VarM[Tempj-(N+1)] -BNVarM[Tempj-(N+1)]));
        
-             if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
-                 variable[modm][Tempi] = Temp1;
-                 variable[modm][Tempj] = Temp2;
-             }
+             if (abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+                VarModM[Tempi] = Temp1;
+                VarModM[Tempj] = Temp2;
+            }
              else 
              {
                counter = 1; // Need to exit both loops
@@ -768,13 +727,13 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
                 Tempi = i-j;
                 Tempj = i - j*(N+1);
                 // Original Detector
-                Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
-                Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
+                Temp1 = MinMod(VarM[Tempi], AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
+                Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]));
        
-                if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
-                    variable[modm][Tempi] = Temp1;
-                    variable[modm][Tempj] = Temp2;
-                 }
+                if ( abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+                  VarModM[Tempi] = Temp1;
+                  VarModM[Tempj] = Temp2;
+                }
                 else //if( Temp1 !=0 && Temp2 !=0)
                  {
                    counter = 1; // Need to exit both loops
@@ -816,6 +775,7 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
     for(int temp=0; temp< Dimension; ++temp) {
         count = N+1;
         counter = 0;
+        double *VarC = variable[C[temp]];
 
         for(i=(N+1)*(N+1)-1; (i > 0) && (counter == 0); i = i - (N+2)) {
           --count;
@@ -835,7 +795,7 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
                  Sum4 += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)];   
              }
 
-             Temp1 = MinMod(variable[C[temp]][Tempi], AlphaN*(Sum1 -variable[C[temp]][Tempi-1]), AlphaN*(variable[C[temp]][Tempi-1] -Sum2), AlphaN*(Sum3 -variable[C[temp]][Tempi-(N+1)]), AlphaN*(variable[C[temp]][Tempi-(N+1)] -Sum4));
+             Temp1 = MinMod(VarC[Tempi], AlphaN*(Sum1 -VarC[Tempi-1]), AlphaN*(VarC[Tempi-1] -Sum2), AlphaN*(Sum3 -VarC[Tempi-(N+1)]), AlphaN*(VarC[Tempi-(N+1)] -Sum4));
                           
              Sum1 = Sum2 = Sum3 = Sum4 = 0;
              for(int z=0; z<Dimension; ++z) {
@@ -845,11 +805,11 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
                  Sum4 += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
              }
 
-             Temp2 = MinMod(variable[C[temp]][Tempj], AlphaN*(Sum1 -variable[C[temp]][Tempj-1]), AlphaN*(variable[C[temp]][Tempj-1] -Sum2), AlphaN*(Sum3 -variable[C[temp]][Tempj-(N+1)]), AlphaN*(variable[C[temp]][Tempj-(N+1)] -Sum4));
+             Temp2 = MinMod(VarC[Tempj], AlphaN*(Sum1 -VarC[Tempj-1]), AlphaN*(VarC[Tempj-1] -Sum2), AlphaN*(Sum3 -VarC[Tempj-(N+1)]), AlphaN*(VarC[Tempj-(N+1)] -Sum4));
 
-             if (abs(Temp1-variable[C[temp]][Tempi]) > epsilon || abs(Temp2-variable[C[temp]][Tempj]) > epsilon ) {
-                 variable[C[temp]][Tempi] = Temp1;
-                 variable[C[temp]][Tempj] = Temp2;
+             if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+                 VarC[Tempi] = Temp1;
+                 VarC[Tempj] = Temp2;
              }
              else {
                  counter = 1.0 ;
@@ -868,12 +828,12 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
                  Sum4 += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
              }
             
-             Temp1 = MinMod(variable[C[temp]][Tempi], AlphaN*(Sum1 -variable[C[temp]][Tempi-(N+1)]), AlphaN*(variable[C[temp]][Tempi-(N+1)] -Sum2));
-             Temp2 = MinMod(variable[C[temp]][Tempj], AlphaN*(Sum3 -variable[C[temp]][Tempj-1]), AlphaN*(variable[C[temp]][Tempj-1] -Sum4));
+             Temp1 = MinMod(VarC[Tempi], AlphaN*(Sum1 -VarC[Tempi-(N+1)]), AlphaN*(VarC[Tempi-(N+1)] -Sum2));
+             Temp2 = MinMod(VarC[Tempj], AlphaN*(Sum3 -VarC[Tempj-1]), AlphaN*(VarC[Tempj-1] -Sum4));
              
-             if ( abs(Temp1-variable[C[temp]][Tempi]) > epsilon || abs(Temp2-variable[C[temp]][Tempj]) > epsilon ) {
-                variable[C[temp]][Tempi] = Temp1;
-                variable[C[temp]][Tempj] = Temp2;
+             if ( abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+                VarC[Tempi] = Temp1;
+                VarC[Tempj] = Temp2;
              }
              else {
                  counter = 1.0 ;
@@ -1024,12 +984,13 @@ void DG_Element_2d::findEigenMatrices(int *V) {
 void DG_Element_2d::convertVariabletoCharacteristic(int *V, int *C, unsigned I) {
     double Sum = 0.0;
     for(int k=0; k < Dimension; ++k) {
+        double *VarK = variable[C[k]];
         for(int i=0; i< (N+1)*(N+1); ++i) {
         Sum = 0.0;
         for(int j=0; j < Dimension; ++j){
             Sum += variable[V[j]][i]*LeftEigenMatrix[k*Dimension +j];
         }     
-        variable[C[k]][i] = Sum;
+        VarK[i] = Sum;
     } 
     }
     
@@ -1049,12 +1010,13 @@ void DG_Element_2d::convertVariabletoCharacteristic(int *V, int *C, unsigned I) 
 void DG_Element_2d::convertCharacteristictoVariable(int *C, int *V, unsigned I) {
     double Sum = 0.0;
     for(int k=0; k < Dimension; ++k) {
+        double *VarK = variable[V[k]];
         for(int i=0; i< (N+1)*(N+1); ++i) {
          Sum = 0.0;
          for(int j=0; j < Dimension; ++j){
             Sum += variable[C[j]][i]*RightEigenMatrix[k*Dimension +j];
           }     
-         variable[V[k]][i] = Sum;
+         VarK[i] = Sum;
         } 
     }
      
