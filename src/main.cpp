@@ -268,9 +268,9 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.2;
-    double time = 0.25;
+    double time = 0.2;
     EulerSolver* a;
-    a = new EulerSolver(130, 130, 2);
+    a = new EulerSolver(130, 130, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
@@ -295,7 +295,7 @@ int main() {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("Output3.vtk");
+    //a->plot("Output3.vtk");
     
 
     delete a;

@@ -157,10 +157,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     variableOnlyAtBoundary.resize(0);
     domainVariable.resize(0);
     cellcenterVariable.resize(0);
-
-    PositivityMarker.resize(0);
+    
+    PositivityMarker = new bool[ne_x*ne_y];
     for(int i =0 ; i < ne_x*ne_y ; ++i) 
-       PositivityMarker.push_back(true);
+       PositivityMarker[i] = true;
     
     RightEigenMatrix = NULL;
     LeftEigenMatrix = NULL;
@@ -214,6 +214,7 @@ void DG_Field_2d::setVanderMandMatrix() {
 DG_Field_2d::~DG_Field_2d() {
   // To explicitly deallocate memory associated with the DG Matrices, shared by all elements
   elements[0][0]->Destroy_Matrices();
+  delete[] PositivityMarker;
 
   if(RightEigenMatrix != NULL) {
       delete[] RightEigenMatrix;
@@ -1175,7 +1176,7 @@ void DG_Field_2d::scal(double a, int x) {
     }
     
     for(int i=0 ; i< (N+1)*(N+1)*ne_x*ne_y ; ++i) {
-        domVar[i] = a * domVar[x][i];
+        domVar[i] = a * domVar[i];
     }
 
     return ;
@@ -1501,7 +1502,7 @@ double DG_Field_2d::FindMindt(int dt) {
     double Mini = CCVar[0];
     for(int i = 0; i < ne_x; i++)
         for(int j = 0; j < ne_y; j++)
-            Mini = min(CCVar[dt][i*ne_y + j] , Mini);
+            Mini = min(CCVar[i*ne_y + j] , Mini);
 
     return Mini;
 }

@@ -1144,7 +1144,6 @@ void DG_Element_2d::setNeighboringElement(char type, DG_Element_2d* neighbor) {
     return ;
 }
 
-
 /* ----------------------------------------------------------------------------*/
 /**
  * @Synopsis  This is the function to get the variable `v` differentiated partially w.r.t. `x` and then store it in the
@@ -1164,11 +1163,15 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
     if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
-        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        zeros(numericalFlux, (N+1)*(N+1)); 
+
+        double *BRv = boundaryRight[v], *NRv = neighboringRight[v];
+        double *BLv = boundaryLeft[v], *NLv = neighboringLeft[v];                                                     
         for(int i=0; i<=N; i++){
-            numericalFlux[i*(N+1)+N]    = 0.5*( boundaryRight[v][i*(N+1)]    + neighboringRight[v][i*(N+1)] ) ;   
-            numericalFlux[i*(N+1)]    = 0.5*( boundaryLeft[v][i*(N+1)]     + neighboringLeft[v][i*(N+1)] ) ;  
-        }
+            numericalFlux[i*(N+1)+N] = 0.5*(BRv[i*(N+1)] + NRv[i*(N+1)] );   
+            numericalFlux[i*(N+1)]   = 0.5*(BLv[i*(N+1)]  + NLv[i*(N+1)]);   
+        }                                                    
+       
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
@@ -1188,10 +1191,11 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1)); 
 
+        double *BRv = boundaryRight[v], *NRv = neighboringRight[v], *BRfv = boundaryRight[fluxVariable], *NRfv = neighboringRight[fluxVariable], *BRcv = boundaryRight[conserVar], *NRcv = neighboringRight[conserVar];
+        double *BLv = boundaryLeft[v], *NLv = neighboringLeft[v], *BLfv = boundaryLeft[fluxVariable], *NLfv = neighboringLeft[fluxVariable], *BLcv = boundaryLeft[conserVar], *NLcv = neighboringLeft[conserVar];                                                     
         for(int i=0; i<=N; i++){
-          // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
-            numericalFlux[i*(N+1)+N] = 0.5*(boundaryRight[v][i*(N+1)] + neighboringRight[v][i*(N+1)] + MAX(fabs(boundaryRight[fluxVariable][i*(N+1)]), fabs(neighboringRight[fluxVariable][i*(N+1)]))*(boundaryRight[conserVar][i*(N+1)] - neighboringRight[conserVar][i*(N+1)])  ) ;   
-            numericalFlux[i*(N+1)]   = 0.5*(boundaryLeft[v][i*(N+1)]  + neighboringLeft[v][i*(N+1)]  - MAX(fabs(boundaryLeft[fluxVariable][i*(N+1)]), fabs(neighboringLeft[fluxVariable][i*(N+1)]))*(boundaryLeft[conserVar][i*(N+1)] - neighboringLeft[conserVar][i*(N+1)])  ) ;   
+            numericalFlux[i*(N+1)+N] = 0.5*(BRv[i*(N+1)] + NRv[i*(N+1)] + MAX(fabs(BRfv[i*(N+1)]), fabs(NRfv[i*(N+1)]))*(BRcv[i*(N+1)] - NRcv[i*(N+1)])  ) ;   
+            numericalFlux[i*(N+1)]   = 0.5*(BLv[i*(N+1)]  + NLv[i*(N+1)]  - MAX(fabs(BLfv[i*(N+1)]), fabs(NLfv[i*(N+1)]))*(BLcv[i*(N+1)] - NLcv[i*(N+1)])  ) ;   
         }
 
         /// vDash = -0.5*dy*D*v
@@ -1230,11 +1234,15 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
     if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
-        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        zeros(numericalFlux, (N+1)*(N+1));     
+
+        double *BTv = boundaryTop[v], *NTv = neighboringTop[v] ;
+        double *BBv = boundaryBottom[v], *NBv = neighboringBottom[v];                                                                                                          
         for(int i=0; i<=N; i++){
-            numericalFlux[N*(N+1)+i]    = 0.5*( boundaryTop[v][i]    + neighboringTop[v][i] ) ;   
-            numericalFlux[i]            = 0.5*( boundaryBottom[v][i]     + neighboringBottom[v][i] ) ;  
-        }
+            numericalFlux[N*(N+1)+i]= 0.5*(BTv[i] + NTv[i]);
+            numericalFlux[i]        = 0.5*(BBv[i] + NBv[i]); 
+        }                                                  
+        
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
@@ -1252,11 +1260,13 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
     else if(fluxType == "rusanov") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
-        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        zeros(numericalFlux, (N+1)*(N+1));     
+
+        double *BTv = boundaryTop[v], *NTv = neighboringTop[v], *BTfv = boundaryTop[fluxVariable], *NTfv = neighboringTop[fluxVariable], *BTcv = boundaryTop[conserVar], *NTcv = neighboringTop[conserVar];
+        double *BBv = boundaryBottom[v], *NBv = neighboringBottom[v], *BBfv = boundaryBottom[fluxVariable], *NBfv = neighboringBottom[fluxVariable], *BBcv = boundaryBottom[conserVar], *NBcv = neighboringBottom[conserVar];                                                                                                          
         for(int i=0; i<=N; i++){
-          // Normals nx, ny have been incorporated into the signs, need to set them separately !!
-            numericalFlux[N*(N+1)+i]= 0.5*(boundaryTop[v][i] + neighboringTop[v][i] + MAX(fabs(boundaryTop[fluxVariable][i]), fabs(neighboringTop[fluxVariable][i]))*(boundaryTop[conserVar][i] - neighboringTop[conserVar][i]));
-            numericalFlux[i]        = 0.5*(boundaryBottom[v][i] + neighboringBottom[v][i] - MAX(fabs(boundaryBottom[fluxVariable][i]), fabs(neighboringBottom[fluxVariable][i]))*(boundaryBottom[conserVar][i] - neighboringBottom[conserVar][i])); 
+            numericalFlux[N*(N+1)+i]= 0.5*(BTv[i] + NTv[i] + MAX(fabs(BTfv[i]), fabs(NTfv[i]))*(BTcv[i] - NTcv[i]));
+            numericalFlux[i]        = 0.5*(BBv[i] + NBv[i] - MAX(fabs(BBfv[i]), fabs(NBfv[i]))*(BBcv[i] - NBcv[i])); 
         }
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -1273,6 +1283,7 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
     }
     return ;
 }
+
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1297,10 +1308,13 @@ void DG_Element_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxTyp
         
         for(int temp =0 ; temp < size; ++temp) {
             v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
-            zeros(numericalFlux, (N+1)*(N+1));                                                       
+            zeros(numericalFlux, (N+1)*(N+1)); 
+
+            double *BRv = boundaryRight[v], *NRv = neighboringRight[v];
+            double *BLv = boundaryLeft[v], *NLv = neighboringLeft[v];                                                     
             for(int i=0; i<=N; i++){
-               numericalFlux[i*(N+1)+N]    = 0.5*( boundaryRight[v][i*(N+1)]    + neighboringRight[v][i*(N+1)] ) ;   
-               numericalFlux[i*(N+1)]    = 0.5*( boundaryLeft[v][i*(N+1)]     + neighboringLeft[v][i*(N+1)] ) ;  
+               numericalFlux[i*(N+1)+N] = 0.5*(BRv[i*(N+1)] + NRv[i*(N+1)]);   
+               numericalFlux[i*(N+1)]   = 0.5*(BLv[i*(N+1)]  + NLv[i*(N+1)]);   
             }
             /// vDash = -0.5*dy*D*v
             cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -1326,10 +1340,11 @@ void DG_Element_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxTyp
             v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
             zeros(numericalFlux, (N+1)*(N+1)); 
 
+            double *BRv = boundaryRight[v], *NRv = neighboringRight[v], *BRfv = boundaryRight[fluxVariable], *NRfv = neighboringRight[fluxVariable], *BRcv = boundaryRight[conserVar], *NRcv = neighboringRight[conserVar];
+            double *BLv = boundaryLeft[v], *NLv = neighboringLeft[v], *BLfv = boundaryLeft[fluxVariable], *NLfv = neighboringLeft[fluxVariable], *BLcv = boundaryLeft[conserVar], *NLcv = neighboringLeft[conserVar];                                                     
             for(int i=0; i<=N; i++){
-               // Normals nx, ny of the cell have been incorporated into the signs, need to set them separately !!
-               numericalFlux[i*(N+1)+N] = 0.5*(boundaryRight[v][i*(N+1)] + neighboringRight[v][i*(N+1)] + MAX(fabs(boundaryRight[fluxVariable][i*(N+1)]), fabs(neighboringRight[fluxVariable][i*(N+1)]))*(boundaryRight[conserVar][i*(N+1)] - neighboringRight[conserVar][i*(N+1)])  ) ;   
-               numericalFlux[i*(N+1)]   = 0.5*(boundaryLeft[v][i*(N+1)]  + neighboringLeft[v][i*(N+1)]  - MAX(fabs(boundaryLeft[fluxVariable][i*(N+1)]), fabs(neighboringLeft[fluxVariable][i*(N+1)]))*(boundaryLeft[conserVar][i*(N+1)] - neighboringLeft[conserVar][i*(N+1)])  ) ;   
+               numericalFlux[i*(N+1)+N] = 0.5*(BRv[i*(N+1)] + NRv[i*(N+1)] + MAX(fabs(BRfv[i*(N+1)]), fabs(NRfv[i*(N+1)]))*(BRcv[i*(N+1)] - NRcv[i*(N+1)])  ) ;   
+               numericalFlux[i*(N+1)]   = 0.5*(BLv[i*(N+1)]  + NLv[i*(N+1)]  - MAX(fabs(BLfv[i*(N+1)]), fabs(NLfv[i*(N+1)]))*(BLcv[i*(N+1)] - NLcv[i*(N+1)])  ) ;   
             }
 
             /// vDash = -0.5*dy*D*v
@@ -1374,9 +1389,11 @@ void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxTyp
         for(int temp =0 ; temp < size; ++temp) {
             v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
             zeros(numericalFlux, (N+1)*(N+1));                                                       
+            double *BTv = boundaryTop[v], *NTv = neighboringTop[v];
+            double *BBv = boundaryBottom[v], *NBv = neighboringBottom[v];                                                                                                          
             for(int i=0; i<=N; i++){
-               numericalFlux[N*(N+1)+i]    = 0.5*( boundaryTop[v][i]    + neighboringTop[v][i] ) ;   
-               numericalFlux[i]            = 0.5*( boundaryBottom[v][i]     + neighboringBottom[v][i] ) ;  
+               numericalFlux[N*(N+1)+i]= 0.5*(BTv[i] + NTv[i]);
+               numericalFlux[i]        = 0.5*(BBv[i] + NBv[i]); 
             }
             /// vDash = -0.5*dy*D*v
             cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -1401,10 +1418,11 @@ void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxTyp
         for(int temp =0 ; temp < size; ++temp) {
             v = V[temp]; vDash = VDash[temp]; conserVar = ConserVar[temp];
             zeros(numericalFlux, (N+1)*(N+1));                                                       
+            double *BTv = boundaryTop[v], *NTv = neighboringTop[v], *BTfv = boundaryTop[fluxVariable], *NTfv = neighboringTop[fluxVariable], *BTcv = boundaryTop[conserVar], *NTcv = neighboringTop[conserVar];
+            double *BBv = boundaryBottom[v], *NBv = neighboringBottom[v], *BBfv = boundaryBottom[fluxVariable], *NBfv = neighboringBottom[fluxVariable], *BBcv = boundaryBottom[conserVar], *NBcv = neighboringBottom[conserVar];                                                                                                          
             for(int i=0; i<=N; i++){
-               // Normals nx, ny have been incorporated into the signs, need to set them separately !!
-               numericalFlux[N*(N+1)+i]= 0.5*(boundaryTop[v][i] + neighboringTop[v][i] + MAX(fabs(boundaryTop[fluxVariable][i]), fabs(neighboringTop[fluxVariable][i]))*(boundaryTop[conserVar][i] - neighboringTop[conserVar][i]));
-               numericalFlux[i]        = 0.5*(boundaryBottom[v][i] + neighboringBottom[v][i] - MAX(fabs(boundaryBottom[fluxVariable][i]), fabs(neighboringBottom[fluxVariable][i]))*(boundaryBottom[conserVar][i] - neighboringBottom[conserVar][i])); 
+               numericalFlux[N*(N+1)+i]= 0.5*(BTv[i] + NTv[i] + MAX(fabs(BTfv[i]), fabs(NTfv[i]))*(BTcv[i] - NTcv[i]));
+               numericalFlux[i]        = 0.5*(BBv[i] + NBv[i] - MAX(fabs(BBfv[i]), fabs(NBfv[i]))*(BBcv[i] - NBcv[i])); 
             }
             /// vDash = -0.5*dy*D*v
             cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
@@ -1441,11 +1459,15 @@ void DG_Element_2d::delByDelX(int v, int vDash, string fluxType) {
     if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
-        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        zeros(numericalFlux, (N+1)*(N+1));   
+
+        double *BRv = boundaryRight[v], *NRv = neighboringRight[v];
+        double *BLv = boundaryLeft[v], *NLv = neighboringLeft[v];                                                     
         for(int i=0; i<=N; i++){
-            numericalFlux[i*(N+1)+N]    = 0.5*( boundaryRight[v][i*(N+1)]    + neighboringRight[v][i*(N+1)] ) ;   
-            numericalFlux[i*(N+1)]    = 0.5*( boundaryLeft[v][i*(N+1)]     + neighboringLeft[v][i*(N+1)] ) ;  
-        }
+            numericalFlux[i*(N+1)+N] = 0.5*(BRv[i*(N+1)] + NRv[i*(N+1)] );   
+            numericalFlux[i*(N+1)]   = 0.5*(BLv[i*(N+1)]  + NLv[i*(N+1)]);   
+        }                                                       
+        
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dy, derivativeMatrix_x, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
@@ -1481,11 +1503,15 @@ void DG_Element_2d::delByDelY(int v, int vDash, string fluxType) {
     if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
-        zeros(numericalFlux, (N+1)*(N+1));                                                       
+        zeros(numericalFlux, (N+1)*(N+1)); 
+        
+        double *BTv = boundaryTop[v], *NTv = neighboringTop[v] ;
+        double *BBv = boundaryBottom[v], *NBv = neighboringBottom[v];                                                                                                          
         for(int i=0; i<=N; i++){
-            numericalFlux[N*(N+1)+i]    = 0.5*( boundaryTop[v][i]    + neighboringTop[v][i] ) ;   
-            numericalFlux[i]            = 0.5*( boundaryBottom[v][i]     + neighboringBottom[v][i] ) ;  
-        }
+            numericalFlux[N*(N+1)+i]= 0.5*(BTv[i] + NTv[i]);
+            numericalFlux[i]        = 0.5*(BBv[i] + NBv[i]); 
+        }                                                         
+        
         /// vDash = -0.5*dy*D*v
         cblas_dgemv(CblasRowMajor, CblasTrans,   (N+1)*(N+1), (N+1)*(N+1), -0.5*dx, derivativeMatrix_y, (N+1)*(N+1), variable[v],   1, 0, auxillaryVariable, 1);
 
@@ -1502,7 +1528,6 @@ void DG_Element_2d::delByDelY(int v, int vDash, string fluxType) {
     
     return ;
 }
-
 
 /* ----------------------------------------------------------------------------*/
 /**

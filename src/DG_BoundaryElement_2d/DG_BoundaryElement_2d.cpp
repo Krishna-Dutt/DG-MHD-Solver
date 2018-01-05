@@ -664,6 +664,7 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
     for(int temp=0; temp<Dimension; ++temp){
         count = N+1;
         counter = 0; 
+        double *VarC = variable[C[temp]];
 
         for(i=(N+1)*(N+1)-1; (i > 0) && (counter == 0); i = i - (N+2)) {
           --count;
@@ -676,36 +677,36 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
 
              Var1.resize(0);
              Var2.resize(0);
-             Var1.push_back(variable[C[temp]][Tempi]);
-             Var2.push_back(variable[C[temp]][Tempj]);
+             Var1.push_back(VarC[Tempi]);
+             Var2.push_back(VarC[Tempj]);
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * rightNeighbor->variable[V[z]][Tempi-1]; 
              }
             if(rightNeighbor != this)
-             Var1.push_back(AlphaN*(Sums -variable[C[temp]][Tempi-1]));
+             Var1.push_back(AlphaN*(Sums -VarC[Tempi-1]));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempi-1]; 
              }
              if(leftNeighbor != this)
-              Var1.push_back(AlphaN*(variable[C[temp]][Tempi-1] -Sums));
+              Var1.push_back(AlphaN*(VarC[Tempi-1] -Sums));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
              }
             if(topNeighbor != this) 
-            Var1.push_back(AlphaN*(Sums -variable[C[temp]][Tempi-(N+1)]));
+            Var1.push_back(AlphaN*(Sums -VarC[Tempi-(N+1)]));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
              }
             if(bottomNeighbor != this) 
-            Var1.push_back(AlphaN*(variable[C[temp]][Tempi-(N+1)] -Sums));
+            Var1.push_back(AlphaN*(VarC[Tempi-(N+1)] -Sums));
 
 
              Sums = 0.0;
@@ -713,35 +714,35 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
              }
             if(rightNeighbor != this) 
-            Var2.push_back(AlphaN*(Sums -variable[C[temp]][Tempj-1]));
+            Var2.push_back(AlphaN*(Sums -VarC[Tempj-1]));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
              }
             if(leftNeighbor != this) 
-            Var2.push_back(AlphaN*(variable[C[temp]][Tempj-1] -Sums));
+            Var2.push_back(AlphaN*(VarC[Tempj-1] -Sums));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * topNeighbor->variable[V[z]][Tempj-(N+1)]; 
              }
             if(topNeighbor != this) 
-            Var2.push_back(AlphaN*(Sums -variable[C[temp]][Tempj-(N+1)]));
+            Var2.push_back(AlphaN*(Sums -VarC[Tempj-(N+1)]));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempj-(N+1)]; 
              }
             if(bottomNeighbor != this) 
-            Var2.push_back(AlphaN*(variable[C[temp]][Tempj-(N+1)] -Sums));
+            Var2.push_back(AlphaN*(VarC[Tempj-(N+1)] -Sums));
              
              Temp1 = MinMod(Var1);
              Temp2 = MinMod(Var2);
              
-             if (abs(Temp1-variable[C[temp]][Tempi]) > epsilon || abs(Temp2-variable[C[temp]][Tempj]) > epsilon ) {
-                 variable[C[temp]][Tempi] = Temp1;
-                 variable[C[temp]][Tempj] = Temp2;
+             if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+                 VarC[Tempi] = Temp1;
+                 VarC[Tempj] = Temp2;
              }
              else {
                  counter = 1.0 ;
@@ -754,43 +755,43 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
          
              Var1.resize(0);
              Var2.resize(0);
-             Var1.push_back(variable[C[temp]][Tempi]);
-             Var2.push_back(variable[C[temp]][Tempj]);
+             Var1.push_back(VarC[Tempi]);
+             Var2.push_back(VarC[Tempj]);
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * topNeighbor->variable[V[z]][Tempi-(N+1)]; 
              }
             if(topNeighbor != this) 
-            Var1.push_back(AlphaN*(Sums -variable[C[temp]][Tempi-(N+1)]));
+            Var1.push_back(AlphaN*(Sums -VarC[Tempi-(N+1)]));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * bottomNeighbor->variable[V[z]][Tempi-(N+1)]; 
              }
             if(bottomNeighbor != this) 
-            Var1.push_back(AlphaN*(variable[C[temp]][Tempi-(N+1)] -Sums));
+            Var1.push_back(AlphaN*(VarC[Tempi-(N+1)] -Sums));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * rightNeighbor->variable[V[z]][Tempj-1]; 
              }
             if(rightNeighbor != this) 
-            Var2.push_back(AlphaN*(Sums -variable[C[temp]][Tempj-1]));
+            Var2.push_back(AlphaN*(Sums -VarC[Tempj-1]));
 
              Sums = 0.0;
              for(int z=0; z<Dimension; ++z) {
                  Sums += LeftEigenMatrix[temp*Dimension+z] * leftNeighbor->variable[V[z]][Tempj-1]; 
              }
             if(leftNeighbor != this) 
-            Var2.push_back(AlphaN*(variable[C[temp]][Tempj-1] -Sums));
+            Var2.push_back(AlphaN*(VarC[Tempj-1] -Sums));
              
              Temp1 = MinMod(Var1);
              Temp2 = MinMod(Var2);
              
-             if ( abs(Temp1-variable[C[temp]][Tempi]) > epsilon || abs(Temp2-variable[C[temp]][Tempj]) > epsilon ) {
-                variable[C[temp]][Tempi] = Temp1;
-                variable[C[temp]][Tempj] = Temp2;
+             if ( abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+                VarC[Tempi] = Temp1;
+                VarC[Tempj] = Temp2;
              }
              else {
                  counter = 1.0 ;

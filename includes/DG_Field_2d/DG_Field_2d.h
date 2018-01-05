@@ -29,7 +29,7 @@ public:
     vector< vector<DG_Element_2d*> > elements;
     vector<double*> domainVariable; // To store variables that have values at all nodes
     vector<double*> cellcenterVariable; // To store variables with only one value per element
-    vector<bool> PositivityMarker;
+    bool *PositivityMarker;
 
     double *RightEigenMatrix, *LeftEigenMatrix;
 
