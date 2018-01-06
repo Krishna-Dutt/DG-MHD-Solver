@@ -32,25 +32,25 @@ private:
     // Inviscid Flux
     int DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy ;
     int DE_plus_Pt_Vx_minus_BxVdotB, DE_plus_Pt_Vy_minus_ByVdotB;
-    int VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, VyBy_minus_ByVy_plus_Si, BzVx, BzVy;
+    int VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVx, BzVy;
     int ChBx, ChBy;
     // Eigen Values
     int C, Vx_plus_C, Vy_plus_C, Ch;
     // Aux. Variables // Define all auxillary
     int Pt, VdotB, Si;
-    int K1D, K1DVx, K1DVy, K1DE, K1Bx, K1By, K1Bz;
-    int K2D, K2DVx, K2DVy, K2DE, K2Bx, K2By, K2Bz; 
-    int K3D, K3DVx, K3DVy, K3DE, K3Bx, K3By, K3Bz;;
+    int K1D, K1DVx, K1DVy, K1DE, K1Bx, K1By, K1Bz, K1Si;
+    int K2D, K2DVx, K2DVy, K2DE, K2Bx, K2By, K2Bz, K2Si; 
+    int K3D, K3DVx, K3DVy, K3DE, K3Bx, K3By, K3Bz, K3Si;
     int dbydxD, dbydyD, dbydxDVx, dbydyDVx, dbydxDVy, dbydyDVy, dbydxDE, dbydyDE;
-    int dbydxBx, dbydyBx, dbydxBy, dbydyBy, dbydxBz, dbydyBz;
+    int dbydxBx, dbydyBx, dbydxBy, dbydyBy, dbydxBz, dbydyBz, dbydxSi, dbydySi;
     int DAnalytical, VxAnalytical, ZERO;
     // Shock Detector
     int CellMarkerG;
     // Limiter
     int Moment, ModMoment;
-    int qModMoment, uModMoment, vModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment;
+    int qModMoment, uModMoment, vModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment;
     // Add corresponding variables for Characteristic Limiter
-    int uMoment, vMoment, qMoment, HMoment, BxMoment, ByMoment, BzMoment ;
+    int uMoment, vMoment, qMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment ;
     int dPdxMoment, dPdyMoment;
     int Char1, Char2, Char3, Char4;
     int dPdx, dPdy;
