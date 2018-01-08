@@ -1184,6 +1184,28 @@ void DG_Field_2d::scal(double a, int x) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis     This is used to set a constasnt value to given vector
+ *
+ * @param a     The constant a
+ * @param v     The column vector v
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setConstant(double a, int v) {
+    /*for(int i = 0; i < ne_x; i++)
+        for(int j = 0; j < ne_y; j++) 
+            elements[i][j]->scal(a, x);*/
+    double *domVar = domainVariable[v];
+    
+    for(int i=0 ; i< (N+1)*(N+1)*ne_x*ne_y ; ++i) {
+        domVar[i] = a;
+    }
+
+    return ;
+}
+
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This is the function used to change the value of variable z to f(x).
  *
  * @Param a Scaling value for x
@@ -1258,6 +1280,55 @@ void DG_Field_2d::setFunctionsForVariables(double t, int a, double u, int b, dou
     return ;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable z to f(a, b, c, d, e).
+ *
+ * @Param p Scaling for first parameter.
+ * @Param a The first parameter of the function
+ * @Param q Scaling for second parameter.
+ * @Param b The second parameter of the function.
+ * @Param r Scaling for third parameter.
+ * @Param c The third parameter of the function.
+ * @Param s Scaling for fourth parameter.
+ * @Param d The fourth parameter of the function.
+ * @Param t Scaling for fifth parameter.
+ * @Param e The fifth parameter of the function.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForVariables(double p, int a, double q, int b, double r, int c, double s, int d, double t, int e, function<void(double, double*, double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z){
+    f(p, domainVariable[a], q, domainVariable[b], r, domainVariable[c], s, domainVariable[d], t, domainVariable[e], 1, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z]);
+    
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This is the function used to change the value of variable z to f(a, b, c, d, e, g).
+ *
+ * @Param p Scaling for first parameter.
+ * @Param a The first parameter of the function
+ * @Param q Scaling for second parameter.
+ * @Param b The second parameter of the function.
+ * @Param r Scaling for third parameter.
+ * @Param c The third parameter of the function.
+ * @Param s Scaling for fourth parameter.
+ * @Param d The fourth parameter of the function.
+ * @Param t Scaling for fifth parameter.
+ * @Param e The fifth parameter of the function.
+ * @Param u Scaling for sixth parameter.
+ * @Param g The sixth paramter.
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsForVariables(double p, int a, double q, int b, double r, int c, double s, int d, double t, int e, double u, int g, function<void(double, double*, double, double*, double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z){
+    f(p, domainVariable[a], q, domainVariable[b], r, domainVariable[c], s, domainVariable[d], t, domainVariable[e], u, domainVariable[g], 1, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z]);
+    
+    return ;
+}
 
 /* ----------------------------------------------------------------------------*/
 /**
@@ -1458,6 +1529,22 @@ double DG_Field_2d::FindMax(int v) {
     double Max = domVar[0]; 
     for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i) {
         Max  = max(Max, domVar[i]);
+    }
+    return Max;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the maximum value in the Field for Cell Centered variables .
+ *
+ * @Param v This is a int which defines the variable name.
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Field_2d::FindMaxCellCentered(int v) {
+    double *CCVar = cellcenterVariable[v];
+    double Max = CCVar[0]; 
+    for(int i=0; i< ne_x*ne_y; ++i) {
+        Max  = max(Max, CCVar[i]);
     }
     return Max;
 }

@@ -969,10 +969,17 @@ void DG_BoundaryElement_2d::updateBoundary(double time) {
 
     if ( System == "EULER") 
     {
-        setBoundary(BoundaryTop, 1, N*(N+1), (N-1)*(N+1), 'T', time);
-        setBoundary(BoundaryBottom, 1, 0, N+1, 'B', time);
-        setBoundary(BoundaryRight, N+1, N, N-1, 'R', time);
-        setBoundary(BoundaryLeft, N+1, 0, 1, 'L', time);
+        setBoundaryEuler(BoundaryTop, 1, N*(N+1), (N-1)*(N+1), 'T', time);
+        setBoundaryEuler(BoundaryBottom, 1, 0, N+1, 'B', time);
+        setBoundaryEuler(BoundaryRight, N+1, N, N-1, 'R', time);
+        setBoundaryEuler(BoundaryLeft, N+1, 0, 1, 'L', time);
+    }
+    else if ( System == "MHD") 
+    {
+        setBoundaryMHD(BoundaryTop, 1, N*(N+1), (N-1)*(N+1), 'T', time);
+        setBoundaryMHD(BoundaryBottom, 1, 0, N+1, 'B', time);
+        setBoundaryMHD(BoundaryRight, N+1, N, N-1, 'R', time);
+        setBoundaryMHD(BoundaryLeft, N+1, 0, 1, 'L', time);
     }
 
     return;
@@ -1286,7 +1293,7 @@ void DG_BoundaryElement_2d::AdjustCornerElement(int *Index, char B) {
  * @Param time the solution time.
 */
 /* ----------------------------------------------------------------------------*/
-void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time) {
+void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time) {
     int D, Xmom, Ymom, Energy;
     D = ConservativeVariables[0];
     Xmom = ConservativeVariables[1];
@@ -1400,6 +1407,151 @@ void DG_BoundaryElement_2d::setBoundary(string BoundaryPosition, int ScaleI, int
     return;
 }
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the respective Boundary values after each time step
+ *
+ * @Param BoundaryPosition Position of Boundary
+ * @Param ScaleI Scaling factor for index i
+ * @Param Index1 Index corresponding to boundary node
+ * @Param Index2 Index corresponding to neighboring node
+ * @Param B Boundary position 
+ * @Param time the solution time.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time) {
+    int D, Xmom, Ymom, Energy, Bx, By, Bz;
+    D = ConservativeVariables[0];
+    Xmom = ConservativeVariables[1];
+    Ymom = ConservativeVariables[2];
+    Energy = ConservativeVariables[3];
+    Bx = ConservativeVariables[4];
+    By = ConservativeVariables[5];
+    Bz = ConservativeVariables[6];
+
+    int* Ind = new int[2]; 
+    Ind[0] = 0;
+    Ind[1] = N;
+
+    // add additional variables as required for other systems !!
+
+    if ( BoundaryPosition == "slipWall" || BoundaryPosition == "symmetric") {
+        for(int i=0; i<=N; ++i) {
+            variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
+            switch(B) {
+                case 't' :
+                case 'T' :
+                case 'b' :
+                case 'B' : variable[Xmom][Index1 + ScaleI*i] = variable[Xmom][ScaleI*i + Index2];
+                           variable[Ymom][Index1 + ScaleI*i] = 0.0;
+                           break ;
+                case 'l' :
+                case 'L' :
+                case 'r' :
+                case 'R' : variable[Xmom][Index1 + ScaleI*i] = 0.0;
+                           variable[Ymom][Index1 + ScaleI*i] = variable[Ymom][ScaleI*i + Index2];
+                           break ;
+            }
+            
+            variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
+            variable[Bx][Index1 + ScaleI*i] = variable[Bx][ScaleI*i + Index2];
+            variable[By][Index1 + ScaleI*i] = variable[By][ScaleI*i + Index2];
+            variable[Bz][Index1 + ScaleI*i] = variable[Bz][ScaleI*i + Index2];
+        }
+    }
+    if ( BoundaryPosition == "noslipWall" ) {
+        for(int i=0; i<=N; ++i) {
+            variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
+            variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
+            variable[Ymom][Index1 + ScaleI*i] = 0.0;
+            variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
+            variable[Bx][Index1 + ScaleI*i] = variable[Bx][ScaleI*i + Index2];
+            variable[By][Index1 + ScaleI*i] = variable[By][ScaleI*i + Index2];
+            variable[Bz][Index1 + ScaleI*i] = variable[Bz][ScaleI*i + Index2];
+        }
+    }
+    else if(BoundaryPosition == "inflow") {
+        AdjustCornerElement(Ind, B);
+        for(int i=Ind[0]; i<=Ind[1]; ++i) {
+            variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Energy][Index1 + ScaleI*i] = BoundaryMHDEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Bx][Index1 + ScaleI*i] = BoundaryBX(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[By][Index1 + ScaleI*i] = BoundaryBY(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Bz][Index1 + ScaleI*i] = BoundaryBZ(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            
+            /*if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) < 1.0) {
+                //cout << "Called Inflow BC !!" << endl;
+                //EulerCharacteristicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+                EulerSubsonicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+            }*/
+        }
+    }
+    else if(BoundaryPosition == "outflow") {
+        AdjustCornerElement(Ind, B);
+        for(int i=Ind[0]; i<=Ind[1]; ++i) {
+            //if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) >= 1.0) 
+            {
+                 for(int j=0; j<ConservativeVariables.size(); ++j) {
+                     variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
+                }
+            }
+            /*else {
+                //variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+                //variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            
+                //EulerCharacteristicOutflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+                EulerSubsonicOutflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
+            }*/
+        }
+    }
+    else if(BoundaryPosition == "dirichlet") {
+        for(int i=0; i<=N; ++i) {
+            variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Energy][Index1 + ScaleI*i] = BoundaryMHDEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Bx][Index1 + ScaleI*i] = BoundaryBX(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[By][Index1 + ScaleI*i] = BoundaryBY(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Bz][Index1 + ScaleI*i] = BoundaryBZ(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            
+        }
+    }
+    else if(BoundaryPosition == "neumann") {
+        for(int j=0; j<ConservativeVariables.size(); ++j) {
+            for(int i=0; i<=N; ++i) {
+                variable[ConservativeVariables[j]][Index1 + ScaleI*i] = variable[ConservativeVariables[j]][ScaleI*i + Index2];
+            }
+        }
+    }
+    else if(BoundaryPosition == "periodic" ) {
+        
+    }
+    else if(BoundaryPosition == "timeDirichlet") {
+        for(int i=0; i<=N; ++i) {
+            variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[Energy][Index1 + ScaleI*i] = BoundaryMHDEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[Bx][Index1 + ScaleI*i] = BoundaryBX(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[By][Index1 + ScaleI*i] = BoundaryBY(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[Bz][Index1 + ScaleI*i] = BoundaryBZ(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            
+        }
+    }
+    else if(BoundaryPosition == "NIL" ) {
+        
+    }
+    else {
+        cout << "NO BOUNDARY SPECIFIED !!" << BoundaryPosition << " : " << B << endl;
+    }
+
+    delete[] Ind;
+    return;
+}
 
 
 

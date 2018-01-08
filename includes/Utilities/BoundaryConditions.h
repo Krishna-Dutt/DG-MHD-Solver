@@ -23,4 +23,16 @@ double BoundarySpecificEnthalpy(double x, double y, double t);
 double BoundaryMachNo(double x, double y, double t);
 double BoundarySoundSpeed(double x, double y, double t);
 
+// MHD
+ double BoundaryMHDEnergy(double x, double y);
+ double BoundaryBX(double x, double y);
+ double BoundaryBY(double x, double y);
+ double BoundaryBZ(double x, double y);
+
+ double BoundaryMHDEnergy(double x, double y, double t);
+ double BoundaryBX(double x, double y, double t);
+ double BoundaryBY(double x, double y, double t);
+ double BoundaryBZ(double x, double y, double t);
+  
+
 #endif

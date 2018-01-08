@@ -93,7 +93,9 @@ public:
         void addConservativeVariables(vector<int> V);
 
         void updateBoundary(double time);
-        void setBoundary(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time);
+        void setBoundaryEuler(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time);
+        void setBoundaryMHD(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time);
+        
         void updateTopBoundary();
         void updateBottomBoundary();
         void updateLeftBoundary();

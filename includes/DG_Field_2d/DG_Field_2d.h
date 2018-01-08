@@ -105,11 +105,14 @@ public:
     // Functions to apply linear operations on the variables.
     void axpy(double a, int x, int y);
     void scal(double a, int x);
+    void setConstant(double a, int v);
     void setFunctionsForVariables(double a, int x, function<void(double, double*, unsigned, unsigned, double*)> f, int z); 
     void setFunctionsForVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
     void setFunctionsForVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z);
     void setFunctionsForVariables(double t, int a, double u, int b, double v, int c, double x, int d, function<void(double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
-     
+    void setFunctionsForVariables(double p, int a, double q, int b, double r, int c, double s, int d, double t, int e, function<void(double, double*, double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
+    void setFunctionsForVariables(double p, int a, double q, int b, double r, int c, double s, int d, double t, int e, double u, int g, function<void(double, double*, double, double*, double, double*, double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z);
+
     // Functions to apply operations only on variables stored at Boundary
     void setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
     void setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z); 
@@ -133,6 +136,7 @@ public:
     
     // Misc. Functions on for global field data 
     double FindMax(int v);
+    double FindMaxCellCentered(int v);
     double FindMindx();
     void FindMindx(int v);
     void FindTimestep(int dt, int dx, int U, double CFL);

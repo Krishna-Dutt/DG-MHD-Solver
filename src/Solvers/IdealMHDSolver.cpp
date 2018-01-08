@@ -22,8 +22,8 @@ void IdealMHDSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
     x2 = _x2;
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
-    field->setSystem("EULER");//change later to MHD 
-    Dimension = 4;
+    field->setSystem("MHD");//change later to MHD 
+    Dimension = 8;
 
    return ;
 }
@@ -67,7 +67,8 @@ void IdealMHDSolver::setConservativeVariables(){
   // Check definition of internal and total energy !!
   De  = field->addVariable_withBounary("qe"); // Internal Energy, added just for ease of manipulating Energy, Remove later if not required !!
   KE  = field->addVariable_withBounary("KE"); // Kinetic Energy , " "
-
+  
+  field->addConservativeVariables(D);
   field->addConservativeVariables(DVx);
   field->addConservativeVariables(DVy);
   field->addConservativeVariables(DE);
@@ -109,6 +110,11 @@ void IdealMHDSolver::setInitialMagneticField(function<double(double, double)> BX
     field->initializeVariable(By, BY);
     field->initializeVariable(Bz, BZ);
 
+    return ;
+}
+
+void IdealMHDSolver::setInitialSi(function<double(double, double)> SI) {
+    field->initializeVariable(Si, SI);
     return ;
 }
 
@@ -197,8 +203,8 @@ void IdealMHDSolver::setEnergy() {
 }
 
 void IdealMHDSolver::setInternalEnergyfromPrimitive() {
-  field->setFunctionsForVariables(1.0, P, 1.0, Bx, 1.0, By, 1.0, Bz, ThermoMagPressure, Pt);
-  field->setFunctionsForVariables(1.0, D, 1.0, T, 1.0, Pt, IE, De);
+  field->setFunctionsForVariables(1.0, Bx, 1.0, By, 1.0, Bz, 1.0, Bx, 1.0, By, 1.0, Bz, AdotB3d, BdotB);
+  field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, BdotB, MHDIE, De);
   return ;
 }
 
@@ -225,7 +231,7 @@ void IdealMHDSolver::updateTemperature() {
 }
 
 void IdealMHDSolver::updatePressure() {
-  field->setFunctionsForVariables(1.0, D, 1.0, De, 1.0, Bx, 1.0, By, 1.0, Bz, Pressure_MHDsystem, P);
+  field->setFunctionsForVariables(1.0, D, 1.0, De, 1.0, Bx, 1.0, By, 1.0, Bz, Pressure_MHD, P);
   return ;
 }
 
@@ -240,7 +246,7 @@ void IdealMHDSolver::updatePrimitiveVariables() {
   setInternalEnergy();
   updateTemperature();
   updatePressure();
-  updateThermoMagPressure();
+  //updateThermoMagPressure();
   return ;
 }
 
@@ -276,21 +282,24 @@ void IdealMHDSolver::setInviscidFlux() {
 }
 
 void IdealMHDSolver::updateInviscidFlux() {
+  
+  field->setFunctionsForVariables(1.0, P,1.0, Bx, 1.0, By, 1.0, Bz, TotalPressureMHD, Pt);
+  field->setFunctionsForVariables(1.0, Vx, 1.0, Vy, 1.0, Bx, 1.0, By, AdotB2d, VdotB);
   field->setFunctionsForVariables(1.0, DVx, 1.0, Vx, 1.0, Pt, 1.0, Bx, MHDMomentumFluxPressure, DVxVx_plus_Pt_minus_BxBx);
-  field->setFunctionsForVariables(1.0, DVy, 1.0, Vy, 1.0, Pt, 1.0, By, MomentumFluxPressure, DVyVy_plus_Pt_minus_ByBy);
+  field->setFunctionsForVariables(1.0, DVy, 1.0, Vy, 1.0, Pt, 1.0, By, MHDMomentumFluxPressure, DVyVy_plus_Pt_minus_ByBy);
   field->setFunctionsForVariables(1.0, DVx, 1.0, Vy, 1.0, Bx, 1.0, By, MHDMomentumFlux, DVxVy_minus_BxBy);
   field->setFunctionsForVariables(1.0, DE, 1.0, Pt, 1.0, Vx, 1.0, Bx, 1.0, VdotB, MHDEnergyFlux, DE_plus_Pt_Vx_minus_BxVdotB);
   field->setFunctionsForVariables(1.0, DE, 1.0, P, 1.0, Vy, 1.0, By, 1.0, VdotB, MHDEnergyFlux, DE_plus_Pt_Vy_minus_ByVdotB);
-  
-  field->setFunctionsForVariables(1.0, Vx, 1.0, Bx, 1.0, Si, MHDMagFieldFlux, VxBx_minus_BxVx_plus_Si);
-  field->setFunctionsForVariables(1.0, Vy, 1.0, By, 1.0, Si, MHDMagFieldFlux, VyBy_minus_ByVy_plus_Si);
-  field->setFunctionsForVariables(1.0, Vx, 1.0, By, 1.0, Bx, 1.0, Vy, MHDMagFieldFlux2, VxBy_minus_BxVy);
+  // Check formulation
+  field->setFunctionsForVariables(1.0, Si, Copy, VxBx_minus_BxVx_plus_Si);
+  field->setFunctionsForVariables(1.0, Si, Copy, VyBy_minus_ByVy_plus_Si);
+  field->setFunctionsForVariables(1.0, Vx, 1.0, By, 1.0, Bx, 1.0, Vy, MHDMagFieldFlux, VxBy_minus_BxVy);
   field->setFunctionsForVariables(-1.0, VxBy_minus_BxVy, Copy, VyBx_minus_ByVx);
-  field->setFunctionsForVariables(1.0, Bz, -1.0, Vx, MHDZMagFlux, BzVx);
-  field->setFunctionsForVariables(1.0, Bz, -1.0, Vy, MHDZMagFlux, BzVy);
+  field->setFunctionsForVariables(1.0, Bz, -1.0, Vx, Product, BzVx);
+  field->setFunctionsForVariables(1.0, Bz, -1.0, Vy, Product, BzVy);
 
-  field->setFunctionsForVariables(1.0, Ch, 1.0, Bx, DivergenceFlux, ChBx);
-  field->setFunctionsForVariables(1.0, Ch, 1.0, By, DivergenceFlux, ChBy);
+  field->setFunctionsForVariables(1.0, Ch, 1.0, Bx, Product, ChBx);
+  field->setFunctionsForVariables(1.0, Ch, 1.0, By, Product, ChBy);
   
   return ;
 }
@@ -388,22 +397,28 @@ void IdealMHDSolver::setAuxillaryVariables() {
 
 void IdealMHDSolver::setEigenValues() {
  // cout << "Calling setEigenValues " << endl;
-  C         = field->addVariable_withBounary("c");
+  Cx         = field->addVariable_withBounary("cx");
+  Cy         = field->addVariable_withBounary("cy");
   Vx_plus_C = field->addVariable_withBounary("u_plus_c");
   Vy_plus_C = field->addVariable_withBounary("v_plus_c");// Recheck formulation of eigen value !!
   
   Ch        = field->addVariable_withBounary("Ch");
 
-  updateEigenValues();
+  //updateEigenValues();
   return ;
 }
 
 void IdealMHDSolver::updateEigenValues() {
  // cout << " Calling updateEigenValues " << endl;
-  field->setFunctionsForVariables(1.0, D, 1.0, P, MHdMaxEigenValue, C);
-  field->setFunctionsForVariables(1.0, Vx, 1.0, C, ModulusAdd, Vx_plus_C);
-  field->setFunctionsForVariables(1.0, Vy, 1.0, C, ModulusAdd, Vy_plus_C);
+  field->setFunctionsForVariables(1.0, Bx, 1.0, By, 1.0, Bz, 1.0, Bx, 1.0, By, 1.0, Bz, AdotB3d, BdotB);
+  field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, Bx, 1.0, BdotB, MHDMaxEigenValue, Cx);
+  field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, By, 1.0, BdotB, MHDMaxEigenValue, Cy);
+  field->setFunctionsForVariables(1.0, Vx, 1.0, Cx, ModulusAdd, Vx_plus_C);
+  field->setFunctionsForVariables(1.0, Vy, 1.0, Cy, ModulusAdd, Vy_plus_C);
   // Add updates for Ch , how to compute Ch ??
+  int umax = field->FindMaxCellCentered(UMax);
+  field->setConstant(umax*umax, Ch);
+  
   return ;
 }
 
@@ -527,15 +542,14 @@ void IdealMHDSolver::solve() {
   // For loop to march in time !!
   while(t <= time) {
     // First Step of RK3
-    
-    updateInviscidFlux();
-    updateEigenValues();
-
     if ( count%no_of_time_steps == 0) {
       setTimeStep();
       cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
       count = 0;
     }
+
+    updateInviscidFlux();
+    updateEigenValues();
 
     RK_Step1();
     

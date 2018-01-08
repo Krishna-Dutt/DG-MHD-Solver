@@ -35,9 +35,9 @@ private:
     int VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVx, BzVy;
     int ChBx, ChBy;
     // Eigen Values
-    int C, Vx_plus_C, Vy_plus_C, Ch;
+    int Cx, Cy, Vx_plus_C, Vy_plus_C, Ch;
     // Aux. Variables // Define all auxillary
-    int Pt, VdotB, Si;
+    int Pt, VdotB, Si, BdotB;
     int K1D, K1DVx, K1DVy, K1DE, K1Bx, K1By, K1Bz, K1Si;
     int K2D, K2DVx, K2DVy, K2DE, K2Bx, K2By, K2Bz, K2Si; 
     int K3D, K3DVx, K3DVy, K3DE, K3Bx, K3By, K3Bz, K3Si;
@@ -138,6 +138,15 @@ public:
     void setInitialTemperature(function<double(double, double)> Tp);
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis This is the function used to initialize the Lagrangian multiplier field of the domain  
+     *
+     * @Param functionT This is the function used to initialize the SI an input.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setInitialSi(function<double(double, double)> SI);
+    
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis This is the function used to initialize the the veclocity of the domain  
      *
      * @Param functionU This is the function used to initialize the `U` velocity as an input.
@@ -221,6 +230,14 @@ public:
     */
     /* ----------------------------------------------------------------------------*/
     void updatePressure();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Pressure Field using Equation of State.
+     *
+     * @Param functionP This is the function used to update total Pressure (thermal + mag) , given Density and Temperature, using Equation of State.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateThermoMagPressure();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to  update Primitive Variables Field using updated Conservative Variables.

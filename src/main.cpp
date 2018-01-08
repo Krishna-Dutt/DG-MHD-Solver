@@ -96,6 +96,65 @@ double V(double x, double y) {
   }
 }
 
+double BX(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.8939;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}
+
+double BY(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.8939;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}
+
+double BZ(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.8939;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}
+
+double SI(double x, double y) {
+  if ( x <= 0.5 && y <= 0.5 ) {
+    return 0.8939 ;
+  }
+  else if ( x <= 0.5 && y > 0.5) {
+    return 0.8939;
+  }
+  else if ( x > 0.5 && y > 0.5) {
+    return 0.0 ;
+  }
+  else {
+    return 0.0 ;
+  }
+}
 
 double IDensity(double x, double y) {
   if ( x <= 0.5 && y <= 0.5 ) {
@@ -276,6 +335,10 @@ int main() {
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
+    a->setInviscidFlux();
+    a->setEigenValues();
+   //a->setViscousFlux();
+    a->setAuxillaryVariables();
     //a->setGradientPrimitiveVariables();
     //a->setMaterialPropertyVariables();
 
@@ -283,16 +346,13 @@ int main() {
     a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
+    a->setInitialMagneticField(BX, BY, BZ);
+    a->setInitialSi(SI);
     a->updateConservativeVariables();
 
-    a->setInviscidFlux();
-    a->setEigenValues();
-   //a->setViscousFlux();
-    a->setAuxillaryVariables();
-
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
-    a->SetLimiter("CharacteristicLimiter");
+    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     //a->plot("Output3.vtk");
