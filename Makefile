@@ -14,7 +14,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   CC := clang++ -arch x86_64
 else
-  CC := g++  -pg -g
+  CC := g++  #-pg -g
 endif
 
 # Folders
@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := EulerChar
+EXECUTABLE := IdealMHD
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths
@@ -41,7 +41,7 @@ INCLIST := $(patsubst includes/%,-I include/%,$(INCDIRS))
 BUILDLIST := $(patsubst includes/%,$(BUILDDIR)/%,$(INCDIRS))
 
 # Shared Compiler Flags
-CFLAGS := -c -pg
+CFLAGS := -c #-pg
 INC := -I include $(INCLIST) -I /usr/local/include
 LIB := -L /usr/local/lib -lblas -llapacke -lgsl -lgslcblas -lm
 

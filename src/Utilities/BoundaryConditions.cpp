@@ -80,10 +80,6 @@ double BoundaryMachNo(double x, double y, double t) {
 
 // MHD 
 
-double BoundaryMHDEnergy(double x, double y) {
-    return BoundaryPressure(x,y)/(BoundaryGamma(x,y) -1.0) + 0.5 * BoundaryDensity(x,y) *(pow(BoundaryU(x,y),2) +pow(BoundaryV(x,y),2)) + 0.5*(pow(BoundaryBX(x,y),2) +pow(BoundaryBY(x,y),2) +pow(BoundaryBZ(x,y),2));
-}
-
 double BoundaryBX(double x, double y){
     return 1.0;
 }
@@ -107,6 +103,10 @@ double BoundaryBY(double x, double y, double t) {
 
 double BoundaryBZ(double x, double y, double t) {
     return 1.0;
+}
+
+double BoundaryMHDEnergy(double x, double y) {
+    return BoundaryPressure(x,y)/(BoundaryGamma(x,y) -1.0) + 0.5 * BoundaryDensity(x,y) *(pow(BoundaryU(x,y),2) +pow(BoundaryV(x,y),2)) + 0.5*(pow(BoundaryBX(x,y),2) +pow(BoundaryBY(x,y),2) +pow(BoundaryBZ(x,y),2));
 }
 
 double BoundaryMHDEnergy(double x, double y, double t) {

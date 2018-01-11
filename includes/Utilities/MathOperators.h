@@ -11,4 +11,8 @@ void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsign
 
 void Copy(double a, double* x, unsigned index, unsigned size, double* z);
 double Sum(unsigned index, unsigned size, double* z);
+
+// Functions for cell centered variables
+void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsigned size_CV, double* z, unsigned node);
+ 
 #endif

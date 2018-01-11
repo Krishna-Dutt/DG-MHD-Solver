@@ -706,6 +706,8 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
         for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
           --count;
           //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+          //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
+          AlphaN = 0.5/sqrt(4.0*count*count -1.0);
           for(j=0; j < count && counter == 0; ++j) {
              Tempi = i-j;
              Tempj = i - j*(N+1);

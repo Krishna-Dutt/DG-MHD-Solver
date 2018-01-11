@@ -12,7 +12,7 @@ void TotalPressureMHD(double a, double* p, double b, double* bx, double c, doubl
     return ;
 }
 
-void MHDIE(double a, double rho*, double b, double *P, double c, double *bdotb, unsigned index, unsigned size, double *ie){
+void MHDIE(double a, double *rho, double b, double *P, double c, double *bdotb, unsigned index, unsigned size, double *ie){
     for(int i=0; i<size; i+= index) {
         ie[i] = a*P[i]/(gamma -1.0)  + 0.5 * bdotb[i];
     }
@@ -22,7 +22,7 @@ void MHDIE(double a, double rho*, double b, double *P, double c, double *bdotb, 
 
 void Pressure_MHD(double a, double *rho, double b, double *ie, double c, double *bx, double d, double *by, double e, double *bz, unsigned index, unsigned size, double *P){
     for(int i=0; i<size; i+=index) {
-        P[i] = (gamma -1.0) * ( b*ie[i] + 0.5 * (pow(c*bx[i],2) + pow(d*by[i],2) + pow(e*bz[i],2) )) ;
+        P[i] = (gamma -1.0) * ( b*ie[i] - 0.5 * (pow(c*bx[i],2) + pow(d*by[i],2) + pow(e*bz[i],2) )) ;
     }
 
     return ;
@@ -30,7 +30,7 @@ void Pressure_MHD(double a, double *rho, double b, double *ie, double c, double 
 
 void MHDMomentumFluxPressure(double a, double *rhoU, double b, double *U, double c, double *Pt, double d, double *bx, unsigned index, unsigned size, double *Momx){
     for(int i=0; i<size; i+= index) {
-        MomX[i] = a*rhoU[i] * b*U[i] + c*Pt[i] - pow(d*bx[i],2);
+        Momx[i] = a*rhoU[i] * b*U[i] + c*Pt[i] - pow(d*bx[i],2);
     }
 
     return ;
@@ -61,13 +61,13 @@ void MHDMagFieldFlux(double a, double *U, double b, double *by, double c, double
 }
 
 void MHDMaxEigenValue(double a, double *rho, double b, double *P, double c, double *bx, double d, double *bdotb, unsigned index, unsigned size, double *C){
-    int temp_a, temp_b, temp_bx;
+    double temp_a = 0 , temp_b = 0, temp_bx = 0;
     for(int i=0; i<size; i+=index){
-        temp_a = sqrt(gamma * P[i]/rho[i]);
-        temp_bx = sqrt(pow(bx[i],2)/rho[i]);
+        temp_a = gamma * P[i]/rho[i];
+        temp_bx = bx[i]/sqrt(rho[i]);
         temp_b = bdotb[i]/rho[i];
-
-        C[i] = sqrt(0.5 * (temp_a*temp_a + temp_b + sqrt(pow(temp_a*temp_a + temp_b,2) -4.0*temp_a*temp_a*temp_bx*temp_bx)));
+        //std::cout << temp_a << " : " << temp_b << " : " << temp_bx << endl;
+        C[i] = sqrt(0.5 * (temp_a + temp_b + sqrt(pow(temp_a + temp_b,2) -4.0*temp_a*temp_bx*temp_bx)));
     }
 
     return ;

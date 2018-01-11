@@ -147,22 +147,6 @@ void EulerSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
   return 1e-4;//2e-5;
 }*/
 
-// Functions for cell centered variables
-void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsigned size_CV, double* z, unsigned node) {
-  int j =-1 , count = 0; 
-  for(int i=0; i < size_DV; ++i) {
-    if(count % node == 0) {
-      j++;
-      count = 0;
-      z[j] = a*x[i];
-    }
-    z[j] = max( max(a*x[i], b*y[i]), z[j]);
-    count++;
-  }
-
-  return ;
-}
-
 void EulerSolver::setXMomentum() {
   field->setFunctionsForVariables(1.0, D, 1.0, Vx, Product, DVx);
   return ;
