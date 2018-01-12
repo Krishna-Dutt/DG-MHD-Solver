@@ -25,6 +25,14 @@ void KineticEnergy(double a, double* rho, double b, double* u, double c, double*
   return ;
 }
 
+void KineticEnergy3d(double a, double* rho, double b, double* u, double c, double* v, double d, double* w, unsigned index, unsigned size, double* ke) {
+  for(int i=0; i < size; i+=index) {
+    ke[i] = 0.5 * (a*rho[i]) * (pow(b*u[i], 2) + pow(c*v[i],2) + pow(d*w[i],2));
+  }
+  return ;
+}
+
+
 void MomentumFluxPressure(double a, double* f, double b, double* u, double c, double* Pr, unsigned index, unsigned size, double* momflux_P) {
   for(int i=0; i < size; i+=index) {
     momflux_P[i] = (a*f[i]) * (b*u[i]) + (c*Pr[i]);

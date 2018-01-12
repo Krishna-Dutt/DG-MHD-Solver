@@ -26,31 +26,31 @@ private:
     int Dimension; //Dimension of sysyem of Equations;
 
     // Primitve Variables
-    int D, Vx, Vy, P, T, Bx, By, Bz;
+    int D, Vx, Vy, Vz, P, T, Bx, By, Bz;
     // Conservative Variables
-    int DVx, DVy, DE, De, KE;
+    int DVx, DVy, DVz, DE, De, KE;
     // Inviscid Flux
-    int DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy ;
+    int DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVxVz_minus_BxBz, DVyVz_minus_ByBz ;
     int DE_plus_Pt_Vx_minus_BxVdotB, DE_plus_Pt_Vy_minus_ByVdotB;
-    int VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVx, BzVy;
+    int VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVx_minus_BxVz, BzVy_minus_ByVz;
     int ChBx, ChBy;
     // Eigen Values
     int Cx, Cy, Vx_plus_C, Vy_plus_C, Ch;
     // Aux. Variables // Define all auxillary
     int Pt, VdotB, Si, BdotB;
-    int K1D, K1DVx, K1DVy, K1DE, K1Bx, K1By, K1Bz, K1Si;
-    int K2D, K2DVx, K2DVy, K2DE, K2Bx, K2By, K2Bz, K2Si; 
-    int K3D, K3DVx, K3DVy, K3DE, K3Bx, K3By, K3Bz, K3Si;
-    int dbydxD, dbydyD, dbydxDVx, dbydyDVx, dbydxDVy, dbydyDVy, dbydxDE, dbydyDE;
+    int K1D, K1DVx, K1DVy, K1DVz, K1DE, K1Bx, K1By, K1Bz, K1Si;
+    int K2D, K2DVx, K2DVy, K2DVz, K2DE, K2Bx, K2By, K2Bz, K2Si; 
+    int K3D, K3DVx, K3DVy, K3DVz, K3DE, K3Bx, K3By, K3Bz, K3Si;
+    int dbydxD, dbydyD, dbydxDVx, dbydyDVx, dbydxDVy, dbydyDVy, dbydxDVz, dbydyDVz, dbydxDE, dbydyDE;
     int dbydxBx, dbydyBx, dbydxBy, dbydyBy, dbydxBz, dbydyBz, dbydxSi, dbydySi;
     int DAnalytical, VxAnalytical, ZERO;
     // Shock Detector
     int CellMarkerG;
     // Limiter
     int Moment, ModMoment;
-    int qModMoment, uModMoment, vModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment;
+    int qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment;
     // Add corresponding variables for Characteristic Limiter
-    int uMoment, vMoment, qMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment ;
+    int uMoment, vMoment, wMoment, qMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment ;
     int dPdxMoment, dPdyMoment;
     int Char1, Char2, Char3, Char4;
     int dPdx, dPdy;
@@ -151,9 +151,10 @@ public:
      *
      * @Param functionU This is the function used to initialize the `U` velocity as an input.
      * @Param functionV This is the function used to initialize the `V` velocity as an input.
+     * @Param functionW This is the function used to initialize the `W` velocity as an input.
      */
     /* ----------------------------------------------------------------------------*/
-    void setInitialVelocity(function<double(double, double)> U, function<double(double, double)> V);
+    void setInitialVelocity(function<double(double, double)> U, function<double(double, double)> V, function<double(double, double)> W);
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to initialize the Magnetic field of the domain  
@@ -179,6 +180,13 @@ public:
     */
     /* ----------------------------------------------------------------------------*/
     void setYMomentum();
+    /* ----------------------------------------------------------------------------*/
+     /**
+     * @Synopsis This is the function used to set and update momentum in Z-direction.
+     *
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setZMomentum();
     /* ----------------------------------------------------------------------------*/
     /**
      * @Synopsis This is the function used to set and update Energy ( Internal + KE ).
