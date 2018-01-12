@@ -1420,14 +1420,15 @@ void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, int Index1, int Index2, char B, double time) {
-    int D, Xmom, Ymom, Energy, Bx, By, Bz;
+    int D, Xmom, Ymom, Zmom, Energy, Bx, By, Bz;
     D = ConservativeVariables[0];
     Xmom = ConservativeVariables[1];
     Ymom = ConservativeVariables[2];
-    Energy = ConservativeVariables[3];
-    Bx = ConservativeVariables[4];
-    By = ConservativeVariables[5];
-    Bz = ConservativeVariables[6];
+    Zmom = ConservativeVariables[3];
+    Energy = ConservativeVariables[4];
+    Bx = ConservativeVariables[5];
+    By = ConservativeVariables[6];
+    Bz = ConservativeVariables[7];
 
     int* Ind = new int[2]; 
     Ind[0] = 0;
@@ -1453,6 +1454,7 @@ void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, 
                            break ;
             }
             
+            variable[Zmom][Index1 + ScaleI*i] = variable[Zmom][ScaleI*i + Index2];
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
             variable[Bx][Index1 + ScaleI*i] = variable[Bx][ScaleI*i + Index2];
             variable[By][Index1 + ScaleI*i] = variable[By][ScaleI*i + Index2];
@@ -1464,6 +1466,7 @@ void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, 
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
             variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
             variable[Ymom][Index1 + ScaleI*i] = 0.0;
+            variable[Zmom][Index1 + ScaleI*i] = variable[Zmom][ScaleI*i + Index2];
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
             variable[Bx][Index1 + ScaleI*i] = variable[Bx][ScaleI*i + Index2];
             variable[By][Index1 + ScaleI*i] = variable[By][ScaleI*i + Index2];
@@ -1476,6 +1479,7 @@ void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, 
             variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Zmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryW(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Energy][Index1 + ScaleI*i] = BoundaryMHDEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Bx][Index1 + ScaleI*i] = BoundaryBX(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[By][Index1 + ScaleI*i] = BoundaryBY(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
@@ -1513,6 +1517,7 @@ void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, 
             variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            variable[Zmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryW(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Energy][Index1 + ScaleI*i] = BoundaryMHDEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[Bx][Index1 + ScaleI*i] = BoundaryBX(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             variable[By][Index1 + ScaleI*i] = BoundaryBY(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
@@ -1535,6 +1540,7 @@ void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, 
             variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
             variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
             variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
+            variable[Zmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time) * BoundaryW(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
             variable[Energy][Index1 + ScaleI*i] = BoundaryMHDEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
             variable[Bx][Index1 + ScaleI*i] = BoundaryBX(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);
             variable[By][Index1 + ScaleI*i] = BoundaryBY(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i], time);

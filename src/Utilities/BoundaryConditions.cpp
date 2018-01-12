@@ -92,6 +92,14 @@ double BoundaryBZ(double x, double y) {
     return 1.0;
 }
 
+double BoundaryW(double x, double y) {
+    return 1.0;
+}
+
+
+double BoundaryW(double x, double y, double t) {
+    return 1.0;
+}
 
 double BoundaryBX(double x, double y, double t) {
     return 1.0;
