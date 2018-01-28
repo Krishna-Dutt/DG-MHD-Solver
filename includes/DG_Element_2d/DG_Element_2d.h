@@ -117,7 +117,8 @@ public:
     // Functions to handle Characteristic Moment Limiter
     void convertCharacteristictoVariable(int *C, int *V, unsigned I);
     void convertVariabletoCharacteristic(int *V, int *C, unsigned I);
-    void findEigenMatrices(int *V);
+    void findEigenMatricesEuler(int *V);
+    void findEigenMatricesMHD(int *V);
     void setEigenMatrices(unsigned _dimension, double *REMp, double *LEMp);
     virtual void limitMoments(int *V, int *C, unsigned Index);
 
