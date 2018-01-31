@@ -44,6 +44,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     x2 = _x2;
     y1 = _y1;
     y2 = _y2;
+    system = "EULER";
     
     /// Setting the grid, by setting the elements. The elements are set by providing their end points for the quads.
     elements.resize(ne_x);
@@ -241,6 +242,7 @@ DG_Field_2d::~DG_Field_2d() {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setSystem(string S) {
+    system = S;
     for(int i = 0; i < ne_x; i++)
     for (int j = 0; j < ne_y; j++) {
       elements[i][j]->setSystem(S);
@@ -891,13 +893,25 @@ void DG_Field_2d::setEigenMatrices(unsigned _dimension) {
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::findEigenMatrices(int *V, int cm) {
   
-  for (int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j)  {
+  if ( system == "EULER") {
+      for (int i=0; i < ne_x; ++i)
+      for(int j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
-            elements[i][j]->findEigenMatrices( V);
+            elements[i][j]->findEigenMatricesEuler( V);
         }
-    }
+      }
 
+  }
+  else if ( system == "MHD") {
+      for (int i=0; i < ne_x; ++i)
+      for(int j=0; j < ne_y; ++j)  {
+        if ( cellcenterVariable[cm][i*ne_y + j] ) {
+            elements[i][j]->findEigenMatricesMHD(V);
+        }
+      }
+
+  }
+  
   return ;
 }
 

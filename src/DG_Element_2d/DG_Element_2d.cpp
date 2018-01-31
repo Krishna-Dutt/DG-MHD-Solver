@@ -966,7 +966,7 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   double epsilon = 1e-10;
   double q, qn, Bn, nx, ny, qe, cfn, can, csn, Pt, BdotB, UdotB, ch, Bcross, Ucross;
   double DVx, DVy, DVz, D, DE, Bx, By, Bz, Si, dPdx, dPdy;
-  double theta1, theta2, scale;
+  double theta1, theta2, scale = 1.0;
   D   = 0.5 * variable[V[0]][0];
   DVx = 0.5 * variable[V[1]][0];
   DVy = 0.5 * variable[V[2]][0];
@@ -975,9 +975,9 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   Bx = 0.5 * variable[V[5]][0];
   By = 0.5 * variable[V[6]][0];
   Bz = 0.5 * variable[V[7]][0];
-  Si = 0.5 * variable[V[8]][0];
-  dPdx = 0.5 * variable[V[4]][0];
-  dPdy = 0.5 * variable[V[5]][0];
+  ch = sqrt(variable[V[10]][0]);
+  dPdx = 0.5 * variable[V[8]][0];
+  dPdy = 0.5 * variable[V[9]][0];
   
   u = DVx/D;
   v = DVy/D;
@@ -1014,13 +1014,58 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   {
       zeros(RightEigenMatrix, Dimension);
       zeros(LeftEigenMatrix, Dimension);
+      // Sub with Euler 2d system with w = 0 !!
+
+      qe = -u*ny + v*nx;
+      P = (gamma-1.0) * ( DE - 0.5*q*q*D ); // Twice pressure
+      c = sqrt(gamma*P/D);
+      H =  c*c/(gamma-1.0) + 0.5*q*q;
+
+      // Setting Right Eigen Matrix
+      RightEigenMatrix[0] = RightEigenMatrix[1] = RightEigenMatrix[2] = 1.0 ;
+      RightEigenMatrix[4] = 0.0;
+      RightEigenMatrix[9] = u - c*nx;
+      RightEigenMatrix[10] = u;
+      RightEigenMatrix[11] = u + c*nx;
+      RightEigenMatrix[13] = -ny;
+      RightEigenMatrix[18] = v - c*ny;
+      RightEigenMatrix[19] = v;
+      RightEigenMatrix[20] = v + c*ny;
+      RightEigenMatrix[22] = nx;
+      RightEigenMatrix[36] = H - qn*c;
+      RightEigenMatrix[37] = 0.5 *q*q;
+      RightEigenMatrix[38] = H + qn*c;
+      RightEigenMatrix[40] = qe;
+
+      // Setting Left Eigen Matrix;
+      LeftEigenMatrix[0] = 0.5 * (0.5*(gamma-1.0)*pow(q/c,2.0) + qn/c);
+      LeftEigenMatrix[1] = -0.5*( (gamma -1.0)*u/(c*c) + nx/c);
+      LeftEigenMatrix[2] = -0.5*( (gamma -1.0)*v/(c*c) + ny/c);
+      LeftEigenMatrix[4] = 0.5 * (gamma-1.0)/(c*c);
+      LeftEigenMatrix[9] = 1.0 - 0.5 * (gamma-1.0)*pow(q/c,2.0);
+      LeftEigenMatrix[10] = (gamma-1.0)*u/(c*c);
+      LeftEigenMatrix[11] = (gamma-1.0)*v/(c*c);
+      LeftEigenMatrix[13] = -(gamma-1.0)/(c*c);
+      LeftEigenMatrix[18] = 0.5 * (0.5*(gamma-1.0)*pow(q/c,2.0) - qn/c);
+      LeftEigenMatrix[19] = -0.5*( (gamma -1.0)*u/(c*c) - nx/c);
+      LeftEigenMatrix[20] = -0.5*( (gamma -1.0)*v/(c*c) - ny/c);
+      LeftEigenMatrix[22] = 0.5 * (gamma-1.0)/(c*c);
+      LeftEigenMatrix[36] = -qe;
+      LeftEigenMatrix[37] = -ny;
+      LeftEigenMatrix[38] = nx;
+      LeftEigenMatrix[40] = 0.0;
+
+      return ;
+  
   }
   // Setting Right Eigen Matrix
   // Lambda = qn 
   RightEigenMatrix[4] = 1.0; RightEigenMatrix[13] = u; RightEigenMatrix[22] = v; RightEigenMatrix[31] = w;
   RightEigenMatrix[40] = 0.5*q*q; RightEigenMatrix[49] =  RightEigenMatrix[58] = RightEigenMatrix[67] = RightEigenMatrix[76] = 0.0 ;
   
-  // Condition for Bz and Bn
+  // Condition for Bn
+  if ( abs(Bn) > epsilon)
+   {
   // Lambda = qn + can
   RightEigenMatrix[6] = 0.0; RightEigenMatrix[15] = -Bz*ny; RightEigenMatrix[24] = Bz*nx;
   RightEigenMatrix[33] = Bcross; RightEigenMatrix[42] = -Bz*Ucross -w*Bcross;
@@ -1072,6 +1117,42 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   RightEigenMatrix[55] = nx*(pow(cfn,2.0) - pow(Bn,2.0)/D)*((cfn*cfn*ny - cfn*v)*theta2 - cfn*theta1)/Bn; RightEigenMatrix[46] = -ny*(pow(cfn,2.0) - pow(Bn,2.0)/D)*((cfn*cfn*ny - cfn*v)*theta2 - cfn*theta1)/Bn; 
   RightEigenMatrix[64] = nx*theta2*cfn*cfn*Bz/D; RightEigenMatrix[73] = 0.0;
   RightEigenMatrix[37] = ((0.5*(gamma-1.0)*q*q - cfn*cfn)*RightEigenMatrix[1] + (1-gamma)*(u*RightEigenMatrix[10] + v*RightEigenMatrix[19] + w*RightEigenMatrix[28]) + (2.0-gamma)*( Bx*RightEigenMatrix[46] + By*RightEigenMatrix[55] + Bz*RightEigenMatrix[64]))/(1.0-gamma) ;
+  
+  }
+
+  else {
+  for(int i=0 ;i<9;++i) {
+      // Lambda = qn +/- can
+      RightEigenMatrix[6 + i*9] = RightEigenMatrix[2 + i*9] = RightEigenMatrix[4 + i*9];
+      // Lambda = qn +/- csn
+      RightEigenMatrix[5 + i*9] = RightEigenMatrix[3 + i*9] = RightEigenMatrix[4 + i*9];
+  }
+  
+  // Lambda = qn + cfn
+  RightEigenMatrix[7] = (2.0-gamma); RightEigenMatrix[16] = (2.0-gamma)*(u + cfn*nx); 
+  RightEigenMatrix[25] = (2.0-gamma)*(v + cfn*ny); RightEigenMatrix[34] = (2.0-gamma)*w;
+  if (abs(Bcross) > epsilon) {
+      RightEigenMatrix[61] = nx*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; RightEigenMatrix[52] = -ny*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; 
+  }
+  else {
+      RightEigenMatrix[61] = 0.0; RightEigenMatrix[52] = 0.0; 
+  }
+  RightEigenMatrix[70] = (2.0-gamma)*Bz/D; RightEigenMatrix[79] = 0.0;
+  RightEigenMatrix[43] = (2.0-gamma)*( (DE+Pt)/D + cfn*qn );
+  
+  // Lambda = qn - cfn
+  RightEigenMatrix[1] = (2.0-gamma); RightEigenMatrix[10] = (2.0-gamma)*(u - cfn*nx);
+  RightEigenMatrix[19] = (2.0-gamma)*(v - cfn*ny); RightEigenMatrix[28] = (2.0-gamma)*w;
+   if (abs(Bcross) > epsilon) {
+      RightEigenMatrix[55] = nx*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; RightEigenMatrix[46] = -ny*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; 
+  }
+  else {
+      RightEigenMatrix[55] = 0.0; RightEigenMatrix[46] = 0.0; 
+  }
+  RightEigenMatrix[64] = (2.0-gamma)*Bz/D; RightEigenMatrix[73] = 0.0;
+  RightEigenMatrix[37] = (2.0-gamma)*( (DE+Pt)/D - cfn*qn ) ;
+  
+  }
   
   // Lambda = ch
   theta1 = (pow(ch - qn,2.0)*(Bn*Bn - BdotB) + BdotB*( Bn*Bn/D - (ch - qn)))/D;
@@ -1247,6 +1328,33 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   if ( abs(scale) < epsilon ) scale = 1.0;
   for(int i=0;i<9;++i) LeftEigenMatrix[0 + i] = LeftEigenMatrix[0 + i]/scale;
 
+  /*cout << " \n Right Eigen Matrix : \n";
+  for(int i=0; i<9; ++i) {
+      for(int j=0; j<9;++j) 
+        cout << " " << RightEigenMatrix[j + i*9] << " ";
+        cout << endl;
+  } 
+  cout << "\n Left Eigen Matrix : \n";
+  for(int i=0; i<9; ++i) {
+      for(int j=0; j<9;++j) 
+        cout << " " << LeftEigenMatrix[j + i*9] << " ";
+        cout << endl;
+  } */
+
+  double A[9][9];
+  for(int i =0; i < 9; ++i) {
+      for(int j=0; j<9; ++j) {
+          A[i][j] = 0.0;
+          for(int k=0; k<9;++k)
+            A[i][j] += LeftEigenMatrix[k + i*9 ]*RightEigenMatrix[k*9 + j];
+      }
+  }
+  cout << "\n Matrix \n";
+  for(int i=0; i<9;++i){
+      for(int j=0; j<9;++j)
+      cout << " " << A[i][j] << " ";
+      cout << endl;
+  }
   
   return ;
 }

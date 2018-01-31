@@ -23,6 +23,7 @@ private:
     double x1, y1, x2, y2;
 
     int Dimension; // Variable to store the dimension of system of equation
+    string system;
 
 
 public:

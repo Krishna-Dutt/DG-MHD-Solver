@@ -9,17 +9,17 @@ using namespace std;
 
 
 double U(double x, double y) {
-  if(x < 0.5) return 0.0;
+  //if(x < 0.5) return 0.0;
   return 0.0;
 }
 
 double V(double x, double y) {
-  if(x < 0.5) return 0.0;
+  //if(x < 0.5) return 0.0;
   return 0.0;
 }
 
 double W(double x, double y) {
-  if(x < 0.5) return 0.0;
+  //if(x < 0.5) return 0.0;
   return 0.0;
 }
 
@@ -108,11 +108,11 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.2;
-    double time = 0.2;
+    double time = 0.0;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(200, 1, 1);
+    a = new IdealMHDSolver(3, 1, 1);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
-    a->setBoundaryCondtions("periodic", "neumann", "periodic", "neumann");
+    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -132,8 +132,8 @@ int main() {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
-    //a->SetLimiter("CharacteristicLimiter");
+    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("Output3.vtk");

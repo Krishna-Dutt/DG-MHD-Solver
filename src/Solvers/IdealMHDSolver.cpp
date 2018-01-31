@@ -566,16 +566,16 @@ void IdealMHDSolver::solve() {
     }
     updateInviscidFlux();
 
-    RK_Step1();
+    //RK_Step1();
     
     RunShockDetector();
     RunLimiter();
-    RunPositivityLimiter();
+    /*RunPositivityLimiter();
 
     field->updateBoundary(t);
     updatePrimitiveVariables();
    
-    
+  
     // Second Step of RK3
     updateInviscidFlux();
     updateEigenValues();
@@ -601,7 +601,7 @@ void IdealMHDSolver::solve() {
    
     field->updateBoundary(t);
     updatePrimitiveVariables();
-
+*/
    t += dt; 
    count += 1;       
     }
@@ -721,30 +721,62 @@ void IdealMHDSolver::SetLimiterVariables() {
     // Change later by adding separate settings for positivity limiter!!
     uMoment = field->addVariable_withoutBounary();
     vMoment = field->addVariable_withoutBounary();
+    wMoment = field->addVariable_withoutBounary();
     qMoment = field->addVariable_withoutBounary();
     HMoment = field->addVariable_withoutBounary();
-    field->scal(0.0, uMoment);
-    field->scal(0.0, vMoment);
-    field->scal(0.0, qMoment);
-    field->scal(0.0, HMoment);
+    BxMoment = field->addVariable_withoutBounary();
+    ByMoment = field->addVariable_withoutBounary();
+    BzMoment = field->addVariable_withoutBounary();
+    SiMoment = field->addVariable_withoutBounary();
     uModMoment = field->addVariable_withoutBounary();
     vModMoment = field->addVariable_withoutBounary();
+    wModMoment = field->addVariable_withoutBounary();
     qModMoment = field->addVariable_withoutBounary();
     HModMoment = field->addVariable_withoutBounary();
+    BxModMoment = field->addVariable_withoutBounary();
+    ByModMoment = field->addVariable_withoutBounary();
+    BzModMoment = field->addVariable_withoutBounary();
+    SiModMoment = field->addVariable_withoutBounary();
+    
+    field->scal(0.0, uMoment);
+    field->scal(0.0, vMoment);
+    field->scal(0.0, wMoment);
+    field->scal(0.0, qMoment);
+    field->scal(0.0, HMoment);
+    field->scal(0.0, BxMoment);
+    field->scal(0.0, ByMoment);
+    field->scal(0.0, BzMoment);
+    field->scal(0.0, SiMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
+    field->scal(0.0, wModMoment);
     field->scal(0.0, qModMoment);
     field->scal(0.0, HModMoment);
+    field->scal(0.0, BxModMoment);
+    field->scal(0.0, ByModMoment);
+    field->scal(0.0, BzModMoment);
+    field->scal(0.0, SiModMoment);
+    
     
 
     Char1 = field->addVariable_withoutBounary();
     Char2 = field->addVariable_withoutBounary();
     Char3 = field->addVariable_withoutBounary();
     Char4 = field->addVariable_withoutBounary();
+    Char5 = field->addVariable_withoutBounary();
+    Char6 = field->addVariable_withoutBounary();
+    Char7 = field->addVariable_withoutBounary();
+    Char8 = field->addVariable_withoutBounary();
+    Char9 = field->addVariable_withoutBounary();
     field->scal(0.0, Char1);
     field->scal(0.0, Char2);
     field->scal(0.0, Char3);
     field->scal(0.0, Char4);
+    field->scal(0.0, Char5);
+    field->scal(0.0, Char6);
+    field->scal(0.0, Char7);
+    field->scal(0.0, Char8);
+    field->scal(0.0, Char9);
 
     dPdx = field->addVariable_withBounary("dPdx");
     dPdy = field->addVariable_withBounary("dPdy");
@@ -783,37 +815,23 @@ void IdealMHDSolver::RunLimiter() {
   }
 
   else if(Limiter == "CharacteristicLimiter") {
-    int AuxVarM[6] = {uMoment, vMoment, qMoment, HMoment, dPdxMoment, dPdyMoment};
-    int AuxVarV[4] = {qMoment, uMoment, vMoment, HMoment};
-    int AuxVarC[4] = {Char1, Char2, Char3, Char4};
-  
-    field->computeMoments(DVx, uMoment, CellMarker);
-    field->computeMoments(DVy, vMoment, CellMarker);
-    field->computeMoments(D, qMoment, CellMarker);
-    field->computeMoments(DE, HMoment, CellMarker);
+    int AuxVarM[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, dPdxMoment, dPdyMoment, Ch};
+    int AuxVarV[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
+    int AuxVarC[] = {Char1, Char2, Char3, Char4, Char5, Char6, Char7, Char8, Char9};
+    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
+    field->computeMoments(Var, AuxVarV, CellMarker, 9);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(P, dPdx, P, "central", Vx_plus_C);
-    field->delByDelY(P, dPdy, P, "central", Vy_plus_C);
+    field->delByDelX(P, dPdx, "central");
+    field->delByDelY(P, dPdy, "central");
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
 
-
     field->findEigenMatrices(AuxVarM, CellMarker);
-
-    // Find Characteristic Variables 
     field->convertVariabletoCharacteristic(AuxVarV, AuxVarC, 0, CellMarker);
-    
-    // Limiting Characteristic Variables ;
-    field->limitMoments(AuxVarV, AuxVarC, CellMarker, 0);
-    
-    // update Conservative Variables
+    //field->limitMoments(AuxVarV, AuxVarC, CellMarker, 0);
     field->convertCharacteristictoVariable(AuxVarC, AuxVarV, 0, CellMarker);
-    
-    field->convertMomentToVariable(qMoment, D, CellMarker);
-    field->convertMomentToVariable(uMoment, DVx, CellMarker);
-    field->convertMomentToVariable(vMoment, DVy, CellMarker);
-    field->convertMomentToVariable(HMoment, DE, CellMarker);
+    field->convertMomentToVariable(AuxVarV, Var, CellMarker, 9);
   }
 
 

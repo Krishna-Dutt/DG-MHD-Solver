@@ -52,11 +52,14 @@ private:
     // Add corresponding variables for Characteristic Limiter
     int uMoment, vMoment, wMoment, qMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment ;
     int dPdxMoment, dPdyMoment;
-    int Char1, Char2, Char3, Char4;
+    int Char1, Char2, Char3, Char4, Char5, Char6, Char7, Char8, Char9;
     int dPdx, dPdy;
 
     // cell centered variables
     int Dx, Dt, UMax, CellMarker; 
+
+    // Variable to store convective speed for Div Cleaning
+    double ConvSpeed;
 
 public:
     /* ----------------------------------------------------------------------------*/
