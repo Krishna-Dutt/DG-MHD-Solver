@@ -25,7 +25,7 @@ void IdealMHDSolver::setDomain(double _x1, double _y1, double _x2, double _y2) {
     y2 = _y2;
     field = new DG_Field_2d(ne_x, ne_y, N, x1, y1, x2, y2);
     field->setSystem("MHD");//change later to MHD 
-    Dimension = 9;
+    Dimension = 8;
 
    return ;
 }
@@ -566,11 +566,11 @@ void IdealMHDSolver::solve() {
     }
     updateInviscidFlux();
 
-    //RK_Step1();
+    RK_Step1();
     
     RunShockDetector();
     RunLimiter();
-    /*RunPositivityLimiter();
+    RunPositivityLimiter();
 
     field->updateBoundary(t);
     updatePrimitiveVariables();
@@ -601,7 +601,7 @@ void IdealMHDSolver::solve() {
    
     field->updateBoundary(t);
     updatePrimitiveVariables();
-*/
+
    t += dt; 
    count += 1;       
     }
@@ -798,7 +798,7 @@ void IdealMHDSolver::RunLimiter() {
     int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
     int Mom[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
     int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment}; 
-    field->computeMoments(Var, Mom, CellMarker, 9);
+    field->computeMoments(Var, Mom, CellMarker, 8);
     field->setFunctionsForVariables(1.0, qMoment, Copy, qModMoment);
     field->setFunctionsForVariables(1.0, uMoment, Copy, uModMoment);
     field->setFunctionsForVariables(1.0, vMoment, Copy, vModMoment);
@@ -809,17 +809,18 @@ void IdealMHDSolver::RunLimiter() {
     field->setFunctionsForVariables(1.0, BzMoment, Copy, BzModMoment);
     field->setFunctionsForVariables(1.0, SiMoment, Copy, SiModMoment);
 
-    field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 9);
-    field->convertMomentToVariable(ModMom, Var, CellMarker, 9);
+    field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 8);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);
 
   }
 
   else if(Limiter == "CharacteristicLimiter") {
+    //cout << "Calling Characteristic " << endl;
     int AuxVarM[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, dPdxMoment, dPdyMoment, Ch};
     int AuxVarV[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
     int AuxVarC[] = {Char1, Char2, Char3, Char4, Char5, Char6, Char7, Char8, Char9};
     int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
-    field->computeMoments(Var, AuxVarV, CellMarker, 9);
+    field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
     field->delByDelX(P, dPdx, "central");
@@ -829,9 +830,9 @@ void IdealMHDSolver::RunLimiter() {
 
     field->findEigenMatrices(AuxVarM, CellMarker);
     field->convertVariabletoCharacteristic(AuxVarV, AuxVarC, 0, CellMarker);
-    //field->limitMoments(AuxVarV, AuxVarC, CellMarker, 0);
+    field->limitMoments(AuxVarV, AuxVarC, CellMarker, 0);
     field->convertCharacteristictoVariable(AuxVarC, AuxVarV, 0, CellMarker);
-    field->convertMomentToVariable(AuxVarV, Var, CellMarker, 9);
+    field->convertMomentToVariable(AuxVarV, Var, CellMarker, 8);
   }
 
 

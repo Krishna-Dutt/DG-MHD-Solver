@@ -1005,17 +1005,19 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   q = sqrt(u*u + v*v + w*w);
   P = (gamma-1.0) * ( DE - 0.5*q*q*D - 0.5*BdotB ); 
   Pt = P + 0.5 * BdotB;
-  c = (gamma*P/D);
+  c = sqrt(gamma*P/D);
   can = abs(Bn)/D;
-  cfn = sqrt( 0.5 * ( c + BdotB/D  + sqrt( pow(c + BdotB/D, 2.0) - 4.0*c*Bn*Bn/D ) ) );
-  csn = sqrt( 0.5 * ( c + BdotB/D  - sqrt( pow(c + BdotB/D, 2.0) - 4.0*c*Bn*Bn/D ) ) );
+  cfn = sqrt( 0.5 * ( c*c + BdotB/D  + sqrt( pow(c*c + BdotB/D, 2.0) - 4.0*c*Bn*Bn/D ) ) );
+  csn = sqrt( 0.5 * ( c*c + BdotB/D  - sqrt( pow(c*c + BdotB/D, 2.0) - 4.0*c*Bn*Bn/D ) ) );
   H = c*c/(gamma - 1.0)  + 0.5*q*q;
-
+  
+  //cout << "\n Speeds :: C : " << c << ", Can : " << can << ", Csn : " << csn << ", Cfn : "<< cfn << endl;
   SignBn = Signum(Bn);
   SignBcross = Signum(Bcross);
   SignBz = Signum(Bz);
   
   alpha = sqrt(BdotB - Bn*Bn);
+  //cout << " \nAlpha : " << alpha << endl;
   if(alpha <  epsilon2) {
       // alfven
       l[0] = SignBz*ny/sqrt(2.0);
@@ -1068,6 +1070,9 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
    alphaF = sqrt( lf[0]*lf[0] + lf[1]*lf[1] + lf[2]*lf[2] + mf[0]*mf[0] + mf[1]*mf[1] + mf[2]*mf[2] + c*c);
    alphaS = sqrt( ls[0]*ls[0] + ls[1]*ls[1] + ls[2]*ls[2] + ms[0]*ms[0] + ms[1]*ms[1] + ms[2]*ms[2] + c*c);
    
+   //cout << " \nAlphaF : " << alphaF << ",  AlphaS : " << alphaS << endl;
+   //cout << " \nAlphaFbar : " << alphaFbar << ",  AlphaSbar : " << alphaSbar << endl;
+
    UdotL = u*l[0] + v*l[1] + w*l[2];
    BdotL = Bx*l[0] + By*l[1] + Bz*l[2];
    UdotLf = u*lf[0] + v*lf[1] + w*lf[2];
@@ -1081,10 +1086,10 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
    // Right Eigen Vector Matrix
    // lambda = qn
    RightEigenMatrix[0] = -1.0; RightEigenMatrix[8] = -u; RightEigenMatrix[16] = -v; RightEigenMatrix[24] = -w;
-   RightEigenMatrix[32] = -0.5 * q*q; RightEigenMatrix[40] = RightEigenMatrix[48]  = RightEigenMatrix[56] = 0.0; 
+   RightEigenMatrix[32] = -0.5*q*q; RightEigenMatrix[40] = RightEigenMatrix[48]  = RightEigenMatrix[56] = 0.0; 
    // lambda = qn
    RightEigenMatrix[1] = RightEigenMatrix[9] = RightEigenMatrix[17] = RightEigenMatrix[25] = 0.0;
-   RightEigenMatrix[33] = c*Bn/(D*sqrt(meu_perm); RightEigenMatrix[41] = c*nx*sqrt(meu_perm/D);
+   RightEigenMatrix[33] = c*Bn/(D*sqrt(meu_perm)); RightEigenMatrix[41] = c*nx*sqrt(meu_perm/D);
    RightEigenMatrix[49] = c*ny*sqrt(meu_perm/D); RightEigenMatrix[57] = 0.0;
    // lambda = qn + can
    RightEigenMatrix[2] = 0.0; RightEigenMatrix[10] = c*l[0]; RightEigenMatrix[18] = c*l[1]; RightEigenMatrix[26] = c*l[2];
@@ -1136,47 +1141,47 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
    // Lambda = qn + cfn
    LeftEigenMatrix[32] = (c*gammabar*0.5*q*q - UdotLf/c )/alphaF; LeftEigenMatrix[33] = (-c*gammabar*u + lf[0]/c)/alphaF; LeftEigenMatrix[34] = (-c*gammabar*v + lf[1]/c)/alphaF; LeftEigenMatrix[35] = (-c*gammabar*w + lf[2]/c)/alphaF;
    LeftEigenMatrix[36] = c*gammabar/alphaF; 
-   LeftEigenMatrix[37] = (-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[0]/c)/alphaF;
-   LeftEigenMatrix[38] = (-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[1]/c)/alphaF;
-   LeftEigenMatrix[39] = (-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[2]/c)/alphaF;
+   LeftEigenMatrix[37] = (-c*gammabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[0]/c)/alphaF;
+   LeftEigenMatrix[38] = (-c*gammabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[1]/c)/alphaF;
+   LeftEigenMatrix[39] = (-c*gammabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[2]/c)/alphaF;
    // Lambda = qn - cfn
    LeftEigenMatrix[40] = (-c*gammabar*0.5*q*q - UdotLf/c )/alphaF; LeftEigenMatrix[41] = (c*gammabar*u + lf[0]/c)/alphaF; LeftEigenMatrix[42] = (c*gammabar*v + lf[1]/c)/alphaF; LeftEigenMatrix[43] = (c*gammabar*w + lf[2]/c)/alphaF;
    LeftEigenMatrix[44] = -c*gammabar/alphaF; 
-   LeftEigenMatrix[45] = -(-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[0]/c)/alphaF;
-   LeftEigenMatrix[46] = -(-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[1]/c)/alphaF;
-   LeftEigenMatrix[47] = -(-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[2]/c)/alphaF;
+   LeftEigenMatrix[45] = -(-c*gammabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[0]/c)/alphaF;
+   LeftEigenMatrix[46] = -(-c*gammabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[1]/c)/alphaF;
+   LeftEigenMatrix[47] = -(-c*gammabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[2]/c)/alphaF;
    // Lambda = qn + csn
    LeftEigenMatrix[48] = (c*gammabar*0.5*q*q - UdotLs/c )/alphaS; LeftEigenMatrix[49] = (-c*gammabar*u + ls[0]/c)/alphaS; LeftEigenMatrix[50] = (-c*gammabar*v + ls[1]/c)/alphaS; LeftEigenMatrix[51] = (-c*gammabar*w + ls[2]/c)/alphaS;
    LeftEigenMatrix[52] = c*gammabar/alphaS; 
-   LeftEigenMatrix[53] = (-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[0]/c)/alphaS;
-   LeftEigenMatrix[54] = (-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[1]/c)/alphaS;
-   LeftEigenMatrix[55] = (-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[2]/c)/alphaS;
+   LeftEigenMatrix[53] = (-c*gammabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[0]/c)/alphaS;
+   LeftEigenMatrix[54] = (-c*gammabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[1]/c)/alphaS;
+   LeftEigenMatrix[55] = (-c*gammabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[2]/c)/alphaS;
    // Lambda = qn - csn
    LeftEigenMatrix[56] = (-c*gammabar*0.5*q*q - UdotLs/c )/alphaS; LeftEigenMatrix[57] = (c*gammabar*u + ls[0]/c)/alphaS; LeftEigenMatrix[58] = (c*gammabar*v + ls[1]/c)/alphaS; LeftEigenMatrix[59] = (c*gammabar*w + ls[2]/c)/alphaS;
    LeftEigenMatrix[60] = -c*gammabar/alphaS; 
-   LeftEigenMatrix[61] = -(-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[0]/c)/alphaS;
-   LeftEigenMatrix[62] = -(-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[1]/c)/alphaS;
-   LeftEigenMatrix[63] = -(-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[2]/c)/alphaS;
+   LeftEigenMatrix[61] = -(-c*gammabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[0]/c)/alphaS;
+   LeftEigenMatrix[62] = -(-c*gammabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[1]/c)/alphaS;
+   LeftEigenMatrix[63] = -(-c*gammabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[2]/c)/alphaS;
 
   /*cout << " \n Right Eigen Matrix : \n";
-  for(int i=0; i<9; ++i) {
-      for(int j=0; j<9;++j) 
-        cout << " " << RightEigenMatrix[j + i*9] << " ";
+  for(int i=0; i<8; ++i) {
+      for(int j=0; j<8;++j) 
+        cout << " " << RightEigenMatrix[j + i*8] << " ";
         cout << endl;
   } 
   cout << "\n Left Eigen Matrix : \n";
-  for(int i=0; i<9; ++i) {
-      for(int j=0; j<9;++j) 
-        cout << " " << LeftEigenMatrix[j + i*9] << " ";
+  for(int i=0; i<8; ++i) {
+      for(int j=0; j<8;++j) 
+        cout << " " << LeftEigenMatrix[j + i*8] << " ";
         cout << endl;
   } */
 
-  double A[8][8];
+  /*double A[8][8];
   for(int i =0; i < 8; ++i) {
       for(int j=0; j<8; ++j) {
           A[i][j] = 0.0;
-          for(int k=0; k<9;++k)
-            A[i][j] += LeftEigenMatrix[k + i*9 ]*RightEigenMatrix[k*9 + j];
+          for(int k=0; k<8;++k)
+            A[i][j] += RightEigenMatrix[k + i*8 ]*LeftEigenMatrix[k*8 + j];
       }
   }
   cout << "\n Matrix \n";
@@ -1184,7 +1189,8 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
       for(int j=0; j<8;++j)
       cout << " " << A[i][j] << " ";
       cout << endl;
-  }
+  }*/
+  
   
   return ;
 }
