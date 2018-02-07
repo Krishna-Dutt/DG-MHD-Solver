@@ -963,19 +963,21 @@ void DG_Element_2d::findEigenMatricesEuler(int *V) {
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::findEigenMatricesMHD(int *V) {
   double u, v, w, c, H, P;
-  double epsilon = 1e-10;
+  double epsilon1 = 1e-10, epsilon2 = 1e-5;
   double q, qn, Bn, nx, ny, qe, cfn, can, csn, Pt, BdotB, UdotB, ch, Bcross, Ucross;
   double DVx, DVy, DVz, D, DE, Bx, By, Bz, Si, dPdx, dPdy;
-  double theta1, theta2, scale = 1.0;
+  double l[3], ls[3], lf[3], ms[3], mf[3]; 
+  double SignBn, SignBz, SignBcross;
+  double alpha, alphaS, alphaF, alphaSbar, alphaFbar;
   D   = 0.5 * variable[V[0]][0];
   DVx = 0.5 * variable[V[1]][0];
   DVy = 0.5 * variable[V[2]][0];
   DVz = 0.5 * variable[V[3]][0];
   DE  = 0.5 * variable[V[4]][0];
-  Bx = 0.5 * variable[V[5]][0];
-  By = 0.5 * variable[V[6]][0];
-  Bz = 0.5 * variable[V[7]][0];
-  ch = sqrt(variable[V[10]][0]);
+  Bx = 0.5 * variable[V[5]][0]/sqrt(meu_perm); // Normalising wrt permeability
+  By = 0.5 * variable[V[6]][0]/sqrt(meu_perm);
+  Bz = 0.5 * variable[V[7]][0]/sqrt(meu_perm);
+  
   dPdx = 0.5 * variable[V[8]][0];
   dPdy = 0.5 * variable[V[9]][0];
   
@@ -983,7 +985,7 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   v = DVy/D;
   w = DVz/D;
   
-  if (  abs(dPdx) > epsilon || abs(dPdy) > epsilon ) {
+  if (  abs(dPdx) > epsilon1 || abs(dPdy) > epsilon1 ) {
       nx = dPdx/sqrt(dPdx*dPdx + dPdy*dPdy);
       ny = dPdy/sqrt(dPdx*dPdx + dPdy*dPdy);
   }
@@ -1002,12 +1004,68 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   q = sqrt(u*u + v*v + w*w);
   P = (gamma-1.0) * ( DE - 0.5*q*q*D - 0.5*BdotB ); 
   Pt = P + 0.5 * BdotB;
-  
   c = (gamma*P/D);
   can = abs(Bn)/D;
   cfn = sqrt( 0.5 * ( c + BdotB/D  + sqrt( pow(c + BdotB/D, 2.0) - 4.0*c*Bn*Bn/D ) ) );
   csn = sqrt( 0.5 * ( c + BdotB/D  - sqrt( pow(c + BdotB/D, 2.0) - 4.0*c*Bn*Bn/D ) ) );
+  H = c*c/(gamma - 1.0)  + 0.5*q*q;
 
+  SignBn = Signum(Bn);
+  SignBcross = Signum(Bcross);
+  SignBz = Signum(Bz);
+  
+  alpha = sqrt(BdotB - Bn*Bn);
+  if(alpha <  epsilon2) {
+      // alfven
+      l[0] = SignBz*ny/sqrt(2.0);
+      l[1] = -SignBz*nx/sqrt(2.0);
+      l[2] = -SignBcross/sqrt(2.0);
+      // fast magneto-sonic
+      lf[0] = cfn*nx - csn*SignBn*SignBcross*ny/sqrt(2.0);
+      lf[1] = cfn*ny + csn*SignBn*SignBcross*nx/sqrt(2.0);
+      lf[2] = -csn*SignBn*SignBz/sqrt(2.0);
+      mf[0] = c*SignBcross*ny/sqrt(2.0);
+      mf[1] = -c*SignBcross*nx/sqrt(2.0);
+      mf[2] = c*SignBz/sqrt(2.0);
+      // slow magneto-sonic
+      ls[0] = csn*nx + cfn*SignBn*SignBcross*ny/sqrt(2.0);
+      ls[1] = csn*ny - cfn*SignBn*SignBcross*nx/sqrt(2.0);
+      ls[2] = cfn*SignBn*SignBz/sqrt(2.0);
+      ms[0] = -c*SignBcross*ny/sqrt(2.0);
+      ms[1] = c*SignBcross*nx/sqrt(2.0);
+      ms[2] = -c*SignBz/sqrt(2.0);
+   }
+   else {
+
+       if ( abs(Bn*Bn/D - c*c) < epsilon1) {
+           alphaSbar = alphaFbar = 1.0/sqrt(2.0);
+       }
+       else {
+           alphaSbar = sqrt( cfn*cfn - c*c)/sqrt( cfn*cfn - csn*csn);
+           alphaFbar = sqrt( -csn*csn + c*c)/sqrt( cfn*cfn - csn*csn);
+       }
+       // alfven
+      l[0] = Bz*ny/alpha;
+      l[1] = -Bz*nx/alpha;
+      l[2] = -Bcross/alpha;
+      // fast magneto-sonic
+      lf[0] = cfn*nx - (alphaSbar/alphaFbar)*csn*SignBn*Bcross*ny/alpha;
+      lf[1] = cfn*ny + (alphaSbar/alphaFbar)*csn*SignBn*Bcross*nx/alpha;;
+      lf[2] = -(alphaSbar/alphaFbar)*csn*SignBn*Bz/alpha;
+      mf[0] = (alphaSbar/alphaFbar)*c*Bcross*ny/alpha;
+      mf[1] = -(alphaSbar/alphaFbar)*c*Bcross*nx/alpha;;
+      mf[2] = (alphaSbar/alphaFbar)*c*Bz/alpha;
+      // slow magneto-sonic
+      ls[0] = csn*nx + (alphaFbar/alphaSbar)*cfn*SignBn*Bcross*ny/alpha;
+      ls[1] = csn*ny - (alphaFbar/alphaSbar)*cfn*SignBn*Bcross*nx/alpha;;
+      ls[2] = (alphaFbar/alphaSbar)*cfn*SignBn*Bz/alpha;
+      ms[0] = -(alphaFbar/alphaSbar)*c*Bcross*ny/alpha;
+      ms[1] = (alphaFbar/alphaSbar)*c*Bcross*nx/alpha;;
+      ms[2] = (alphaFbar/alphaSbar)*c*Bz/alpha;
+   }
+
+   alphaF = sqrt( lf[0]*lf[0] + lf[1]*lf[1] + lf[2]*lf[2] + mf[0]*mf[0] + mf[1]*mf[1] + mf[2]*mf[2] + c*c);
+   alphaS = sqrt( ls[0]*ls[0] + ls[1]*ls[1] + ls[2]*ls[2] + ms[0]*ms[0] + ms[1]*ms[1] + ms[2]*ms[2] + c*c);
   
   // Checks for Zero Magnetic field !!
   if ( (abs(Bx) + abs(By) + abs(Bz)) < epsilon ) 
