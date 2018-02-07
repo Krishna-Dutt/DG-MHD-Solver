@@ -964,11 +964,12 @@ void DG_Element_2d::findEigenMatricesEuler(int *V) {
 void DG_Element_2d::findEigenMatricesMHD(int *V) {
   double u, v, w, c, H, P;
   double epsilon1 = 1e-10, epsilon2 = 1e-5;
-  double q, qn, Bn, nx, ny, qe, cfn, can, csn, Pt, BdotB, UdotB, ch, Bcross, Ucross;
+  double q, qn, Bn, nx, ny, qe, cfn, can, csn, Pt, BdotB, UdotB, UdotL, BdotL, UdotLf, UdotLs, BdotMf, BdotMs;
+  double  ch, Bcross, Ucross;
   double DVx, DVy, DVz, D, DE, Bx, By, Bz, Si, dPdx, dPdy;
   double l[3], ls[3], lf[3], ms[3], mf[3]; 
   double SignBn, SignBz, SignBcross;
-  double alpha, alphaS, alphaF, alphaSbar, alphaFbar;
+  double alpha, alphaS, alphaF, alphaSbar, alphaFbar, gammabar;
   D   = 0.5 * variable[V[0]][0];
   DVx = 0.5 * variable[V[1]][0];
   DVy = 0.5 * variable[V[2]][0];
@@ -1066,325 +1067,96 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
 
    alphaF = sqrt( lf[0]*lf[0] + lf[1]*lf[1] + lf[2]*lf[2] + mf[0]*mf[0] + mf[1]*mf[1] + mf[2]*mf[2] + c*c);
    alphaS = sqrt( ls[0]*ls[0] + ls[1]*ls[1] + ls[2]*ls[2] + ms[0]*ms[0] + ms[1]*ms[1] + ms[2]*ms[2] + c*c);
-  
-  // Checks for Zero Magnetic field !!
-  if ( (abs(Bx) + abs(By) + abs(Bz)) < epsilon ) 
-  {
-      zeros(RightEigenMatrix, Dimension);
-      zeros(LeftEigenMatrix, Dimension);
-      // Sub with Euler 2d system with w = 0 !!
+   
+   UdotL = u*l[0] + v*l[1] + w*l[2];
+   BdotL = Bx*l[0] + By*l[1] + Bz*l[2];
+   UdotLf = u*lf[0] + v*lf[1] + w*lf[2];
+   BdotMf = Bx*mf[0] + By*mf[1] + Bz*mf[2];
+   UdotLs = u*ls[0] + v*ls[1] + w*ls[2];
+   BdotMs = Bx*ms[0] + By*ms[1] + Bz*ms[2];
 
-      qe = -u*ny + v*nx;
-      P = (gamma-1.0) * ( DE - 0.5*q*q*D ); // Twice pressure
-      c = sqrt(gamma*P/D);
-      H =  c*c/(gamma-1.0) + 0.5*q*q;
-
-      // Setting Right Eigen Matrix
-      RightEigenMatrix[0] = RightEigenMatrix[1] = RightEigenMatrix[2] = 1.0 ;
-      RightEigenMatrix[4] = 0.0;
-      RightEigenMatrix[9] = u - c*nx;
-      RightEigenMatrix[10] = u;
-      RightEigenMatrix[11] = u + c*nx;
-      RightEigenMatrix[13] = -ny;
-      RightEigenMatrix[18] = v - c*ny;
-      RightEigenMatrix[19] = v;
-      RightEigenMatrix[20] = v + c*ny;
-      RightEigenMatrix[22] = nx;
-      RightEigenMatrix[36] = H - qn*c;
-      RightEigenMatrix[37] = 0.5 *q*q;
-      RightEigenMatrix[38] = H + qn*c;
-      RightEigenMatrix[40] = qe;
-
-      // Setting Left Eigen Matrix;
-      LeftEigenMatrix[0] = 0.5 * (0.5*(gamma-1.0)*pow(q/c,2.0) + qn/c);
-      LeftEigenMatrix[1] = -0.5*( (gamma -1.0)*u/(c*c) + nx/c);
-      LeftEigenMatrix[2] = -0.5*( (gamma -1.0)*v/(c*c) + ny/c);
-      LeftEigenMatrix[4] = 0.5 * (gamma-1.0)/(c*c);
-      LeftEigenMatrix[9] = 1.0 - 0.5 * (gamma-1.0)*pow(q/c,2.0);
-      LeftEigenMatrix[10] = (gamma-1.0)*u/(c*c);
-      LeftEigenMatrix[11] = (gamma-1.0)*v/(c*c);
-      LeftEigenMatrix[13] = -(gamma-1.0)/(c*c);
-      LeftEigenMatrix[18] = 0.5 * (0.5*(gamma-1.0)*pow(q/c,2.0) - qn/c);
-      LeftEigenMatrix[19] = -0.5*( (gamma -1.0)*u/(c*c) - nx/c);
-      LeftEigenMatrix[20] = -0.5*( (gamma -1.0)*v/(c*c) - ny/c);
-      LeftEigenMatrix[22] = 0.5 * (gamma-1.0)/(c*c);
-      LeftEigenMatrix[36] = -qe;
-      LeftEigenMatrix[37] = -ny;
-      LeftEigenMatrix[38] = nx;
-      LeftEigenMatrix[40] = 0.0;
-
-      return ;
-  
-  }
-  // Setting Right Eigen Matrix
-  // Lambda = qn 
-  RightEigenMatrix[4] = 1.0; RightEigenMatrix[13] = u; RightEigenMatrix[22] = v; RightEigenMatrix[31] = w;
-  RightEigenMatrix[40] = 0.5*q*q; RightEigenMatrix[49] =  RightEigenMatrix[58] = RightEigenMatrix[67] = RightEigenMatrix[76] = 0.0 ;
-  
-  // Condition for Bn
-  if ( abs(Bn) > epsilon)
-   {
-  // Lambda = qn + can
-  RightEigenMatrix[6] = 0.0; RightEigenMatrix[15] = -Bz*ny; RightEigenMatrix[24] = Bz*nx;
-  RightEigenMatrix[33] = Bcross; RightEigenMatrix[42] = -Bz*Ucross -w*Bcross;
-  RightEigenMatrix[51] = can*ny*Bz/Bn; RightEigenMatrix[60] = -can*nx*Bz/Bn;
-  RightEigenMatrix[69] = -can*Bcross/Bn; RightEigenMatrix[76] = 0.0;  
-
-  // Lambda = qn - can
-  RightEigenMatrix[2] = 0.0; RightEigenMatrix[11] = -Bz*ny; RightEigenMatrix[20] = Bz*nx;
-  RightEigenMatrix[29] = Bcross; RightEigenMatrix[38] = -Bz*Ucross -w*Bcross;
-  RightEigenMatrix[47] = -can*ny*Bz/Bn; RightEigenMatrix[56] = can*nx*Bz/Bn;
-  RightEigenMatrix[65] = can*Bcross/Bn; RightEigenMatrix[74] = 0.0; 
-
-  // Lambda = qn + csn
-  theta2 = -Bcross*( (gamma-1.0)*Bn*Bn/D + (2.0-gamma)*csn*csn );
-  theta1 = (1.0-gamma)*Bn * ( (Bn*UdotB/D + csn*(DE + Pt)/D)*nx*(pow(csn,2.0) - pow(Bn,2.0)/D) -nx*Bn*w*Bz*csn*csn/D -(Bn/D)*( (Bx*(qn + csn) -w*Bz*nx)*(pow(csn,2.0)-pow(Bn,2.0)/D) - nx*csn*Bz*Bz*Bn/D) ) 
-           - csn* ( (gamma-1.0)*(2.0*w*w - 0.5*q*q)*Bn*nx*(pow(csn,2.0) - pow(Bn,2.0)/D) + (gamma-1.0)*(nx*w*Bn*Bn*Bz*csn/D) + (2.0-gamma)*( -Bcross*(csn*csn*ny + csn*v)*(pow(csn,2.0)-pow(Bn,2.0)/D) + nx*Bz*Bn*csn*csn*Bz/D ) );
-  RightEigenMatrix[5] = theta2*nx*(pow(csn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[14] = (theta2*(qn + csn) + theta1*ny)*(pow(csn,2.0) - pow(Bn,2.0)/D);
-  RightEigenMatrix[23] = -theta1*nx*(pow(csn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[32] = -theta2*nx*(w*(pow(csn,2.0) - pow(Bn,2.0)/D) + csn*Bz*Bn/D);
-  RightEigenMatrix[59] = nx*(pow(csn,2.0) - pow(Bn,2.0)/D)*((csn*csn*ny + csn*v)*theta2 + csn*theta1)/Bn; RightEigenMatrix[50] = -ny*(pow(csn,2.0) - pow(Bn,2.0)/D)*((csn*csn*ny + csn*v)*theta2 + csn*theta1)/Bn; 
-  RightEigenMatrix[68] = nx*theta2*csn*csn*Bz/D; RightEigenMatrix[77] = 0.0;
-  RightEigenMatrix[41] = ((0.5*(gamma-1.0)*q*q - csn*csn)*RightEigenMatrix[5] + (1-gamma)*(u*RightEigenMatrix[14] + v*RightEigenMatrix[23] + w*RightEigenMatrix[32]) + (2.0-gamma)*( Bx*RightEigenMatrix[50] + By*RightEigenMatrix[59] + Bz*RightEigenMatrix[68]))/(1.0-gamma) ;
-  
-  // Lambda = qn - csn
-  theta2 = -Bcross*( (gamma-1.0)*Bn*Bn/D + (2.0-gamma)*csn*csn );
-  theta1 = (1.0-gamma)*Bn * ( (Bn*UdotB/D - csn*(DE + Pt)/D)*nx*(pow(csn,2.0) - pow(Bn,2.0)/D) -nx*Bn*w*Bz*csn*csn/D -(Bn/D)*( (Bx*(qn - csn) -w*Bz*nx)*(pow(csn,2.0)-pow(Bn,2.0)/D) + nx*csn*Bz*Bz*Bn/D) ) 
-           + csn* ( (gamma-1.0)*(2.0*w*w - 0.5*q*q)*Bn*nx*(pow(csn,2.0) - pow(Bn,2.0)/D) + (gamma-1.0)*(-nx*w*Bn*Bn*Bz*csn/D) + (2.0-gamma)*( -Bcross*(csn*csn*ny - csn*v)*(pow(csn,2.0)-pow(Bn,2.0)/D) + nx*Bz*Bn*csn*csn*Bz/D ) );
-  RightEigenMatrix[3] = theta2*nx*(pow(csn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[12] = (theta2*(qn - csn) + theta1*ny)*(pow(csn,2.0) - pow(Bn,2.0)/D);
-  RightEigenMatrix[21] = -theta1*nx*(pow(csn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[30] = -theta2*nx*(w*(pow(csn,2.0) - pow(Bn,2.0)/D) - csn*Bz*Bn/D);
-  RightEigenMatrix[57] = nx*(pow(csn,2.0) - pow(Bn,2.0)/D)*((csn*csn*ny - csn*v)*theta2 - csn*theta1)/Bn; RightEigenMatrix[48] = -ny*(pow(csn,2.0) - pow(Bn,2.0)/D)*((csn*csn*ny - csn*v)*theta2 - csn*theta1)/Bn; 
-  RightEigenMatrix[66] = nx*theta2*csn*csn*Bz/D; RightEigenMatrix[75] = 0.0;
-  RightEigenMatrix[39] = ((0.5*(gamma-1.0)*q*q - csn*csn)*RightEigenMatrix[3] + (1-gamma)*(u*RightEigenMatrix[12] + v*RightEigenMatrix[21] + w*RightEigenMatrix[30]) + (2.0-gamma)*( Bx*RightEigenMatrix[48] + By*RightEigenMatrix[57] + Bz*RightEigenMatrix[66]))/(1.0-gamma) ;
-  
-  // Lambda = qn + cfn
-  theta2 = -Bcross*( (gamma-1.0)*Bn*Bn/D + (2.0-gamma)*cfn*cfn );
-  theta1 = (1.0-gamma)*Bn * ( (Bn*UdotB/D + cfn*(DE + Pt)/D)*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D) -nx*Bn*w*Bz*cfn*cfn/D -(Bn/D)*( (Bx*(qn + cfn) -w*Bz*nx)*(pow(cfn,2.0)-pow(Bn,2.0)/D) - nx*cfn*Bz*Bz*Bn/D) ) 
-           - cfn* ( (gamma-1.0)*(2.0*w*w - 0.5*q*q)*Bn*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D) + (gamma-1.0)*(nx*w*Bn*Bn*Bz*cfn/D) + (2.0-gamma)*( -Bcross*(cfn*cfn*ny + cfn*v)*(pow(cfn,2.0)-pow(Bn,2.0)/D) + nx*Bz*Bn*cfn*cfn*Bz/D ) );
-  RightEigenMatrix[7] = theta2*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[16] = (theta2*(qn + cfn) + theta1*ny)*(pow(cfn,2.0) - pow(Bn,2.0)/D);
-  RightEigenMatrix[25] = -theta1*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[34] = -theta2*nx*(w*(pow(cfn,2.0) - pow(Bn,2.0)/D) + cfn*Bz*Bn/D);
-  RightEigenMatrix[61] = nx*(pow(cfn,2.0) - pow(Bn,2.0)/D)*((cfn*cfn*ny + cfn*v)*theta2 + cfn*theta1)/Bn; RightEigenMatrix[52] = -ny*(pow(cfn,2.0) - pow(Bn,2.0)/D)*((cfn*cfn*ny + cfn*v)*theta2 + cfn*theta1)/Bn; 
-  RightEigenMatrix[70] = nx*theta2*cfn*cfn*Bz/D; RightEigenMatrix[79] = 0.0;
-  RightEigenMatrix[43] = ((0.5*(gamma-1.0)*q*q - cfn*cfn)*RightEigenMatrix[7] + (1-gamma)*(u*RightEigenMatrix[16] + v*RightEigenMatrix[25] + w*RightEigenMatrix[34]) + (2.0-gamma)*( Bx*RightEigenMatrix[52] + By*RightEigenMatrix[61] + Bz*RightEigenMatrix[70]))/(1.0-gamma) ;
-  
-  // Lambda = qn - cfn
-  theta2 = -Bcross*( (gamma-1.0)*Bn*Bn/D + (2.0-gamma)*cfn*cfn );
-  theta1 = (1.0-gamma)*Bn * ( (Bn*UdotB/D - cfn*(DE + Pt)/D)*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D) -nx*Bn*w*Bz*cfn*cfn/D -(Bn/D)*( (Bx*(qn - cfn) -w*Bz*nx)*(pow(cfn,2.0)-pow(Bn,2.0)/D) + nx*cfn*Bz*Bz*Bn/D) ) 
-           + cfn* ( (gamma-1.0)*(2.0*w*w - 0.5*q*q)*Bn*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D) + (gamma-1.0)*(-nx*w*Bn*Bn*Bz*cfn/D) + (2.0-gamma)*( -Bcross*(cfn*cfn*ny - cfn*v)*(pow(cfn,2.0)-pow(Bn,2.0)/D) + nx*Bz*Bn*cfn*cfn*Bz/D ) );
-  RightEigenMatrix[1] = theta2*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[10] = (theta2*(qn - cfn) + theta1*ny)*(pow(cfn,2.0) - pow(Bn,2.0)/D);
-  RightEigenMatrix[19] = -theta1*nx*(pow(cfn,2.0) - pow(Bn,2.0)/D); RightEigenMatrix[28] = -theta2*nx*(w*(pow(cfn,2.0) - pow(Bn,2.0)/D) - cfn*Bz*Bn/D);
-  RightEigenMatrix[55] = nx*(pow(cfn,2.0) - pow(Bn,2.0)/D)*((cfn*cfn*ny - cfn*v)*theta2 - cfn*theta1)/Bn; RightEigenMatrix[46] = -ny*(pow(cfn,2.0) - pow(Bn,2.0)/D)*((cfn*cfn*ny - cfn*v)*theta2 - cfn*theta1)/Bn; 
-  RightEigenMatrix[64] = nx*theta2*cfn*cfn*Bz/D; RightEigenMatrix[73] = 0.0;
-  RightEigenMatrix[37] = ((0.5*(gamma-1.0)*q*q - cfn*cfn)*RightEigenMatrix[1] + (1-gamma)*(u*RightEigenMatrix[10] + v*RightEigenMatrix[19] + w*RightEigenMatrix[28]) + (2.0-gamma)*( Bx*RightEigenMatrix[46] + By*RightEigenMatrix[55] + Bz*RightEigenMatrix[64]))/(1.0-gamma) ;
-  
-  }
-
-  else {
-  for(int i=0 ;i<9;++i) {
-      // Lambda = qn +/- can
-      RightEigenMatrix[6 + i*9] = RightEigenMatrix[2 + i*9] = RightEigenMatrix[4 + i*9];
-      // Lambda = qn +/- csn
-      RightEigenMatrix[5 + i*9] = RightEigenMatrix[3 + i*9] = RightEigenMatrix[4 + i*9];
-  }
-  
-  // Lambda = qn + cfn
-  RightEigenMatrix[7] = (2.0-gamma); RightEigenMatrix[16] = (2.0-gamma)*(u + cfn*nx); 
-  RightEigenMatrix[25] = (2.0-gamma)*(v + cfn*ny); RightEigenMatrix[34] = (2.0-gamma)*w;
-  if (abs(Bcross) > epsilon) {
-      RightEigenMatrix[61] = nx*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; RightEigenMatrix[52] = -ny*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; 
-  }
-  else {
-      RightEigenMatrix[61] = 0.0; RightEigenMatrix[52] = 0.0; 
-  }
-  RightEigenMatrix[70] = (2.0-gamma)*Bz/D; RightEigenMatrix[79] = 0.0;
-  RightEigenMatrix[43] = (2.0-gamma)*( (DE+Pt)/D + cfn*qn );
-  
-  // Lambda = qn - cfn
-  RightEigenMatrix[1] = (2.0-gamma); RightEigenMatrix[10] = (2.0-gamma)*(u - cfn*nx);
-  RightEigenMatrix[19] = (2.0-gamma)*(v - cfn*ny); RightEigenMatrix[28] = (2.0-gamma)*w;
-   if (abs(Bcross) > epsilon) {
-      RightEigenMatrix[55] = nx*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; RightEigenMatrix[46] = -ny*( cfn*cfn + (1.0-gamma)*(DE+Pt)/D + 0.5*(gamma-1.0)*q*q - (2.0-gamma)*Bz*Bz/D)/Bcross; 
-  }
-  else {
-      RightEigenMatrix[55] = 0.0; RightEigenMatrix[46] = 0.0; 
-  }
-  RightEigenMatrix[64] = (2.0-gamma)*Bz/D; RightEigenMatrix[73] = 0.0;
-  RightEigenMatrix[37] = (2.0-gamma)*( (DE+Pt)/D - cfn*qn ) ;
-  
-  }
-  
-  // Lambda = ch
-  theta1 = (pow(ch - qn,2.0)*(Bn*Bn - BdotB) + BdotB*( Bn*Bn/D - (ch - qn)))/D;
-  theta2 = Bn*(ch - qn)*( Bn*Bn/D - BdotB/D + gamma*(pow(ch - qn,2.0) - Bn*Bn/D) ) + (qn*Bn - UdotB)*( -2.0*pow(ch - qn,2.0) + (1.0-gamma)*Bn*Bn/D );
-  RightEigenMatrix[80] = ch * (pow(ch - qn, 2.0) - Bn*Bn/D)*theta1;
-  RightEigenMatrix[71] = theta1*(Bz*Bn/D - w*(ch - qn)) - theta2*(pow(ch - qn, 2.0)*Bz/D); 
-  RightEigenMatrix[62] = theta1*( -Bcross*nx*Bn/D + (ch - qn)*Ucross*nx + ny*( pow(ch - qn,2.0) - Bn*Bn/D )) - theta2*(pow(ch - qn,2.0)*(By - Bn*ny)/D);
-  RightEigenMatrix[53] = theta1*( Bcross*ny*Bn/D - (ch - qn)*Ucross*ny + nx*( pow(ch - qn,2.0) - Bn*Bn/D )) - theta2*(pow(ch - qn,2.0)*Bcross*ny/D);
-  RightEigenMatrix[8] = -theta2*(pow(ch - qn,2.0) - Bn*Bn/D) ;
-  RightEigenMatrix[17] = theta1*( -(ch - qn)*ny*Bcross + Bn*ny*Ucross ) -theta2*( u*(pow(ch - qn,2.0) - Bn*Bn/D) + (ch - qn)*(pow(ch - qn,2.0)*nx - Bx*Bn/D) ) ;
-  RightEigenMatrix[26] = theta1*( (ch - qn)*nx*Bcross - Bn*nx*Ucross ) -theta2*( v*(pow(ch - qn,2.0) - Bn*Bn/D) + (ch - qn)*(pow(ch - qn,2.0)*ny - By*Bn/D) ); 
-  RightEigenMatrix[35] = theta1*( w*Bn - Bz*( ch - qn) ) - theta2*( w*(pow(ch - qn,2.0) - Bn*Bn/D) - Bz*Bn*( ch - qn)/D );
-  RightEigenMatrix[44] = (( pow(ch - qn,2.0) - 0.5*(gamma-1.0)*q*q )*RightEigenMatrix[8] + (gamma-1.0)*(u*RightEigenMatrix[17] + v*RightEigenMatrix[26] + w*RightEigenMatrix[35])
-                         + (gamma-2.0)*( Bx*RightEigenMatrix[53] + By*RightEigenMatrix[62] + Bz*RightEigenMatrix[71]) + (2*Bn/ch)*RightEigenMatrix[80] )/(gamma-1.0);  
-
-  // Lambda = -ch
-  theta1 = (pow(-ch - qn,2.0)*(Bn*Bn - BdotB) + BdotB*( Bn*Bn/D - (-ch - qn)))/D;
-  theta2 = Bn*(-ch - qn)*( Bn*Bn/D - BdotB/D + gamma*(pow(-ch - qn,2.0) - Bn*Bn/D) ) + (qn*Bn - UdotB)*( -2.0*pow(-ch - qn,2.0) + (1.0-gamma)*Bn*Bn/D );
-  RightEigenMatrix[72] = -ch * (pow(-ch - qn, 2.0) - Bn*Bn/D)*theta1;
-  RightEigenMatrix[63] = theta1*(Bz*Bn/D - w*(-ch - qn)) - theta2*(pow(-ch - qn, 2.0)*Bz/D); 
-  RightEigenMatrix[54] = theta1*( -Bcross*nx*Bn/D + (-ch - qn)*Ucross*nx + ny*( pow(-ch - qn,2.0) - Bn*Bn/D )) - theta2*(pow(-ch - qn,2.0)*(By - Bn*ny)/D);
-  RightEigenMatrix[45] = theta1*( Bcross*ny*Bn/D - (-ch - qn)*Ucross*ny + nx*( pow(-ch - qn,2.0) - Bn*Bn/D )) - theta2*(pow(-ch - qn,2.0)*Bcross*ny/D);
-  RightEigenMatrix[0] = -theta2*(pow(-ch - qn,2.0) - Bn*Bn/D) ;
-  RightEigenMatrix[9] = theta1*( -(-ch - qn)*ny*Bcross + Bn*ny*Ucross ) -theta2*( u*(pow(-ch - qn,2.0) - Bn*Bn/D) + (-ch - qn)*(pow(-ch - qn,2.0)*nx - Bx*Bn/D) ) ;
-  RightEigenMatrix[18] = theta1*( (-ch - qn)*nx*Bcross - Bn*nx*Ucross ) -theta2*( v*(pow(-ch - qn,2.0) - Bn*Bn/D) + (-ch - qn)*(pow(-ch - qn,2.0)*ny - By*Bn/D) ); 
-  RightEigenMatrix[27] = theta1*( w*Bn - Bz*(-ch - qn) ) - theta2*( w*(pow(-ch - qn,2.0) - Bn*Bn/D) - Bz*Bn*(-ch - qn)/D );
-  RightEigenMatrix[36] = (( pow(-ch - qn,2.0) - 0.5*(gamma-1.0)*q*q )*RightEigenMatrix[0] + (gamma-1.0)*(u*RightEigenMatrix[9] + v*RightEigenMatrix[18] + w*RightEigenMatrix[27])
-                         + (gamma-2.0)*( Bx*RightEigenMatrix[45] + By*RightEigenMatrix[54] + Bz*RightEigenMatrix[63]) + (2*Bn/ch)*RightEigenMatrix[72] )/(gamma-1.0);  
-  
-
-
-  // Setting Left Eigen Matrix;
-  //inverse(RightEigenMatrix,LeftEigenMatrix,Dimension*Dimension);
-  // Lambda = qn
-  if ( abs(Bcross) > epsilon )
-   {
-      LeftEigenMatrix[36] = ( -(DE + Pt)/D + BdotB/D + qn*qn ) * Bcross - Ucross * Bz * w;
-      LeftEigenMatrix[37] = -(Bz*w*nx + qn *(Bx - Bn*nx)); LeftEigenMatrix[38] = (Bz*w*ny + qn*(By - Bn*ny));
-      LeftEigenMatrix[39] = -Bcross*w; LeftEigenMatrix[40] = Bcross;
-      LeftEigenMatrix[41] = -Bcross*Bcross*ny; LeftEigenMatrix[42] = Bcross*Bcross*nx;
-      LeftEigenMatrix[43] = -Bz*Bcross; LeftEigenMatrix[44] = 0.0;
-
-      scale = Bcross*( BdotB/D + 0.5*q*q - ( w*w + (DE + Pt)/D ) );
-      for(int i=36; i<=44; ++i) LeftEigenMatrix[i] = LeftEigenMatrix[i]/scale;
-
-  }
-
-  else {
-      LeftEigenMatrix[36] = q*q + (Bn*Bn + Bz*Bz - DE - Pt)/D ;
-      LeftEigenMatrix[37] = -u; LeftEigenMatrix[38] = -v;
-      LeftEigenMatrix[39] = -w; LeftEigenMatrix[40] = 1;
-      LeftEigenMatrix[41] = 0; LeftEigenMatrix[42] = 0;
-      LeftEigenMatrix[43] = -Bz; LeftEigenMatrix[44] = 0.0;
-
-      scale = 0.5*q*q + (Bn*Bn + Bz*Bz - DE - Pt)/D;
-      for(int i=36; i<=44; ++i) LeftEigenMatrix[i] = LeftEigenMatrix[i]/scale;
-
-  }
-  
-  
-  // Condition for Bn = 0.0
-  // Lambda  = qn + can
-  scale = 2.0*( Bn*(Bn*Bn - BdotB)/D + can*(UdotB - qn*Bn) );
-  if ( abs(scale) < epsilon) scale = 1.0;
-  theta1 = -Bn*Bcross/D + can*Ucross;
-  LeftEigenMatrix[54] =  -( (-Ucross +can*Bcross/Bn)*(w*can -Bz*Bn/D) + (w - can*Bz/Bn)*theta1) ;  
-  LeftEigenMatrix[55] = -ny*( w*can -Bz*Bn/D); LeftEigenMatrix[56] = nx*( w*can -Bz*Bn/D);
-  LeftEigenMatrix[57] = theta1; LeftEigenMatrix[58] = 0.0;
-  LeftEigenMatrix[59] = -ny*(-can*D/Bn)*(w*can - Bz*Bn/D); LeftEigenMatrix[60] = nx*(-can*D/Bn)*(w*can - Bz*Bn/D);
-  LeftEigenMatrix[61] = theta1*(-can*D/Bn); LeftEigenMatrix[62] = 0.0;
-  for(int i=54; i<=62; ++i) LeftEigenMatrix[i] = LeftEigenMatrix[i]/scale;
-
-  // Lambda  = qn - can
-  scale = 2.0*( Bn*(Bn*Bn - BdotB)/D - can*(UdotB - qn*Bn) );
-  if ( abs(scale) < epsilon) scale = 1.0;
-  theta1 = -Bn*Bcross/D - can*Ucross;
-  LeftEigenMatrix[18] =  -( (-Ucross -can*Bcross/Bn)*(-w*can -Bz*Bn/D) + (w +can*Bz/Bn)*theta1) ;  
-  LeftEigenMatrix[19] = -ny*( -w*can -Bz*Bn/D); LeftEigenMatrix[20] = nx*( -w*can -Bz*Bn/D);
-  LeftEigenMatrix[21] = theta1; LeftEigenMatrix[22] = 0.0;
-  LeftEigenMatrix[23] = -ny*(can*D/Bn)*(-w*can - Bz*Bn/D); LeftEigenMatrix[24] = nx*(can*D/Bn)*(-w*can - Bz*Bn/D);
-  LeftEigenMatrix[25] = theta1*(can*D/Bn); LeftEigenMatrix[26] = 0.0;
-  for(int i=18; i<=26; ++i) LeftEigenMatrix[i] = LeftEigenMatrix[i]/scale;
-
-  // Lambda = qn - csn
-  LeftEigenMatrix[28] = -u*(pow(csn,2.0) - pow(Bn,2.0)/D) + csn*(csn*csn*nx - Bn*Bx/D)/(gamma-1.0); LeftEigenMatrix[29] = -v*(pow(csn,2.0) - pow(Bn,2.0)/D) + csn*(csn*csn*ny - Bn*By/D)/(gamma-1.0);
-  LeftEigenMatrix[30] = -w*(pow(csn,2.0) - pow(Bn,2.0)/D) + csn*(- Bn*Bz/D)/(gamma-1.0);
-  LeftEigenMatrix[31] = (pow(csn,2.0) - pow(Bn,2.0)/D);
-  LeftEigenMatrix[32] = -Bcross*ny*( ((gamma-2)/(gamma-1.0))*csn*csn - Bn*Bn/D); LeftEigenMatrix[33] = Bcross*nx*( ((gamma-2)/(gamma-1.0))*csn*csn - Bn*Bn/D);
-  LeftEigenMatrix[34] = -Bz*( ((gamma-2)/(gamma-1.0))*csn*csn - Bn*Bn/D); LeftEigenMatrix[35] = 0.0;
-  LeftEigenMatrix[27] = ( csn*csn/(gamma-1.0) + Bn*Bn/D -(DE+Pt)/D )*LeftEigenMatrix[31] -u*LeftEigenMatrix[28] -v*LeftEigenMatrix[29] -w*LeftEigenMatrix[30] -(Bx*LeftEigenMatrix[32] + By*LeftEigenMatrix[33] + Bz*LeftEigenMatrix[34])/D;
-  scale = 0.0;
-  for(int i=0; i<9; ++i) {
-      scale += LeftEigenMatrix[27 + i] * RightEigenMatrix[3 + i*9];
-  }
-  if ( abs(scale) < epsilon ) scale = 1.0;
-  for(int i=0;i<9;++i) LeftEigenMatrix[27 + i] = LeftEigenMatrix[27 + i]/scale;
-
-
-  // Lambda = qn + csn
-  LeftEigenMatrix[46] = -u*(pow(csn,2.0) - pow(Bn,2.0)/D) - csn*(csn*csn*nx - Bn*Bx/D)/(gamma-1.0); LeftEigenMatrix[47] = -v*(pow(csn,2.0) - pow(Bn,2.0)/D) - csn*(csn*csn*ny - Bn*By/D)/(gamma-1.0);
-  LeftEigenMatrix[48] = -w*(pow(csn,2.0) - pow(Bn,2.0)/D) - csn*(- Bn*Bz/D)/(gamma-1.0);
-  LeftEigenMatrix[49] = (pow(csn,2.0) - pow(Bn,2.0)/D);
-  LeftEigenMatrix[50] = -Bcross*ny*( ((gamma-2)/(gamma-1.0))*csn*csn - Bn*Bn/D); LeftEigenMatrix[51] = Bcross*nx*( ((gamma-2)/(gamma-1.0))*csn*csn - Bn*Bn/D);
-  LeftEigenMatrix[52] = -Bz*( ((gamma-2)/(gamma-1.0))*csn*csn - Bn*Bn/D); LeftEigenMatrix[53] = 0.0;
-  LeftEigenMatrix[45] = ( csn*csn/(gamma-1.0) + Bn*Bn/D -(DE+Pt)/D )*LeftEigenMatrix[49] -u*LeftEigenMatrix[46] -v*LeftEigenMatrix[47] -w*LeftEigenMatrix[48] -(Bx*LeftEigenMatrix[50] + By*LeftEigenMatrix[51] + Bz*LeftEigenMatrix[52])/D;
-  scale = 0.0;
-  for(int i=0; i<9; ++i) {
-      scale += LeftEigenMatrix[45 + i] * RightEigenMatrix[5 + i*9];
-  }
-  if ( abs(scale) < epsilon ) scale = 1.0;
-  for(int i=0;i<9;++i) LeftEigenMatrix[45 + i] = LeftEigenMatrix[45 + i]/scale;
-
-  // Lambda = qn - cfn
-  LeftEigenMatrix[10] = -u*(pow(cfn,2.0) - pow(Bn,2.0)/D) + cfn*(cfn*cfn*nx - Bn*Bx/D)/(gamma-1.0); LeftEigenMatrix[11] = -v*(pow(cfn,2.0) - pow(Bn,2.0)/D) + cfn*(cfn*cfn*ny - Bn*By/D)/(gamma-1.0);
-  LeftEigenMatrix[12] = -w*(pow(cfn,2.0) - pow(Bn,2.0)/D) + cfn*(- Bn*Bz/D)/(gamma-1.0);
-  LeftEigenMatrix[13] = (pow(cfn,2.0) - pow(Bn,2.0)/D);
-  LeftEigenMatrix[14] = -Bcross*ny*( ((gamma-2)/(gamma-1.0))*cfn*cfn - Bn*Bn/D); LeftEigenMatrix[15] = Bcross*nx*( ((gamma-2)/(gamma-1.0))*cfn*cfn - Bn*Bn/D);
-  LeftEigenMatrix[16] = -Bz*( ((gamma-2)/(gamma-1.0))*cfn*cfn - Bn*Bn/D); LeftEigenMatrix[17] = 0.0;
-  LeftEigenMatrix[9] = ( cfn*cfn/(gamma-1.0) + Bn*Bn/D -(DE+Pt)/D )*LeftEigenMatrix[13] -u*LeftEigenMatrix[10] -v*LeftEigenMatrix[11] -w*LeftEigenMatrix[12] -(Bx*LeftEigenMatrix[14] + By*LeftEigenMatrix[15] + Bz*LeftEigenMatrix[16])/D;
-  scale = 0.0;
-  for(int i=0; i<9; ++i) {
-      scale += LeftEigenMatrix[9 + i] * RightEigenMatrix[1 + i*9];
-  }
-  if ( abs(scale) < epsilon ) scale = 1.0;
-  for(int i=0;i<9;++i) LeftEigenMatrix[9 + i] = LeftEigenMatrix[9 + i]/scale;
-
-
-  // Lambda = qn + cfn
-  LeftEigenMatrix[64] = -u*(pow(cfn,2.0) - pow(Bn,2.0)/D) - cfn*(cfn*cfn*nx - Bn*Bx/D)/(gamma-1.0); LeftEigenMatrix[65] = -v*(pow(cfn,2.0) - pow(Bn,2.0)/D) - cfn*(cfn*cfn*ny - Bn*By/D)/(gamma-1.0);
-  LeftEigenMatrix[66] = -w*(pow(cfn,2.0) - pow(Bn,2.0)/D) - cfn*(- Bn*Bz/D)/(gamma-1.0);
-  LeftEigenMatrix[67] = (pow(cfn,2.0) - pow(Bn,2.0)/D);
-  LeftEigenMatrix[68] = -Bcross*ny*( ((gamma-2)/(gamma-1.0))*cfn*cfn - Bn*Bn/D); LeftEigenMatrix[69] = Bcross*nx*( ((gamma-2)/(gamma-1.0))*cfn*cfn - Bn*Bn/D);
-  LeftEigenMatrix[70] = -Bz*( ((gamma-2)/(gamma-1.0))*cfn*cfn - Bn*Bn/D); LeftEigenMatrix[71] = 0.0;
-  LeftEigenMatrix[63] = ( cfn*cfn/(gamma-1.0) + Bn*Bn/D -(DE+Pt)/D )*LeftEigenMatrix[67] -u*LeftEigenMatrix[64] -v*LeftEigenMatrix[65] -w*LeftEigenMatrix[66] -(Bx*LeftEigenMatrix[68] + By*LeftEigenMatrix[69] + Bz*LeftEigenMatrix[70])/D;
-  scale = 0.0;
-  for(int i=0; i<9; ++i) {
-      scale += LeftEigenMatrix[63 + i] * RightEigenMatrix[7 + i*9];
-  }
-  if ( abs(scale) < epsilon ) scale = 1.0;
-  for(int i=0;i<9;++i) LeftEigenMatrix[63 + i] = LeftEigenMatrix[63 + i]/scale;
-
-  // Lambda = ch
-  LeftEigenMatrix[73] = pow(ch-qn,2.0)*((ch-qn)*nx/(gamma-1.0) - u) - (Bn/D)*((ch-gamma*qn)*nx/(gamma-1.0) - (By*u-Bx*v)*ny) ;
-  LeftEigenMatrix[74] = pow(ch-qn,2.0)*((ch-qn)*ny/(gamma-1.0) - v) - (Bn/D)*((ch-gamma*qn)*ny/(gamma-1.0) - (By*u-Bx*v)*nx);
-  LeftEigenMatrix[75] = -w*( pow(ch-qn,2.0) - Bn*Bn/D ) -Bz*Bn*(ch-qn)/(D*(gamma-1.0)) ;
-  LeftEigenMatrix[76] = pow(ch - qn,2.0) - Bn*Bn/D;
-  LeftEigenMatrix[77] = ch*nx*( pow(ch-qn,2.0) - Bn*Bn/D ) + Bcross*ny*(((2.0-gamma)/(gamma-1.0))*pow(ch-qn,2.0) + Bn*Bn/D );
-  LeftEigenMatrix[78] = ch*ny*( pow(ch-qn,2.0) - Bn*Bn/D ) - Bcross*nx*(((2.0-gamma)/(gamma-1.0))*pow(ch-qn,2.0) + Bn*Bn/D );
-  LeftEigenMatrix[79] = Bz *( ((2.0-gamma)/(gamma-1.0))*pow(ch-qn,2.0) + Bn*Bn/D ) ;
-  LeftEigenMatrix[80] = pow(ch - qn,2.0) - Bn*Bn/D;
-  LeftEigenMatrix[72] = (pow(ch-qn,2.0)/(gamma-1.0) + Bn*Bn/D -(DE+Pt)/D)*LeftEigenMatrix[76] + ch*(Bn/D)*LeftEigenMatrix[80] -u*LeftEigenMatrix[73] -v*LeftEigenMatrix[74] -w*LeftEigenMatrix[75] -(Bx*LeftEigenMatrix[77] + By*LeftEigenMatrix[78] + Bz*LeftEigenMatrix[79])/D  ;
-  scale = 0.0;
-  for(int i=0; i<9; ++i) {
-      scale += LeftEigenMatrix[72 + i] * RightEigenMatrix[8 + i*9];
-  }
-  if ( abs(scale) < epsilon ) scale = 1.0;
-  for(int i=0;i<9;++i) LeftEigenMatrix[72 + i] = LeftEigenMatrix[72 + i]/scale;
-
-  // Lambda = -ch
-  LeftEigenMatrix[1] = pow(-ch - qn,2.0)*((-ch - qn)*nx/(gamma-1.0) - u) - (Bn/D)*((-ch -gamma*qn)*nx/(gamma-1.0) - (By*u-Bx*v)*ny);
-  LeftEigenMatrix[2] = pow(-ch - qn,2.0)*((-ch - qn)*ny/(gamma-1.0) - v) - (Bn/D)*((-ch -gamma*qn)*ny/(gamma-1.0) - (By*u-Bx*v)*nx);
-  LeftEigenMatrix[3] = -w*( pow(-ch - qn,2.0) - Bn*Bn/D ) -Bz*Bn*(-ch - qn)/(D*(gamma-1.0)) ;
-  LeftEigenMatrix[4] = pow(-ch - qn,2.0) - Bn*Bn/D;
-  LeftEigenMatrix[5] = -ch*nx*( pow(-ch - qn,2.0) - Bn*Bn/D ) + Bcross*ny*(((2.0-gamma)/(gamma-1.0))*pow(-ch - qn,2.0) + Bn*Bn/D );
-  LeftEigenMatrix[6] = -ch*ny*( pow(-ch - qn,2.0) - Bn*Bn/D ) - Bcross*nx*(((2.0-gamma)/(gamma-1.0))*pow(-ch - qn,2.0) + Bn*Bn/D );
-  LeftEigenMatrix[7] = Bz *( ((2.0-gamma)/(gamma-1.0))*pow(-ch - qn,2.0) + Bn*Bn/D ) ;
-  LeftEigenMatrix[8] = pow(-ch - qn,2.0) - Bn*Bn/D;
-  LeftEigenMatrix[0] = (pow(-ch - qn,2.0)/(gamma-1.0) + Bn*Bn/D -(DE+Pt)/D)*LeftEigenMatrix[4] + -ch*(Bn/D)*LeftEigenMatrix[8] -u*LeftEigenMatrix[1] -v*LeftEigenMatrix[2] -w*LeftEigenMatrix[3] -(Bx*LeftEigenMatrix[5] + By*LeftEigenMatrix[6] + Bz*LeftEigenMatrix[7])/D  ;
-  scale = 0.0;
-  for(int i=0; i<9; ++i) {
-      scale += LeftEigenMatrix[0 + i] * RightEigenMatrix[0 + i*9];
-  }
-  if ( abs(scale) < epsilon ) scale = 1.0;
-  for(int i=0;i<9;++i) LeftEigenMatrix[0 + i] = LeftEigenMatrix[0 + i]/scale;
+   gammabar = (gamma-1.0)/(c*c);
+   
+   
+   // Right Eigen Vector Matrix
+   // lambda = qn
+   RightEigenMatrix[0] = -1.0; RightEigenMatrix[8] = -u; RightEigenMatrix[16] = -v; RightEigenMatrix[24] = -w;
+   RightEigenMatrix[32] = -0.5 * q*q; RightEigenMatrix[40] = RightEigenMatrix[48]  = RightEigenMatrix[56] = 0.0; 
+   // lambda = qn
+   RightEigenMatrix[1] = RightEigenMatrix[9] = RightEigenMatrix[17] = RightEigenMatrix[25] = 0.0;
+   RightEigenMatrix[33] = c*Bn/(D*sqrt(meu_perm); RightEigenMatrix[41] = c*nx*sqrt(meu_perm/D);
+   RightEigenMatrix[49] = c*ny*sqrt(meu_perm/D); RightEigenMatrix[57] = 0.0;
+   // lambda = qn + can
+   RightEigenMatrix[2] = 0.0; RightEigenMatrix[10] = c*l[0]; RightEigenMatrix[18] = c*l[1]; RightEigenMatrix[26] = c*l[2];
+   RightEigenMatrix[34] = c*( UdotL + BdotL/(D*sqrt(meu_perm))) ;
+   RightEigenMatrix[42] = -c*l[0]*sqrt(meu_perm/D); RightEigenMatrix[50] = -c*l[1]*sqrt(meu_perm/D); RightEigenMatrix[58] = -c*l[2]*sqrt(meu_perm/D);
+   // lambda = qn - can
+   RightEigenMatrix[3] = 0.0; RightEigenMatrix[11] = c*l[0]; RightEigenMatrix[19] = c*l[1]; RightEigenMatrix[27] = c*l[2];
+   RightEigenMatrix[35] = c*( UdotL - BdotL/(D*sqrt(meu_perm))) ;
+   RightEigenMatrix[43] = c*l[0]*sqrt(meu_perm/D); RightEigenMatrix[51] = c*l[1]*sqrt(meu_perm/D); RightEigenMatrix[59] = c*l[2]*sqrt(meu_perm/D);
+   // lambda = qn + cfn
+   RightEigenMatrix[4] = (c/alphaF); RightEigenMatrix[12] = (c/alphaF)*(u + lf[0]);
+   RightEigenMatrix[20] = (c/alphaF)*(v + lf[1]); RightEigenMatrix[28] = (c/alphaF)*(w + lf[2]);
+   RightEigenMatrix[36] = (c/alphaF)*( H + UdotLf + BdotMf/(D*sqrt(meu_perm))) ;
+   RightEigenMatrix[44] = (c/alphaF)*mf[0]*sqrt(meu_perm/D); RightEigenMatrix[52] = (c/alphaF)*mf[1]*sqrt(meu_perm/D); RightEigenMatrix[60] = (c/alphaF)*mf[2]*sqrt(meu_perm/D);
+   // lambda = qn - cfn
+   RightEigenMatrix[5] = -(c/alphaF); RightEigenMatrix[13] = (c/alphaF)*(-u + lf[0]);
+   RightEigenMatrix[21] = (c/alphaF)*(-v + lf[1]); RightEigenMatrix[29] = (c/alphaF)*(-w + lf[2]);
+   RightEigenMatrix[37] = (c/alphaF)*( -H + UdotLf - BdotMf/(D*sqrt(meu_perm))) ;
+   RightEigenMatrix[45] = -(c/alphaF)*mf[0]*sqrt(meu_perm/D); RightEigenMatrix[53] = -(c/alphaF)*mf[1]*sqrt(meu_perm/D); RightEigenMatrix[61] = -(c/alphaF)*mf[2]*sqrt(meu_perm/D);
+   // lambda = qn + csn
+   RightEigenMatrix[6] = (c/alphaS); RightEigenMatrix[14] = (c/alphaS)*(u + ls[0]);
+   RightEigenMatrix[22] = (c/alphaS)*(v + ls[1]); RightEigenMatrix[30] = (c/alphaS)*(w + ls[2]);
+   RightEigenMatrix[38] = (c/alphaS)*( H + UdotLs + BdotMs/(D*sqrt(meu_perm))) ;
+   RightEigenMatrix[46] = (c/alphaS)*ms[0]*sqrt(meu_perm/D); RightEigenMatrix[54] = (c/alphaS)*ms[1]*sqrt(meu_perm/D); RightEigenMatrix[62] = (c/alphaS)*ms[2]*sqrt(meu_perm/D);
+   // lambda = qn - csn
+   RightEigenMatrix[7] = -(c/alphaS); RightEigenMatrix[15] = (c/alphaS)*(-u + ls[0]);
+   RightEigenMatrix[23] = (c/alphaS)*(-v + ls[1]); RightEigenMatrix[31] = (c/alphaS)*(-w + ls[2]);
+   RightEigenMatrix[39] = (c/alphaS)*( -H + UdotLs - BdotMs/(D*sqrt(meu_perm))) ;
+   RightEigenMatrix[47] = -(c/alphaS)*ms[0]*sqrt(meu_perm/D); RightEigenMatrix[55] = -(c/alphaS)*ms[1]*sqrt(meu_perm/D); RightEigenMatrix[63] = -(c/alphaS)*ms[2]*sqrt(meu_perm/D);
+   
+   // Left Eigen Vector Matrix
+   // Lambda = qn
+   LeftEigenMatrix[0] = gammabar*(q*q - H);
+   LeftEigenMatrix[1] = -gammabar*u; LeftEigenMatrix[2] = -gammabar*v; LeftEigenMatrix[3] = -gammabar*w;
+   LeftEigenMatrix[4] = gammabar;
+   LeftEigenMatrix[5] = -gammabar*Bx/(meu_perm*sqrt(D)); LeftEigenMatrix[6] = -gammabar*By/(meu_perm*sqrt(D)); LeftEigenMatrix[7] = -gammabar*Bz/(meu_perm*sqrt(D));
+   // Lambda = qn
+   LeftEigenMatrix[8] = LeftEigenMatrix[9] = LeftEigenMatrix[10] = LeftEigenMatrix[11] = 0.0;
+   LeftEigenMatrix[12] = 0.0;
+   LeftEigenMatrix[13] = (sqrt(D/meu_perm)*nx/c); LeftEigenMatrix[14] = (sqrt(D/meu_perm)*ny/c); LeftEigenMatrix[15] = 0.0;
+   // Lambda = qn + can
+   LeftEigenMatrix[16] = -UdotL/c; LeftEigenMatrix[17] = l[0]/c; LeftEigenMatrix[18] = l[1]/c; LeftEigenMatrix[19] = l[2]/c;
+   LeftEigenMatrix[20] = 0.0;
+   LeftEigenMatrix[21] = -sqrt(D/meu_perm)*l[0]/c; LeftEigenMatrix[22] = -sqrt(D/meu_perm)*l[1]/c; LeftEigenMatrix[23] = -sqrt(D/meu_perm)*l[2]/c;
+   // Lambda = qn - can
+   LeftEigenMatrix[24] = -UdotL/c; LeftEigenMatrix[25] = l[0]/c; LeftEigenMatrix[26] = l[1]/c; LeftEigenMatrix[27] = l[2]/c;
+   LeftEigenMatrix[28] = 0.0;
+   LeftEigenMatrix[29] = sqrt(D/meu_perm)*l[0]/c; LeftEigenMatrix[30] = sqrt(D/meu_perm)*l[1]/c; LeftEigenMatrix[31] = sqrt(D/meu_perm)*l[2]/c;
+   // Lambda = qn + cfn
+   LeftEigenMatrix[32] = (c*gammabar*0.5*q*q - UdotLf/c )/alphaF; LeftEigenMatrix[33] = (-c*gammabar*u + lf[0]/c)/alphaF; LeftEigenMatrix[34] = (-c*gammabar*v + lf[1]/c)/alphaF; LeftEigenMatrix[35] = (-c*gammabar*w + lf[2]/c)/alphaF;
+   LeftEigenMatrix[36] = c*gammabar/alphaF; 
+   LeftEigenMatrix[37] = (-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[0]/c)/alphaF;
+   LeftEigenMatrix[38] = (-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[1]/c)/alphaF;
+   LeftEigenMatrix[39] = (-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[2]/c)/alphaF;
+   // Lambda = qn - cfn
+   LeftEigenMatrix[40] = (-c*gammabar*0.5*q*q - UdotLf/c )/alphaF; LeftEigenMatrix[41] = (c*gammabar*u + lf[0]/c)/alphaF; LeftEigenMatrix[42] = (c*gammabar*v + lf[1]/c)/alphaF; LeftEigenMatrix[43] = (c*gammabar*w + lf[2]/c)/alphaF;
+   LeftEigenMatrix[44] = -c*gammabar/alphaF; 
+   LeftEigenMatrix[45] = -(-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[0]/c)/alphaF;
+   LeftEigenMatrix[46] = -(-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[1]/c)/alphaF;
+   LeftEigenMatrix[47] = -(-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*mf[2]/c)/alphaF;
+   // Lambda = qn + csn
+   LeftEigenMatrix[48] = (c*gammabar*0.5*q*q - UdotLs/c )/alphaS; LeftEigenMatrix[49] = (-c*gammabar*u + ls[0]/c)/alphaS; LeftEigenMatrix[50] = (-c*gammabar*v + ls[1]/c)/alphaS; LeftEigenMatrix[51] = (-c*gammabar*w + ls[2]/c)/alphaS;
+   LeftEigenMatrix[52] = c*gammabar/alphaS; 
+   LeftEigenMatrix[53] = (-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[0]/c)/alphaS;
+   LeftEigenMatrix[54] = (-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[1]/c)/alphaS;
+   LeftEigenMatrix[55] = (-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[2]/c)/alphaS;
+   // Lambda = qn - csn
+   LeftEigenMatrix[56] = (-c*gammabar*0.5*q*q - UdotLs/c )/alphaS; LeftEigenMatrix[57] = (c*gammabar*u + ls[0]/c)/alphaS; LeftEigenMatrix[58] = (c*gammabar*v + ls[1]/c)/alphaS; LeftEigenMatrix[59] = (c*gammabar*w + ls[2]/c)/alphaS;
+   LeftEigenMatrix[60] = -c*gammabar/alphaS; 
+   LeftEigenMatrix[61] = -(-c*gamabar*Bx/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[0]/c)/alphaS;
+   LeftEigenMatrix[62] = -(-c*gamabar*By/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[1]/c)/alphaS;
+   LeftEigenMatrix[63] = -(-c*gamabar*Bz/(meu_perm*sqrt(D)) + sqrt(D/meu_perm)*ms[2]/c)/alphaS;
 
   /*cout << " \n Right Eigen Matrix : \n";
   for(int i=0; i<9; ++i) {
@@ -1399,17 +1171,17 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
         cout << endl;
   } */
 
-  double A[9][9];
-  for(int i =0; i < 9; ++i) {
-      for(int j=0; j<9; ++j) {
+  double A[8][8];
+  for(int i =0; i < 8; ++i) {
+      for(int j=0; j<8; ++j) {
           A[i][j] = 0.0;
           for(int k=0; k<9;++k)
             A[i][j] += LeftEigenMatrix[k + i*9 ]*RightEigenMatrix[k*9 + j];
       }
   }
   cout << "\n Matrix \n";
-  for(int i=0; i<9;++i){
-      for(int j=0; j<9;++j)
+  for(int i=0; i<8;++i){
+      for(int j=0; j<8;++j)
       cout << " " << A[i][j] << " ";
       cout << endl;
   }
