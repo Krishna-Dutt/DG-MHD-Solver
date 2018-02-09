@@ -458,7 +458,7 @@ void IdealMHDSolver::RK_Step1() {
   field->setFunctionsForVariables(0.5*dt, K1Bx, 1.0, Bx, Addab, Bx);
   field->setFunctionsForVariables(0.5*dt, K1By, 1.0, By, Addab, By);
   field->setFunctionsForVariables(0.5*dt, K1Bz, 1.0, Bz, Addab, Bz);
-  field->setFunctionsForVariables(0.5*dt, K1Si, 1.0, Si, Addab, Si);
+  //field->setFunctionsForVariables(0.5*dt, K1Si, 1.0, Si, Addab, Si);
 
   return;
 }
@@ -493,7 +493,7 @@ void IdealMHDSolver::RK_Step2() {
   field->setFunctionsForVariables(-1.5*dt, K1Bx, 2.0*dt, K2Bx, 1.0, Bx, Addabc, Bx);
   field->setFunctionsForVariables(-1.5*dt, K1By, 2.0*dt, K2By, 1.0, By, Addabc, By);
   field->setFunctionsForVariables(-1.5*dt, K1Bz, 2.0*dt, K2Bz, 1.0, Bz, Addabc, Bz);
-  field->setFunctionsForVariables(-1.5*dt, K1Si, 2.0*dt, K2Si, 1.0, Si, Addabc, Si);
+  //field->setFunctionsForVariables(-1.5*dt, K1Si, 2.0*dt, K2Si, 1.0, Si, Addabc, Si);
 
   return;
 }
@@ -530,7 +530,7 @@ void IdealMHDSolver::RK_Step3() {
   field->setFunctionsForVariables((7.0/6.0)*dt, K1Bx, -(4.0/3.0)*dt, K2Bx, (1.0/6.0)*dt, K3Bx, 1.0, Bx, Addabcd, Bx);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1By, -(4.0/3.0)*dt, K2By, (1.0/6.0)*dt, K3By, 1.0, By, Addabcd, By);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1Bz, -(4.0/3.0)*dt, K2Bz, (1.0/6.0)*dt, K3Bz, 1.0, Bz, Addabcd, Bz);
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1Si, -(4.0/3.0)*dt, K2Si, (1.0/6.0)*dt, K3Si, 1.0, Bx, Addabcd, Si);
+  //field->setFunctionsForVariables((7.0/6.0)*dt, K1Si, -(4.0/3.0)*dt, K2Si, (1.0/6.0)*dt, K3Si, 1.0, Bx, Addabcd, Si);
 
   return;
 }

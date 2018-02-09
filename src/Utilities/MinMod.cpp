@@ -15,6 +15,11 @@ double Signum(double x) {
   return 0.0 ;
 }
 
+double ModSignum(double x) {
+  if ( x >= 0.0) return 1.0 ;
+  if ( x < 0.0) return -1.0 ;
+}
+
 double MinMod(double a, double b, double c) {
  if ( Signum(a) == Signum(b) && Signum(b) == Signum(c) ) 
  // if ( Signum(b) == Signum(c) ) 
