@@ -32,12 +32,17 @@ private:
     // Inviscid Flux
     int DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVxVz_minus_BxBz, DVyVz_minus_ByBz ;
     int DE_plus_Pt_Vx_minus_BxVdotB, DE_plus_Pt_Vy_minus_ByVdotB;
-    int VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVx_minus_BxVz, BzVy_minus_ByVz;
+    int VxBx_minus_BxVx, VxBy_minus_BxVy, VyBx_minus_ByVx, VyBy_minus_ByVy, BzVx_minus_BxVz, BzVy_minus_ByVz;
     int ChBx, ChBy;
     // Eigen Values
     int Cx, Cy, Vx_plus_C, Vy_plus_C, Ch;
+    // Source Terms
+    int DeldotB_Bx, DeldotB_By, DeldotB_Bz, DeldotB_Vx, DeldotB_Vy, DeldotB_Vz, DeldotB_VdotB; 
+    // Gradients
+    int dBxdx, dBydy;
+    int dPdx, dPdy;
     // Aux. Variables // Define all auxillary
-    int Pt, VdotB, Si, BdotB;
+    int Pt, VdotB, Si, BdotB, DeldotB;
     int K1D, K1DVx, K1DVy, K1DVz, K1DE, K1Bx, K1By, K1Bz, K1Si;
     int K2D, K2DVx, K2DVy, K2DVz, K2DE, K2Bx, K2By, K2Bz, K2Si; 
     int K3D, K3DVx, K3DVy, K3DVz, K3DE, K3Bx, K3By, K3Bz, K3Si;
@@ -53,7 +58,7 @@ private:
     int uMoment, vMoment, wMoment, qMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment ;
     int dPdxMoment, dPdyMoment;
     int Char1, Char2, Char3, Char4, Char5, Char6, Char7, Char8, Char9;
-    int dPdx, dPdy;
+    
 
     // cell centered variables
     int Dx, Dt, UMax, CellMarker; 
@@ -292,9 +297,22 @@ public:
     void updateViscousFlux();
     /* ----------------------------------------------------------------------------*/
     /**
+     * @Synopsis This is the function used to  set up Source term Variables in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void setSourceTerms();
+    /* ----------------------------------------------------------------------------*/
+    /**
+     * @Synopsis This is the function used to  update Source term in the domain.
+    */
+    /* ----------------------------------------------------------------------------*/
+    void updateSourceTerms();
+    /* ----------------------------------------------------------------------------*/
+    /**
      * @Synopsis This is the function used to  update gradients of primitive Variables in the domain.
     */
     /* ----------------------------------------------------------------------------*/
+    
     void updatePrimitiveGradient();
     /* ----------------------------------------------------------------------------*/
     /**

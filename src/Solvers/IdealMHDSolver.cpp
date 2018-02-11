@@ -46,21 +46,14 @@ void IdealMHDSolver::setPrimitiveVariables(){
   return ;
 }
 
-/*void IdealMHDSolver::setGradientPrimitiveVariables(){
-  field->addVariable_withoutBounary("dqdx");
-  field->addVariable_withoutBounary("dudx");
-  field->addVariable_withoutBounary("dvdx");
-  field->addVariable_withoutBounary("dPdx");
-  field->addVariable_withoutBounary("dTdx");
-
-  field->addVariable_withoutBounary("dqdy");
-  field->addVariable_withoutBounary("dudy");
-  field->addVariable_withoutBounary("dvdy");
-  field->addVariable_withoutBounary("dPdy");
-  field->addVariable_withoutBounary("dTdy");
+void IdealMHDSolver::setGradientPrimitiveVariables(){
+  dPdx = field->addVariable_withBounary("dPdx");
+  dPdy = field->addVariable_withBounary("dPdy");
+  dBxdx = field->addVariable_withoutBounary();
+  dBydy = field->addVariable_withoutBounary();
 
   return ;
-}*/
+}
 
 
 void IdealMHDSolver::setConservativeVariables(){
@@ -268,15 +261,15 @@ void IdealMHDSolver::setInviscidFlux() {
   DVyVz_minus_ByBz            = field->addVariable_withBounary("qvw_minus_bybz");
   DE_plus_Pt_Vx_minus_BxVdotB = field->addVariable_withBounary("qE_plus_Pt_u_minusbxVdotB");
   DE_plus_Pt_Vy_minus_ByVdotB = field->addVariable_withBounary("qE_plus_Pt_v_minusbyVdotB");
-  VxBx_minus_BxVx_plus_Si     = field->addVariable_withBounary("ubx_minus_bxu_plus_si");    
+  VxBx_minus_BxVx     = field->addVariable_withBounary("ubx_minus_bxu");    
   VxBy_minus_BxVy             = field->addVariable_withBounary("uby_minus_bxv");
   VyBx_minus_ByVx             = field->addVariable_withBounary("vbx_minus_uby");
-  VyBy_minus_ByVy_plus_Si     = field->addVariable_withBounary("vby_minus_byv_plus_si");
+  VyBy_minus_ByVy     = field->addVariable_withBounary("vby_minus_byv");
   BzVx_minus_BxVz             = field->addVariable_withBounary("bzu_minus_bxw");
   BzVy_minus_ByVz             = field->addVariable_withBounary("bzv_minus_byw");
 
-  ChBx                        = field->addVariable_withBounary("Chbx");
-  ChBy                        = field->addVariable_withBounary("Chby");  
+  //ChBx                        = field->addVariable_withBounary("Chbx");
+  //ChBy                        = field->addVariable_withBounary("Chby");  
 
   //updateInviscidFlux();
   return ;
@@ -294,15 +287,17 @@ void IdealMHDSolver::updateInviscidFlux() {
   field->setFunctionsForVariables(1.0, DE, 1.0, Pt, 1.0, Vx, 1.0, Bx, 1.0, VdotB, MHDEnergyFlux, DE_plus_Pt_Vx_minus_BxVdotB);
   field->setFunctionsForVariables(1.0, DE, 1.0, Pt, 1.0, Vy, 1.0, By, 1.0, VdotB, MHDEnergyFlux, DE_plus_Pt_Vy_minus_ByVdotB);
   // Check formulation
-  field->setFunctionsForVariables(1.0, Si, Copy, VxBx_minus_BxVx_plus_Si);
-  field->setFunctionsForVariables(1.0, Si, Copy, VyBy_minus_ByVy_plus_Si);
+  //field->setFunctionsForVariables(1.0, Si, Copy, VxBx_minus_BxVx);
+  //field->setFunctionsForVariables(1.0, Si, Copy, VyBy_minus_ByVy);
+  field->scal(0.0, VxBx_minus_BxVx);
+  field->scal(0.0, VyBy_minus_ByVy);
   field->setFunctionsForVariables(1.0, Vx, 1.0, By, 1.0, Bx, 1.0, Vy, MHDMagFieldFlux, VxBy_minus_BxVy);
   field->setFunctionsForVariables(-1.0, VxBy_minus_BxVy, Copy, VyBx_minus_ByVx);
   field->setFunctionsForVariables(1.0, Vx, 1.0, Bz, 1.0, Bx, 1.0, Vz, MHDMagFieldFlux, BzVx_minus_BxVz);
   field->setFunctionsForVariables(1.0, Vy, 1.0, Bz, 1.0, By, 1.0, Vz, MHDMagFieldFlux, BzVy_minus_ByVz);
   
-  field->setFunctionsForVariables(1.0, Ch, 1.0, Bx, Product, ChBx);
-  field->setFunctionsForVariables(1.0, Ch, 1.0, By, Product, ChBy);
+  //field->setFunctionsForVariables(1.0, Ch, 1.0, Bx, Product, ChBx);
+  //field->setFunctionsForVariables(1.0, Ch, 1.0, By, Product, ChBy);
   
   return ;
 }
@@ -327,25 +322,44 @@ void IdealMHDSolver::updateInviscidFlux() {
   return ;
 }*/
 
-/*void IdealMHDSolver::updatePrimitiveGradient() {
-  field->delByDelX(D, "dqdx", "central");
-  field->delByDelX(Vx, "dudx", "central");
-  field->delByDelX(Vy, "dvdx", "central");
-  field->delByDelX(P, "dPdx", "central");
-  field->delByDelX(T, "dTdx", "central");
+void IdealMHDSolver::updatePrimitiveGradient() {
+  field->delByDelX(Bx, dBxdx, "central");
+  field->delByDelY(By, dBydy, "central");
 
-  field->delByDelY(D, "dqdy", "central");
-  field->delByDelY(Vx, "dudy", "central");
-  field->delByDelY(Vy, "dvdy", "central");
-  field->delByDelY(P, "dPdy", "central");
-  field->delByDelY(T, "dTdy", "central");
-}*/
+  return;
+}
+
+void IdealMHDSolver::setSourceTerms() {
+  DeldotB_Bx = field->addVariable_withBounary("DeldotB_Bx");
+  DeldotB_By = field->addVariable_withBounary("DeldotB_By");
+  DeldotB_Bz = field->addVariable_withBounary("DeldotB_Bz");
+  DeldotB_VdotB = field->addVariable_withBounary("DeldotB_VdotB");
+  DeldotB_Vx = field->addVariable_withBounary("DeldotB_u");
+  DeldotB_Vy = field->addVariable_withBounary("DeldotB_v");
+  DeldotB_Vz = field->addVariable_withBounary("DeldotB_w");
+  
+  return ;
+}
+
+void IdealMHDSolver::updateSourceTerms(){
+  field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, Bx, Product, DeldotB_Bx);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, By, Product, DeldotB_By);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, Bz, Product, DeldotB_Bz);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, VdotB, Product, DeldotB_VdotB);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, Vx, Product, DeldotB_Vx);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, Vy, Product, DeldotB_Vy);
+  field->setFunctionsForVariables(1.0, DeldotB, 1.0, Vz, Product, DeldotB_Vz);
+
+  return ;
+}
 
 void IdealMHDSolver::setAuxillaryVariables() {
  // cout << " Calling setAuxillaryVariables " << endl;
   Si = field->addVariable_withBounary("si");
   VdotB = field->addVariable_withBounary("V.B");
   BdotB = field->addVariable_withBounary("B.B");
+  DeldotB = field->addVariable_withBounary("Del.B");
 
   K1D   = field->addVariable_withoutBounary();
   K1DVx = field->addVariable_withoutBounary();
@@ -429,26 +443,25 @@ void IdealMHDSolver::updateEigenValues() {
 }
 
 void IdealMHDSolver::RK_Step1() {
-  int FluxX[] = {DVx, DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVxVz_minus_BxBz, DE_plus_Pt_Vx_minus_BxVdotB, VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, BzVx_minus_BxVz, ChBx};
-  int FluxY[] = {DVy, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVyVz_minus_ByBz, DE_plus_Pt_Vy_minus_ByVdotB, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVy_minus_ByVz, ChBy};
+  int FluxX[] = {DVx, DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVxVz_minus_BxBz, DE_plus_Pt_Vx_minus_BxVdotB, VxBx_minus_BxVx, VxBy_minus_BxVy, BzVx_minus_BxVz};
+  int FluxY[] = {DVy, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVyVz_minus_ByBz, DE_plus_Pt_Vy_minus_ByVdotB, VyBx_minus_ByVx, VyBy_minus_ByVy, BzVy_minus_ByVz};
   int FluxVarx[] = {Vx_plus_C};
   int FluxVary[] = {Vy_plus_C};
-  int Var[] = {D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
-  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDVz, dbydxDE, dbydxBx, dbydxBy, dbydxBz, dbydxSi};
-  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDVz, dbydyDE, dbydyBx, dbydyBy, dbydyBz, dbydySi};
+  int Var[] = {D, DVx, DVy, DVz, DE, Bx, By, Bz};
+  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDVz, dbydxDE, dbydxBx, dbydxBy, dbydxBz};
+  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDVz, dbydyDE, dbydyBx, dbydyBy, dbydyBz};
 
-  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 9);
-  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 9);
+  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 8);
+  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 8);
 
   field->setFunctionsForVariables(-1.0, dbydxD, -1.0, dbydyD, Addab, K1D);
-  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K1DVx);
-  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K1DVy);
-  field->setFunctionsForVariables(-1.0, dbydxDVz, -1.0, dbydyDVz, Addab, K1DVz);
-  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K1DE);
-  field->setFunctionsForVariables(-1.0, dbydxBx, -1.0, dbydyBx, Addab, K1Bx);
-  field->setFunctionsForVariables(-1.0, dbydxBy, -1.0, dbydyBy, Addab, K1By);
-  field->setFunctionsForVariables(-1.0, dbydxBz, -1.0, dbydyBz, Addab, K1Bz);
-  field->setFunctionsForVariables(-1.0, dbydxSi, -1.0, dbydySi, Addab, K1Si);
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, -1.0, DeldotB_Vx, Addabc, K1DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, -1.0, DeldotB_Vy, Addabc, K1DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDVz, -1.0, dbydyDVz, -1.0, DeldotB_Vz, Addabc, K1DVz);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, -1.0, DeldotB_VdotB, Addabc, K1DE);
+  field->setFunctionsForVariables(-1.0, dbydxBx, -1.0, dbydyBx, -1.0, DeldotB_Bx, Addabc, K1Bx);
+  field->setFunctionsForVariables(-1.0, dbydxBy, -1.0, dbydyBy, -1.0, DeldotB_By, Addabc, K1By);
+  field->setFunctionsForVariables(-1.0, dbydxBz, -1.0, dbydyBz, -1.0, DeldotB_Bz, Addabc, K1Bz);
   
   field->setFunctionsForVariables(0.5*dt, K1D, 1.0, D, Addab, D);
   field->setFunctionsForVariables(0.5*dt, K1DVx, 1.0, DVx, Addab, DVx);
@@ -458,32 +471,30 @@ void IdealMHDSolver::RK_Step1() {
   field->setFunctionsForVariables(0.5*dt, K1Bx, 1.0, Bx, Addab, Bx);
   field->setFunctionsForVariables(0.5*dt, K1By, 1.0, By, Addab, By);
   field->setFunctionsForVariables(0.5*dt, K1Bz, 1.0, Bz, Addab, Bz);
-  //field->setFunctionsForVariables(0.5*dt, K1Si, 1.0, Si, Addab, Si);
 
   return;
 }
 
 void IdealMHDSolver::RK_Step2() {
-  int FluxX[] = {DVx, DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVxVz_minus_BxBz, DE_plus_Pt_Vx_minus_BxVdotB, VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, BzVx_minus_BxVz, ChBx};
-  int FluxY[] = {DVy, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVyVz_minus_ByBz, DE_plus_Pt_Vy_minus_ByVdotB, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVy_minus_ByVz, ChBy};
+  int FluxX[] = {DVx, DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVxVz_minus_BxBz, DE_plus_Pt_Vx_minus_BxVdotB, VxBx_minus_BxVx, VxBy_minus_BxVy, BzVx_minus_BxVz};
+  int FluxY[] = {DVy, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVyVz_minus_ByBz, DE_plus_Pt_Vy_minus_ByVdotB, VyBx_minus_ByVx, VyBy_minus_ByVy, BzVy_minus_ByVz};
   int FluxVarx[] = {Vx_plus_C};
   int FluxVary[] = {Vy_plus_C};
-  int Var[] = {D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
-  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDVz, dbydxDE, dbydxBx, dbydxBy, dbydxBz, dbydxSi};
-  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDVz, dbydyDE, dbydyBx, dbydyBy, dbydyBz, dbydySi};
+  int Var[] = {D, DVx, DVy, DVz, DE, Bx, By, Bz};
+  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDVz, dbydxDE, dbydxBx, dbydxBy, dbydxBz};
+  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDVz, dbydyDE, dbydyBx, dbydyBy, dbydyBz};
 
-  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 9);
-  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 9);
+  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 8);
+  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 8);
 
   field->setFunctionsForVariables(-1.0, dbydxD, -1.0, dbydyD, Addab, K2D);
-  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K2DVx);
-  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K2DVy);
-  field->setFunctionsForVariables(-1.0, dbydxDVz, -1.0, dbydyDVz, Addab, K2DVz);
-  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K2DE);
-  field->setFunctionsForVariables(-1.0, dbydxBx, -1.0, dbydyBx, Addab, K2Bx);
-  field->setFunctionsForVariables(-1.0, dbydxBy, -1.0, dbydyBy, Addab, K2By);
-  field->setFunctionsForVariables(-1.0, dbydxBz, -1.0, dbydyBz, Addab, K2Bz);
-  field->setFunctionsForVariables(-1.0, dbydxSi, -1.0, dbydySi, Addab, K2Si);
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, -1.0, DeldotB_Vx, Addabc, K2DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, -1.0, DeldotB_Vy, Addabc, K2DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDVz, -1.0, dbydyDVz, -1.0, DeldotB_Vz, Addabc, K2DVz);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, -1.0, DeldotB_VdotB, Addabc, K2DE);
+  field->setFunctionsForVariables(-1.0, dbydxBx, -1.0, dbydyBx, -1.0, DeldotB_Bx, Addabc, K2Bx);
+  field->setFunctionsForVariables(-1.0, dbydxBy, -1.0, dbydyBy, -1.0, DeldotB_By, Addabc, K2By);
+  field->setFunctionsForVariables(-1.0, dbydxBz, -1.0, dbydyBz, -1.0, DeldotB_Bz, Addabc, K2Bz);
   
   field->setFunctionsForVariables(-1.5*dt, K1D, 2.0*dt, K2D, 1.0, D, Addabc, D);
   field->setFunctionsForVariables(-1.5*dt, K1DVx, 2.0*dt, K2DVx, 1.0, DVx, Addabc, DVx);
@@ -493,34 +504,31 @@ void IdealMHDSolver::RK_Step2() {
   field->setFunctionsForVariables(-1.5*dt, K1Bx, 2.0*dt, K2Bx, 1.0, Bx, Addabc, Bx);
   field->setFunctionsForVariables(-1.5*dt, K1By, 2.0*dt, K2By, 1.0, By, Addabc, By);
   field->setFunctionsForVariables(-1.5*dt, K1Bz, 2.0*dt, K2Bz, 1.0, Bz, Addabc, Bz);
-  //field->setFunctionsForVariables(-1.5*dt, K1Si, 2.0*dt, K2Si, 1.0, Si, Addabc, Si);
 
   return;
 }
 
 void IdealMHDSolver::RK_Step3() {
-  int FluxX[] = {DVx, DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVxVz_minus_BxBz, DE_plus_Pt_Vx_minus_BxVdotB, VxBx_minus_BxVx_plus_Si, VxBy_minus_BxVy, BzVx_minus_BxVz, ChBx};
-  int FluxY[] = {DVy, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVyVz_minus_ByBz, DE_plus_Pt_Vy_minus_ByVdotB, VyBx_minus_ByVx, VyBy_minus_ByVy_plus_Si, BzVy_minus_ByVz, ChBy};
+  int FluxX[] = {DVx, DVxVx_plus_Pt_minus_BxBx, DVxVy_minus_BxBy, DVxVz_minus_BxBz, DE_plus_Pt_Vx_minus_BxVdotB, VxBx_minus_BxVx, VxBy_minus_BxVy, BzVx_minus_BxVz};
+  int FluxY[] = {DVy, DVxVy_minus_BxBy, DVyVy_plus_Pt_minus_ByBy, DVyVz_minus_ByBz, DE_plus_Pt_Vy_minus_ByVdotB, VyBx_minus_ByVx, VyBy_minus_ByVy, BzVy_minus_ByVz};
   int FluxVarx[] = {Vx_plus_C};
   int FluxVary[] = {Vy_plus_C};
-  int Var[] = {D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
-  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDVz, dbydxDE, dbydxBx, dbydxBy, dbydxBz, dbydxSi};
-  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDVz, dbydyDE, dbydyBx, dbydyBy, dbydyBz, dbydySi};
+  int Var[] = {D, DVx, DVy, DVz, DE, Bx, By, Bz};
+  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDVz, dbydxDE, dbydxBx, dbydxBy, dbydxBz};
+  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDVz, dbydyDE, dbydyBx, dbydyBy, dbydyBz};
 
-  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 9);
-  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 9);
+  field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 8);
+  field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 8);
 
   field->setFunctionsForVariables(-1.0, dbydxD, -1.0, dbydyD, Addab, K3D);
-  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K3DVx);
-  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K3DVy);
-  field->setFunctionsForVariables(-1.0, dbydxDVz, -1.0, dbydyDVz, Addab, K3DVz);
-  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K3DE);
-  field->setFunctionsForVariables(-1.0, dbydxBx, -1.0, dbydyBx, Addab, K3Bx);
-  field->setFunctionsForVariables(-1.0, dbydxBy, -1.0, dbydyBy, Addab, K3By);
-  field->setFunctionsForVariables(-1.0, dbydxBz, -1.0, dbydyBz, Addab, K3Bz);
-  field->setFunctionsForVariables(-1.0, dbydxSi, -1.0, dbydySi, Addab, K3Si);
-  
-  
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, -1.0, DeldotB_Vx, Addabc, K3DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, -1.0, DeldotB_Vy, Addabc, K3DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDVz, -1.0, dbydyDVz, -1.0, DeldotB_Vz, Addabc, K3DVz);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, -1.0, DeldotB_VdotB, Addabc, K3DE);
+  field->setFunctionsForVariables(-1.0, dbydxBx, -1.0, dbydyBx, -1.0, DeldotB_Bx, Addabc, K3Bx);
+  field->setFunctionsForVariables(-1.0, dbydxBy, -1.0, dbydyBy, -1.0, DeldotB_By, Addabc, K3By);
+  field->setFunctionsForVariables(-1.0, dbydxBz, -1.0, dbydyBz, -1.0, DeldotB_Bz, Addabc, K3Bz);
+    
   
   field->setFunctionsForVariables((7.0/6.0)*dt, K1D, -(4.0/3.0)*dt, K2D, (1.0/6.0)*dt, K3D, 1.0, D, Addabcd, D);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1DVx, -(4.0/3.0)*dt, K2DVx, (1.0/6.0)*dt, K3DVx, 1.0, DVx, Addabcd, DVx);
@@ -530,8 +538,7 @@ void IdealMHDSolver::RK_Step3() {
   field->setFunctionsForVariables((7.0/6.0)*dt, K1Bx, -(4.0/3.0)*dt, K2Bx, (1.0/6.0)*dt, K3Bx, 1.0, Bx, Addabcd, Bx);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1By, -(4.0/3.0)*dt, K2By, (1.0/6.0)*dt, K3By, 1.0, By, Addabcd, By);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1Bz, -(4.0/3.0)*dt, K2Bz, (1.0/6.0)*dt, K3Bz, 1.0, Bz, Addabcd, Bz);
-  //field->setFunctionsForVariables((7.0/6.0)*dt, K1Si, -(4.0/3.0)*dt, K2Si, (1.0/6.0)*dt, K3Si, 1.0, Bx, Addabcd, Si);
-
+  
   return;
 }
 
@@ -540,8 +547,8 @@ void IdealMHDSolver::setTimeStep() {
   field->FindTimestep(Dt, Dx, UMax, CFL);
   dt = field->FindMindt(Dt);
   // Add updates for Ch , how to compute Ch ??
-  double umax = field->FindMaxCellCentered(UMax);
-  field->setConstant(umax*umax, Ch);
+  //double umax = field->FindMaxCellCentered(UMax);
+  //field->setConstant(umax*umax, Ch);
 
   return ;
 }
@@ -565,6 +572,8 @@ void IdealMHDSolver::solve() {
       count = 0;
     }
     updateInviscidFlux();
+    updatePrimitiveGradient();
+    updateSourceTerms();
 
     RK_Step1();
     
@@ -579,6 +588,8 @@ void IdealMHDSolver::solve() {
     // Second Step of RK3
     updateInviscidFlux();
     updateEigenValues();
+    updatePrimitiveGradient();
+    updateSourceTerms();
     
     RK_Step2();
     
@@ -592,6 +603,8 @@ void IdealMHDSolver::solve() {
    // Third (Final) Step of RK3
     updateInviscidFlux();
     updateEigenValues();
+    updatePrimitiveGradient();
+    updateSourceTerms();
 
     RK_Step3();
     
@@ -663,11 +676,6 @@ void IdealMHDSolver::SetLimiter(string _Limiter) {
 
 void IdealMHDSolver::SetLimiterVariables() {
   if (Limiter == "LiliaMoment") {
-    /*CellMarker  = field->addVariable_CellCentered();
-    field->ResetVariables_CellCentered(CellMarker, 1.5);
-    CellMarkerG = field->addVariable_withBounary("cellmarker");
-    field->scal(0.0, CellMarkerG);*/
-
     Moment    = field->addVariable_withBounary("moment");
     field->scal(0.0, Moment);
     ModMoment = field->addVariable_withBounary("modmoment");
@@ -680,7 +688,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     BxMoment = field->addVariable_withoutBounary();
     ByMoment = field->addVariable_withoutBounary();
     BzMoment = field->addVariable_withoutBounary();
-    SiMoment = field->addVariable_withoutBounary();
     uModMoment = field->addVariable_withoutBounary();
     vModMoment = field->addVariable_withoutBounary();
     wModMoment = field->addVariable_withoutBounary();
@@ -689,7 +696,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     BxModMoment = field->addVariable_withoutBounary();
     ByModMoment = field->addVariable_withoutBounary();
     BzModMoment = field->addVariable_withoutBounary();
-    SiModMoment = field->addVariable_withoutBounary();
     
     field->scal(0.0, uMoment);
     field->scal(0.0, vMoment);
@@ -699,7 +705,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     field->scal(0.0, BxMoment);
     field->scal(0.0, ByMoment);
     field->scal(0.0, BzMoment);
-    field->scal(0.0, SiMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
     field->scal(0.0, wModMoment);
@@ -708,7 +713,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     field->scal(0.0, BxModMoment);
     field->scal(0.0, ByModMoment);
     field->scal(0.0, BzModMoment);
-    field->scal(0.0, SiModMoment);
     field->setVanderMandMatrix();
   }
   else if (Limiter == "CharacteristicLimiter") {
@@ -728,7 +732,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     BxMoment = field->addVariable_withoutBounary();
     ByMoment = field->addVariable_withoutBounary();
     BzMoment = field->addVariable_withoutBounary();
-    SiMoment = field->addVariable_withoutBounary();
     uModMoment = field->addVariable_withoutBounary();
     vModMoment = field->addVariable_withoutBounary();
     wModMoment = field->addVariable_withoutBounary();
@@ -737,7 +740,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     BxModMoment = field->addVariable_withoutBounary();
     ByModMoment = field->addVariable_withoutBounary();
     BzModMoment = field->addVariable_withoutBounary();
-    SiModMoment = field->addVariable_withoutBounary();
     
     field->scal(0.0, uMoment);
     field->scal(0.0, vMoment);
@@ -747,7 +749,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     field->scal(0.0, BxMoment);
     field->scal(0.0, ByMoment);
     field->scal(0.0, BzMoment);
-    field->scal(0.0, SiMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
     field->scal(0.0, wModMoment);
@@ -755,10 +756,7 @@ void IdealMHDSolver::SetLimiterVariables() {
     field->scal(0.0, HModMoment);
     field->scal(0.0, BxModMoment);
     field->scal(0.0, ByModMoment);
-    field->scal(0.0, BzModMoment);
-    field->scal(0.0, SiModMoment);
-    
-    
+    field->scal(0.0, BzModMoment);  
 
     Char1 = field->addVariable_withoutBounary();
     Char2 = field->addVariable_withoutBounary();
@@ -768,7 +766,6 @@ void IdealMHDSolver::SetLimiterVariables() {
     Char6 = field->addVariable_withoutBounary();
     Char7 = field->addVariable_withoutBounary();
     Char8 = field->addVariable_withoutBounary();
-    Char9 = field->addVariable_withoutBounary();
     field->scal(0.0, Char1);
     field->scal(0.0, Char2);
     field->scal(0.0, Char3);
@@ -777,10 +774,7 @@ void IdealMHDSolver::SetLimiterVariables() {
     field->scal(0.0, Char6);
     field->scal(0.0, Char7);
     field->scal(0.0, Char8);
-    field->scal(0.0, Char9);
-
-    dPdx = field->addVariable_withBounary("dPdx");
-    dPdy = field->addVariable_withBounary("dPdy");
+    
     dPdxMoment = field->addVariable_withoutBounary();
     dPdyMoment = field->addVariable_withoutBounary();
     field->scal(0.0, dPdxMoment);
@@ -796,9 +790,9 @@ void IdealMHDSolver::RunLimiter() {
   
   if ( Limiter == "LiliaMoment") {
     //updatePrimitiveVariables();
-    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
-    int Mom[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
-    int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment}; 
+    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz};
+    int Mom[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment};
+    int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment}; 
     field->computeMoments(Var, Mom, CellMarker, 8);
     field->setFunctionsForVariables(1.0, qMoment, Copy, qModMoment);
     field->setFunctionsForVariables(1.0, uMoment, Copy, uModMoment);
@@ -808,7 +802,6 @@ void IdealMHDSolver::RunLimiter() {
     field->setFunctionsForVariables(1.0, BxMoment, Copy, BxModMoment);
     field->setFunctionsForVariables(1.0, ByMoment, Copy, ByModMoment);
     field->setFunctionsForVariables(1.0, BzMoment, Copy, BzModMoment);
-    field->setFunctionsForVariables(1.0, SiMoment, Copy, SiModMoment);
 
     field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 8);
     field->convertMomentToVariable(ModMom, Var, CellMarker, 8);
@@ -819,15 +812,15 @@ void IdealMHDSolver::RunLimiter() {
 
   else if(Limiter == "CharacteristicLimiter") {
     //cout << "Calling Characteristic " << endl;
-    int AuxVarM[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, dPdxMoment, dPdyMoment, Ch};
-    int AuxVarV[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
-    int AuxVarC[] = {Char1, Char2, Char3, Char4, Char5, Char6, Char7, Char8, Char9};
-    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
+    int AuxVarM[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, dPdxMoment, dPdyMoment};
+    int AuxVarV[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment};
+    int AuxVarC[] = {Char1, Char2, Char3, Char4, Char5, Char6, Char7, Char8};
+    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz};
     field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(DE, dPdx, "central");
-    field->delByDelY(DE, dPdy, "central");
+    field->delByDelX(D, dPdx, "central");
+    field->delByDelY(D, dPdy, "central");
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
 
@@ -855,9 +848,9 @@ void IdealMHDSolver::Run_LiliaMomentLimiter(int v) {
 void IdealMHDSolver::RunPositivityLimiter() {
   
   if ( Limiter == "LiliaMoment" || Limiter == "CharacteristicLimiter") {
-    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
-    int Mom[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
-    int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment}; 
+    int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz};
+    int Mom[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment};
+    int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment}; 
    
     field->ResetVariables_CellCentered(CellMarker, 1.5);
     //field->resetPositivity(true);
@@ -872,7 +865,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     Run_PositivityMomentLimiter(Bx, N+2);
     Run_PositivityMomentLimiter(Bz, N+2);*/
 
-    field->computeMoments(Var, Mom, CellMarker, 9);
+    field->computeMoments(Var, Mom, CellMarker, 8);
     field->scal(0.0, qModMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
@@ -881,9 +874,8 @@ void IdealMHDSolver::RunPositivityLimiter() {
     field->scal(0.0, BxModMoment);
     field->scal(0.0, ByModMoment);
     field->scal(0.0, BzModMoment);
-    field->scal(0.0, SiModMoment);
-    field->limitMoments(Mom, ModMom, CellMarker, N+2, 9);
-    field->convertMomentToVariable(ModMom, Var, CellMarker, 9);
+    field->limitMoments(Mom, ModMom, CellMarker, N+2, 8);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);
     //updateConservativeVariables();
 
 
@@ -895,7 +887,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     Run_PositivityMomentLimiter(DE, 0);
     Run_PositivityMomentLimiter(D, 0);*/
     //Run_PositivityMomentLimiter(T, N+2); // If needed, else compute it later using q and P ..
-    /*field->computeMoments(Var, Mom, CellMarker, 9);
+    /*field->computeMoments(Var, Mom, CellMarker, 8);
     field->scal(0.0, qModMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
@@ -904,9 +896,8 @@ void IdealMHDSolver::RunPositivityLimiter() {
     field->scal(0.0, BxModMoment);
     field->scal(0.0, ByModMoment);
     field->scal(0.0, BzModMoment);
-    field->scal(0.0, SiModMoment);
-    field->limitMoments(Mom, ModMom, CellMarker, 0, 9);
-    field->convertMomentToVariable(ModMom, Var, CellMarker, 9);*/
+    field->limitMoments(Mom, ModMom, CellMarker, 0, 8);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);*/
     //updateConservativeVariables();
   }
 

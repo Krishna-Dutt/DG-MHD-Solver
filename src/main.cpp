@@ -118,9 +118,9 @@ int main() {
     a->setConservativeVariables();
     a->setInviscidFlux();
     a->setEigenValues();
-   //a->setViscousFlux();
+    a->setSourceTerms();
     a->setAuxillaryVariables();
-    //a->setGradientPrimitiveVariables();
+    a->setGradientPrimitiveVariables();
     //a->setMaterialPropertyVariables();
 
     a->setInitialVelocity(U, V, W);
@@ -132,8 +132,8 @@ int main() {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
-    a->SetLimiter("CharacteristicLimiter");
+    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("Output3.vtk");
