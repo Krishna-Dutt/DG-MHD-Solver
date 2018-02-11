@@ -1346,6 +1346,20 @@ void DG_Field_2d::setFunctionsForVariables(double p, int a, double q, int b, dou
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This is the function used to change the value of variable z to f(a*x).
+ *
+ * @Param a Scaling for first parameter.
+ * @Param x The first parameter of the function
+ * @Param functionf The function `f` which is required for the intended mapping.
+ * @Param z The variable in which the value is to be stored
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::setFunctionsforDomainVariablesfromCellCenterVariables(double a, int x, function<void(double, double*, unsigned, unsigned, double*, unsigned)> f, int z){
+    f(a, cellcenterVariable[x], ne_x*ne_y, (N+1)*(N+1)*ne_x*ne_y, domainVariable[z], (N+1)*(N+1));
+    return ;
+}
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This is the function used to change the value of Boundary variable z to f(x, y).
  *
  * @Param a Scaling value for x

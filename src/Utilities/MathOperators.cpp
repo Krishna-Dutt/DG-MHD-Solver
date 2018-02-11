@@ -96,3 +96,18 @@ void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsign
 
   return ;
 }
+
+// Function to copy cell center values to domain variables
+void SetAverage(double a, double* x, unsigned size_CV, unsigned size_DV, double* z, unsigned node) {
+  int j =-1 , count = 0; 
+  for(int i=0; i < size_DV; ++i) {
+    if(count % node == 0) {
+      j++;
+      count = 0;
+    }
+    z[i] = a*x[j];
+    count++;
+  }
+
+  return ;
+}

@@ -578,7 +578,7 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-16;
+        epsilon = 1e-17;
     }
 
     for(i=Index; i > 0; i = i - (N+2)) {
@@ -592,7 +592,11 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
        Temp1 = MinMod(VarM[Tempi], AlphaN*(RNVarM[Tempi-1] -VarM[Tempi-1]), AlphaN*(VarM[Tempi-1] -LNVarM[Tempi-1]) , AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
        Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]) , AlphaN*(TNVarM[Tempj-(N+1)] -VarM[Tempj-(N+1)]), AlphaN*(VarM[Tempj-(N+1)] -BNVarM[Tempj-(N+1)]));
        
-       if (abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+       if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
+                 variable[modm][Tempi] = Temp1;
+                 variable[modm][Tempj] = Temp2;
+        }
+       else if (abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
          VarModM[Tempi] = Temp1;
          VarModM[Tempj] = Temp2;
        }
@@ -609,7 +613,7 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
        Temp1 = MinMod(VarM[Tempi], AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
        Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]));
        
-       if ( abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+       if ( abs(Temp1-VarModM[Tempi]) >= epsilon || abs(Temp2-VarModM[Tempj]) >= epsilon ) {
          VarModM[Tempi] = Temp1;
          VarModM[Tempj] = Temp2;
        }
@@ -686,7 +690,7 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-16;
+        epsilon = 1e-17;
     }
     int counter = 0;
     for(int temp = 0 ; temp<size; ++temp) {
@@ -705,7 +709,7 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
         AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));
         for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
           --count;
-          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
           //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
           for(j=0; j < count && counter == 0; ++j) {
@@ -715,7 +719,11 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
              Temp1 = MinMod(VarM[Tempi], AlphaN*(RNVarM[Tempi-1] -VarM[Tempi-1]), AlphaN*(VarM[Tempi-1] -LNVarM[Tempi-1]) , AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
              Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]) , AlphaN*(TNVarM[Tempj-(N+1)] -VarM[Tempj-(N+1)]), AlphaN*(VarM[Tempj-(N+1)] -BNVarM[Tempj-(N+1)]));
        
-             if (abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+             if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
+                 variable[modm][Tempi] = Temp1;
+                 variable[modm][Tempj] = Temp2;
+             }
+             else if (abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
                 VarModM[Tempi] = Temp1;
                 VarModM[Tempj] = Temp2;
             }
@@ -732,7 +740,7 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
                 Temp1 = MinMod(VarM[Tempi], AlphaN*(TNVarM[Tempi-(N+1)] -VarM[Tempi-(N+1)]), AlphaN*(VarM[Tempi-(N+1)] -BNVarM[Tempi-(N+1)]));
                 Temp2 = MinMod(VarM[Tempj], AlphaN*(RNVarM[Tempj-1] -VarM[Tempj-1]), AlphaN*(VarM[Tempj-1] -LNVarM[Tempj-1]));
        
-                if ( abs(Temp1-VarModM[Tempi]) > epsilon || abs(Temp2-VarModM[Tempj]) > epsilon ) {
+                if ( abs(Temp1-VarModM[Tempi]) >= epsilon || abs(Temp2-VarModM[Tempj]) >= epsilon ) {
                   VarModM[Tempi] = Temp1;
                   VarModM[Tempj] = Temp2;
                 }
@@ -770,7 +778,7 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-16;
+        epsilon = 1e-17;
     }
     
     int counter = 0;
@@ -782,9 +790,9 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
         for(i=(N+1)*(N+1)-1; (i > 0) && (counter == 0); i = i - (N+2)) {
           --count;
 
-          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
-          //AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
+          AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
           for(j=0; (j < count) && (counter == 0); ++j) {
              Tempi = i-j;
              Tempj = i - j*(N+1);
@@ -808,8 +816,13 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
              }
 
              Temp2 = MinMod(VarC[Tempj], AlphaN*(Sum1 -VarC[Tempj-1]), AlphaN*(VarC[Tempj-1] -Sum2), AlphaN*(Sum3 -VarC[Tempj-(N+1)]), AlphaN*(VarC[Tempj-(N+1)] -Sum4));
-
-             if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+             
+             if ( Tempi == (N+1)*(N+1)-1 && (abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon) ) {
+                 VarC[Tempi] = Temp1;
+                 VarC[Tempj] = Temp2;
+                 
+             }
+             else  if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
                  VarC[Tempi] = Temp1;
                  VarC[Tempj] = Temp2;
              }
@@ -833,7 +846,7 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
              Temp1 = MinMod(VarC[Tempi], AlphaN*(Sum1 -VarC[Tempi-(N+1)]), AlphaN*(VarC[Tempi-(N+1)] -Sum2));
              Temp2 = MinMod(VarC[Tempj], AlphaN*(Sum3 -VarC[Tempj-1]), AlphaN*(VarC[Tempj-1] -Sum4));
              
-             if ( abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+             if ( abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon ) {
                 VarC[Tempi] = Temp1;
                 VarC[Tempj] = Temp2;
              }
@@ -986,11 +999,11 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   v = DVy/D;
   w = DVz/D;
   
-  /*if (  abs(dPdx) > epsilon1 || abs(dPdy) > epsilon1 ) {
+  if (  abs(dPdx) > epsilon1 || abs(dPdy) > epsilon1 ) {
       nx = dPdx/sqrt(dPdx*dPdx + dPdy*dPdy);
       ny = dPdy/sqrt(dPdx*dPdx + dPdy*dPdy);
   }
-  else */
+  else 
   {
       nx = 1.0; // Asuming 1D flow in x direction
       ny = 0.0;

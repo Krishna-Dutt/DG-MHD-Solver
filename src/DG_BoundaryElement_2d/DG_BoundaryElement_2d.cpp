@@ -503,7 +503,7 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 0.0;
+        epsilon = 1e-16;
     }
 
     for(i=Index; i > 0; i = i - (N+2)) {
@@ -519,7 +519,11 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+       if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
+                 variable[modm][Tempi] = Temp1;
+                 variable[modm][Tempj] = Temp2;
+        }
+       else if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -537,7 +541,7 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
       
-       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+       if ( abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -575,7 +579,7 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-16;
+        epsilon = 1e-18;
     }
     int counter = 0;
     for(int temp = 0 ; temp<size; ++temp) {
@@ -585,11 +589,10 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
         count = N+1;
         counter = 0;
         AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));
-        AlphaN = 0.5/sqrt((2.0*N -1.0)*(2.0*N +1));
+        //AlphaN = 0.5/sqrt((2.0*N -1.0)*(2.0*N +1));
         for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
           --count;
-          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
-          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
           for(j=0; j < count && counter == 0; ++j) {
@@ -601,7 +604,11 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
              //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
              //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-             if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+             if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
+                 variable[modm][Tempi] = Temp1;
+                 variable[modm][Tempj] = Temp2;
+             }
+             else if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
                  variable[modm][Tempi] = Temp1;
                  variable[modm][Tempj] = Temp2;
              }
@@ -621,7 +628,7 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
                 //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
                 //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
        
-                if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+                if ( abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon ) {
                     variable[modm][Tempi] = Temp1;
                     variable[modm][Tempj] = Temp2;
                  }
@@ -658,7 +665,7 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
         epsilon = 0.0 ;
     }
     else {
-        epsilon = 1e-16;
+        epsilon = 1e-18;
     }
     
     int counter = 0;
@@ -741,16 +748,24 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
              Temp1 = MinMod(Var1);
              Temp2 = MinMod(Var2);
              
-             if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+             if ( Tempi == (N+1)*(N+1)-1 && (abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon) ) {
                  VarC[Tempi] = Temp1;
                  VarC[Tempj] = Temp2;
+                 
+             }
+             else if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+                 VarC[Tempi] = Temp1;
+                 VarC[Tempj] = Temp2;
+                 
              }
              else {
                  counter = 1.0 ;
+                 //cout << " Epsilon :  " << abs(Temp1-VarC[Tempi]) << endl;
              }
           } 
              // Special Case for end values, when Tempi or Tempj access zero order polynomials !!
           if(counter == 0) {
+              //cout << "count : " << count<< endl; 
              Tempi = i-j;
              Tempj = i - j*(N+1);
          
@@ -790,7 +805,7 @@ void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
              Temp1 = MinMod(Var1);
              Temp2 = MinMod(Var2);
              
-             if ( abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+             if ( abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon ) {
                 VarC[Tempi] = Temp1;
                 VarC[Tempj] = Temp2;
              }

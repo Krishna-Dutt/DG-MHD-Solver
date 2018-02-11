@@ -14,5 +14,7 @@ double Sum(unsigned index, unsigned size, double* z);
 
 // Functions for cell centered variables
 void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsigned size_CV, double* z, unsigned node);
- 
+
+void SetAverage(double a, double* x, unsigned size_CV, unsigned size_DV, double* z, unsigned node);
+
 #endif

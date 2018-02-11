@@ -648,7 +648,8 @@ void IdealMHDSolver::Run_KXRCF() {
 
   //field->updateOutFlowBoundary(Vx, Vy);
   //field->updateCellMarker(D, CellMarker);
-
+  //field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
+  
   return ;
 }
 
@@ -794,7 +795,7 @@ void IdealMHDSolver::RunLimiter() {
   field->resetPositivity(true);
   
   if ( Limiter == "LiliaMoment") {
-        
+    //updatePrimitiveVariables();
     int Var[] ={D, DVx, DVy, DVz, DE, Bx, By, Bz, Si};
     int Mom[] = {qMoment, uMoment, vMoment, wMoment, HMoment, BxMoment, ByMoment, BzMoment, SiMoment};
     int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment}; 
@@ -811,6 +812,8 @@ void IdealMHDSolver::RunLimiter() {
 
     field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 8);
     field->convertMomentToVariable(ModMom, Var, CellMarker, 8);
+    //updateConservativeVariables();
+
 
   }
 
@@ -823,8 +826,8 @@ void IdealMHDSolver::RunLimiter() {
     field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(P, dPdx, "central");
-    field->delByDelY(P, dPdy, "central");
+    field->delByDelX(DE, dPdx, "central");
+    field->delByDelY(DE, dPdy, "central");
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
 
@@ -857,7 +860,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     int ModMom[] = {qModMoment, uModMoment, vModMoment, wModMoment, HModMoment, BxModMoment, ByModMoment, BzModMoment, SiModMoment}; 
    
     field->ResetVariables_CellCentered(CellMarker, 1.5);
-
+    //field->resetPositivity(true);
     updatePrimitiveVariables();
     field->resetPositivity(false);
     checkPositivity();
@@ -881,17 +884,18 @@ void IdealMHDSolver::RunPositivityLimiter() {
     field->scal(0.0, SiModMoment);
     field->limitMoments(Mom, ModMom, CellMarker, N+2, 9);
     field->convertMomentToVariable(ModMom, Var, CellMarker, 9);
+    //updateConservativeVariables();
 
 
-    updatePrimitiveVariables();
+    /*updatePrimitiveVariables();
     field->resetPositivity(false);
-    //checkPositivity();
+    checkPositivity();*/
     /*Run_PositivityMomentLimiter(DVx, 0);
     Run_PositivityMomentLimiter(DVy, 0);
     Run_PositivityMomentLimiter(DE, 0);
     Run_PositivityMomentLimiter(D, 0);*/
     //Run_PositivityMomentLimiter(T, N+2); // If needed, else compute it later using q and P ..
-    field->computeMoments(Var, Mom, CellMarker, 9);
+    /*field->computeMoments(Var, Mom, CellMarker, 9);
     field->scal(0.0, qModMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
@@ -902,7 +906,8 @@ void IdealMHDSolver::RunPositivityLimiter() {
     field->scal(0.0, BzModMoment);
     field->scal(0.0, SiModMoment);
     field->limitMoments(Mom, ModMom, CellMarker, 0, 9);
-    field->convertMomentToVariable(ModMom, Var, CellMarker, 9);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 9);*/
+    //updateConservativeVariables();
   }
 
   return ;

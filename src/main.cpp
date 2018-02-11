@@ -110,7 +110,7 @@ int main() {
     double CFL = 0.2;
     double time = 0.2;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(200, 1, 1);
+    a = new IdealMHDSolver(200, 1, 2);
     a->setDomain(-1.0, -1.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
@@ -132,8 +132,8 @@ int main() {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
-    //a->SetLimiter("CharacteristicLimiter");
+    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("Output3.vtk");
