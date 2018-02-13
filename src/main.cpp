@@ -96,7 +96,7 @@ int main() {
     IdealMHDSolver* a;
     a = new IdealMHDSolver(100, 100, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
-    a->setBoundaryCondtions("periodic", "periodic", "periodic", "periodic");
+    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();

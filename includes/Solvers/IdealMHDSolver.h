@@ -43,11 +43,11 @@ private:
     int dPdx, dPdy;
     // Aux. Variables // Define all auxillary
     int Pt, VdotB, Si, BdotB, DeldotB;
-    int K1D, K1DVx, K1DVy, K1DVz, K1DE, K1Bx, K1By, K1Bz, K1Si;
-    int K2D, K2DVx, K2DVy, K2DVz, K2DE, K2Bx, K2By, K2Bz, K2Si; 
-    int K3D, K3DVx, K3DVy, K3DVz, K3DE, K3Bx, K3By, K3Bz, K3Si;
+    int K1D, K1DVx, K1DVy, K1DVz, K1DE, K1Bx, K1By, K1Bz, K1Si, K1DeldotB;
+    int K2D, K2DVx, K2DVy, K2DVz, K2DE, K2Bx, K2By, K2Bz, K2Si, K2DeldotB; 
+    int K3D, K3DVx, K3DVy, K3DVz, K3DE, K3Bx, K3By, K3Bz, K3Si, K3DeldotB;
     int dbydxD, dbydyD, dbydxDVx, dbydyDVx, dbydxDVy, dbydyDVy, dbydxDVz, dbydyDVz, dbydxDE, dbydyDE;
-    int dbydxBx, dbydyBx, dbydxBy, dbydyBy, dbydxBz, dbydyBz, dbydxSi, dbydySi;
+    int dbydxBx, dbydyBx, dbydxBy, dbydyBy, dbydxBz, dbydyBz, dbydxSi, dbydySi, dbydxDeldotB, dbydyDeldotB;
     int DAnalytical, VxAnalytical, ZERO;
     // Shock Detector
     int CellMarkerG;
