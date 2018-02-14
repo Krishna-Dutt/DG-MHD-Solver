@@ -583,8 +583,8 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
 
     for(i=Index; i > 0; i = i - (N+2)) {
      --count;
-     //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
-     AlphaN = 0.25*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
+     AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+     //AlphaN = 0.25*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
      //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
      for(j=0; j < count; ++j) {
        Tempi = i-j;
@@ -711,8 +711,8 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
         AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));
         for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
           --count;
-          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
-          AlphaN = 0.25*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
+          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+          //AlphaN = 0.25*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
           for(j=0; j < count && counter == 0; ++j) {
              Tempi = i-j;
@@ -792,9 +792,9 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
         for(i=(N+1)*(N+1)-1; (i > 0) && (counter == 0); i = i - (N+2)) {
           --count;
 
-          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
-          AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
+          //AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
           for(j=0; (j < count) && (counter == 0); ++j) {
              Tempi = i-j;
              Tempj = i - j*(N+1);

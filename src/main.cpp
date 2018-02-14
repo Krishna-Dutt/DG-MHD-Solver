@@ -127,7 +127,7 @@ int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
-    double CFL = 0.1;
+    double CFL = 0.2;
     double time = 0.15;
     IdealMHDSolver* a;
     a = new IdealMHDSolver(200, 200, 1);
@@ -156,7 +156,7 @@ int main() {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("RotorTest.vtk");
+    a->plot("RotorTesttempChar.vtk");
     
 
     delete a;
