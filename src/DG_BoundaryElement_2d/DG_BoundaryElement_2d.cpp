@@ -519,11 +519,11 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-       if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
+       /*if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
                  variable[modm][Tempi] = Temp1;
                  variable[modm][Tempj] = Temp2;
         }
-       else if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+       else*/ if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -541,7 +541,7 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
        //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
        //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
       
-       if ( abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon ) {
+       if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
          variable[modm][Tempi] = Temp1;
          variable[modm][Tempj] = Temp2;
        }
@@ -604,11 +604,11 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
              //Temp1 = MinMod(variable[m][Tempi], AlphaN*(rightNeighbor->variable[m][Tempi-1] -variable[m][Tempi-1]), AlphaN*(variable[m][Tempi-1] -leftNeighbor->variable[m][Tempi-1]) , AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
              //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]) , AlphaN*(topNeighbor->variable[m][Tempj-(N+1)] -variable[m][Tempj-(N+1)]), AlphaN*(variable[m][Tempj-(N+1)] -bottomNeighbor->variable[m][Tempj-(N+1)]));
        
-             if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
+             /*if ( Tempi == Index && (abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon )) {
                  variable[modm][Tempi] = Temp1;
                  variable[modm][Tempj] = Temp2;
              }
-             else if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
+             else*/ if (abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
                  variable[modm][Tempi] = Temp1;
                  variable[modm][Tempj] = Temp2;
              }
@@ -628,7 +628,7 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
                 //Temp1 = MinMod(variable[m][Tempi], AlphaN*(topNeighbor->variable[m][Tempi-(N+1)] -variable[m][Tempi-(N+1)]), AlphaN*(variable[m][Tempi-(N+1)] -bottomNeighbor->variable[m][Tempi-(N+1)]));
                 //Temp2 = MinMod(variable[m][Tempj], AlphaN*(rightNeighbor->variable[m][Tempj-1] -variable[m][Tempj-1]), AlphaN*(variable[m][Tempj-1] -leftNeighbor->variable[m][Tempj-1]));
        
-                if ( abs(Temp1-variable[modm][Tempi]) >= epsilon || abs(Temp2-variable[modm][Tempj]) >= epsilon ) {
+                if ( abs(Temp1-variable[modm][Tempi]) > epsilon || abs(Temp2-variable[modm][Tempj]) > epsilon ) {
                     variable[modm][Tempi] = Temp1;
                     variable[modm][Tempj] = Temp2;
                  }
