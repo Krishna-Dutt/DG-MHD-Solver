@@ -167,7 +167,7 @@ public:
     // Fucntions to compute cell centered values
     void setFunctionsForVariablesCellCentered(int x, int y, function<double(double, double, double)> f, int z); 
     
-
+   
     // Functions to do various other operations on the elements.
     double l2Norm(int v1, int v2);
 
@@ -176,6 +176,10 @@ public:
     void FindMindx(int v);
     void FindTimestep(int dt, int dx, int U, double CFL);
     double FindMindt(int dt);
+
+    // Function to compute divergence of Magnetic field !!
+    void updateDivergenceB(int Bx, int By, int DeldotB);
+
 
     // Virtual Function for Polymorphic behaviour
     virtual void assignBoundary( string type, char b);

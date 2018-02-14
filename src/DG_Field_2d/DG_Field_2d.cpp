@@ -1153,6 +1153,26 @@ void DG_Field_2d::delByDelY(int v, int vDash, string fluxType) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  Function to compute the Divergence of Magnetic field.
+ * 
+ * @Param Bx This is Magnetic field in x direction.
+ * @Param By This is Magnetic field in y direction.
+ * @Param DeldotB This is used to store the computed locally constant Divergence of B.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::updateDivergenceB(int Bx, int By, int DeldotB) {
+  for(int i=0; i < ne_x; ++i)
+    for(int j=0; j < ne_y; ++j) {
+        {
+             elements[i][j]->updateDivergenceB(Bx, By, DeldotB);
+        }
+    }
+
+  return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @brief      This is used to extern the function `saxpy` to the class DG_Field_2d. $\mathbf{y} \mapsto a\mathbf{x} + \mathbf{y}$
  *
  * @param[in]  a     The coefficient `a` of `x`

@@ -709,8 +709,8 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
         AlphaN = sqrt((2.0*N -1.0)/(2.0*N +1));
         for(i=Index; i > 0 && counter == 0; i = i - (N+2)) {
           --count;
-          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
-          //AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
+          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0)); 
+          AlphaN = 0.5*sqrt((4.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
           for(j=0; j < count && counter == 0; ++j) {
              Tempi = i-j;
@@ -817,12 +817,12 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
 
              Temp2 = MinMod(VarC[Tempj], AlphaN*(Sum1 -VarC[Tempj-1]), AlphaN*(VarC[Tempj-1] -Sum2), AlphaN*(Sum3 -VarC[Tempj-(N+1)]), AlphaN*(VarC[Tempj-(N+1)] -Sum4));
              
-             if ( Tempi == (N+1)*(N+1)-1 && (abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon) ) {
+             /*if ( Tempi == (N+1)*(N+1)-1 && (abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon) ) {
                  VarC[Tempi] = Temp1;
                  VarC[Tempj] = Temp2;
                  
              }
-             else  if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
+             else*/  if (abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
                  VarC[Tempi] = Temp1;
                  VarC[Tempj] = Temp2;
              }
@@ -846,7 +846,7 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
              Temp1 = MinMod(VarC[Tempi], AlphaN*(Sum1 -VarC[Tempi-(N+1)]), AlphaN*(VarC[Tempi-(N+1)] -Sum2));
              Temp2 = MinMod(VarC[Tempj], AlphaN*(Sum3 -VarC[Tempj-1]), AlphaN*(VarC[Tempj-1] -Sum4));
              
-             if ( abs(Temp1-VarC[Tempi]) >= epsilon || abs(Temp2-VarC[Tempj]) >= epsilon ) {
+             if ( abs(Temp1-VarC[Tempi]) > epsilon || abs(Temp2-VarC[Tempj]) > epsilon ) {
                 VarC[Tempi] = Temp1;
                 VarC[Tempj] = Temp2;
              }
@@ -1275,6 +1275,33 @@ void DG_Element_2d::convertCharacteristictoVariable(int *C, int *V, unsigned I) 
 }
 
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  Function to compute the Divergence of Magnetic field.
+ * 
+ * @Param Bx This is Magnetic field in x direction.
+ * @Param By This is Magnetic field in y direction.
+ * @Param DeldotB This is used to store the computed locally constant Divergence of B.
+*/
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateDivergenceB(int Bx, int By, int DeldotB) {
+  double *NumFlux = new double[N+1];
+  double LocalDeldotB = 0.0 ;
+
+  Addabcd(0.5, boundaryRight[Bx], 0.5, neighboringRight[Bx], -0.5, boundaryLeft[Bx], -0.5, neighboringLeft[Bx], 1, N+1, NumFlux);
+  LocalDeldotB += lobattoIntegration(y_start, y_end, N, 1, NumFlux);
+
+  Addabcd(0.5, boundaryTop[By], 0.5, neighboringTop[By], -0.5, boundaryBottom[By], -0.5, neighboringBottom[By], 1, N+1, NumFlux);
+  LocalDeldotB += lobattoIntegration(x_start, x_end, N, 1, NumFlux);
+
+  for(int i=0; i<(N+1)*(N+1); ++i) {
+      variable[DeldotB][i] = LocalDeldotB;
+  }
+
+  delete[] NumFlux;
+ 
+  return ;
+}
 
 /* ----------------------------------------------------------------------------*/
 /**

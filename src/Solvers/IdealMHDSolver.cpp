@@ -342,7 +342,8 @@ void IdealMHDSolver::setSourceTerms() {
 }
 
 void IdealMHDSolver::updateSourceTerms(){
-  field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+  //field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+  field->updateDivergenceB(Bx, By, DeldotB);
   field->setFunctionsForVariables(1.0, DeldotB, 1.0, Bx, Product, DeldotB_Bx);
   field->setFunctionsForVariables(1.0, DeldotB, 1.0, By, Product, DeldotB_By);
   field->setFunctionsForVariables(1.0, DeldotB, 1.0, Bz, Product, DeldotB_Bz);
@@ -359,6 +360,7 @@ void IdealMHDSolver::setAuxillaryVariables() {
   VdotB = field->addVariable_withBounary("V.B");
   BdotB = field->addVariable_withBounary("B.B");
   DeldotB = field->addVariable_withBounary("Del.B");
+  BdotB_minus_BzBz = field->addVariable_withBounary("B.B_minus_BzBz");
 
   K1D   = field->addVariable_withoutBounary();
   K1DVx = field->addVariable_withoutBounary();
@@ -428,6 +430,7 @@ void IdealMHDSolver::setEigenValues() {
 void IdealMHDSolver::updateEigenValues() {
  // cout << " Calling updateEigenValues " << endl;
   field->setFunctionsForVariables(1.0, Bx, 1.0, By, 1.0, Bz, 1.0, Bx, 1.0, By, 1.0, Bz, AdotB3d, BdotB);
+  field->setFunctionsForVariables(1.0, Bx, 1.0, By, 0.0, Bz, 1.0, Bx, 1.0, By, 0.0, Bz, AdotB3d, BdotB_minus_BzBz);
   field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, Bx, 1.0, BdotB, MHDMaxEigenValue, Cx);
   field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, By, 1.0, BdotB, MHDMaxEigenValue, Cy);
   field->setFunctionsForVariables(1.0, Vx, 1.0, Cx, ModulusAdd, Vx_plus_C);
@@ -569,8 +572,7 @@ void IdealMHDSolver::solve() {
       count = 0;
     }
     updateInviscidFlux();
-    updatePrimitiveGradient();
-    field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+    //updatePrimitiveGradient();
     updateSourceTerms();
 
     RK_Step1();
@@ -586,8 +588,7 @@ void IdealMHDSolver::solve() {
     // Second Step of RK3
     updateInviscidFlux();
     updateEigenValues();
-    updatePrimitiveGradient();
-    field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+    //updatePrimitiveGradient();
     updateSourceTerms();
     
     RK_Step2();
@@ -602,8 +603,7 @@ void IdealMHDSolver::solve() {
    // Third (Final) Step of RK3
     updateInviscidFlux();
     updateEigenValues();
-    updatePrimitiveGradient();
-    field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+    //updatePrimitiveGradient();
     updateSourceTerms();
 
     RK_Step3();
@@ -618,8 +618,8 @@ void IdealMHDSolver::solve() {
    t += dt; 
    count += 1;       
     }
-    updatePrimitiveGradient();
-    field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
+    //updatePrimitiveGradient();
+    //field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
 
 
   return ;
@@ -822,8 +822,9 @@ void IdealMHDSolver::RunLimiter() {
     field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(D, dPdx, "central");
-    field->delByDelY(D, dPdy, "central");
+    field->delByDelX(Bx, dPdx, "central");
+    field->delByDelY(By, dPdy, "central");
+    //field->scal(-1.0, dPdy);
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
 

@@ -92,11 +92,11 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.2;
-    double time = 0.1;
+    double time = 0.5;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(100, 100, 1);
+    a = new IdealMHDSolver(200, 200, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
-    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
+    a->setBoundaryCondtions("periodic", "periodic", "periodic", "periodic");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -116,8 +116,8 @@ int main() {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
-    //a->SetLimiter("CharacteristicLimiter");
+    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("OrszagTang.vtk");
