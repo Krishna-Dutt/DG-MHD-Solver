@@ -869,7 +869,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     Run_PositivityMomentLimiter(Bx, N+2);
     Run_PositivityMomentLimiter(Bz, N+2);*/
 
-    field->computeMoments(Var, Mom, CellMarker, 8);
+    /*field->computeMoments(Var, Mom, CellMarker, 8);
     field->scal(0.0, qModMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
@@ -879,7 +879,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     field->scal(0.0, ByModMoment);
     field->scal(0.0, BzModMoment);
     field->limitMoments(Mom, ModMom, CellMarker, N+2, 8);
-    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);*/
     //updateConservativeVariables();
 
 
@@ -891,7 +891,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     Run_PositivityMomentLimiter(DE, 0);
     Run_PositivityMomentLimiter(D, 0);*/
     //Run_PositivityMomentLimiter(T, N+2); // If needed, else compute it later using q and P ..
-    /*field->computeMoments(Var, Mom, CellMarker, 8);
+    field->computeMoments(Var, Mom, CellMarker, 8);
     field->scal(0.0, qModMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
@@ -901,7 +901,7 @@ void IdealMHDSolver::RunPositivityLimiter() {
     field->scal(0.0, ByModMoment);
     field->scal(0.0, BzModMoment);
     field->limitMoments(Mom, ModMom, CellMarker, 0, 8);
-    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);*/
+    field->convertMomentToVariable(ModMom, Var, CellMarker, 8);
     //updateConservativeVariables();
   }
 

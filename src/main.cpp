@@ -9,11 +9,35 @@ using namespace std;
 
 
 double U(double x, double y) {
-  return -1.0 * sin(2.0*M_PI*y);
+  double r0 = 0.1, r1 = 0.115, u0 = 2.0;
+  double r = sqrt( pow(x -0.5,2.0) + pow(y-0.5,2.0) );
+  double f = (r1 - r)/(r1 - r0);
+
+  if ( r < r0) {
+    return (u0/r0)*(-y + 0.5);
+  }
+  else if ( r >= r0  &&  r < r1){
+    return (f*u0/r)*(-y + 0.5);
+  }
+  else {
+    return 0.0;
+  }
 }
 
 double V(double x, double y) {
-  return sin(2.0*M_PI*x);
+  double r0 = 0.1, r1 = 0.115, u0 = 2.0;
+  double r = sqrt( pow(x -0.5,2.0) + pow(y-0.5,2.0) );
+  double f = (r1 - r)/(r1 - r0);
+
+  if ( r < r0) {
+    return (u0/r0)*(x - 0.5);
+  }
+  else if ( r >= r0  &&  r < r1){
+    return (f*u0/r)*(x - 0.5);
+  }
+  else {
+    return 0.0;
+  }
 }
 
 double W(double x, double y) {
@@ -21,11 +45,11 @@ double W(double x, double y) {
 }
 
 double BX(double x, double y) {
-  return -1.0 * pow(4.0*M_PI, -0.5) * sin(2.0*M_PI*y);
+  return 5.0/sqrt(4.0*M_PI);;
 }
 
 double BY(double x, double y) {
-  return pow(4.0*M_PI, -0.5) * sin(4.0*M_PI*x);
+  return 0.0;
 }
 
 double BZ(double x, double y) {
@@ -37,11 +61,23 @@ double SI(double x, double y) {
 }
 
 double IDensity(double x, double y) {
-  return 25.0/(36.0*M_PI);
+  double r0 = 0.1, r1 = 0.115, u0 = 2.0;
+  double r = sqrt( pow(x -0.5,2.0) + pow(y-0.5,2.0) );
+  double f = (r1 - r)/(r1 - r0);
+
+  if ( r < r0) {
+    return 10;
+  }
+  else if ( r >= r0  &&  r < r1){
+    return 1.0 + 9.0*f;
+  }
+  else {
+    return 1.0;
+  }
 }
 
 double IPressure(double x, double y) {
-  return 5.0/(12.0*M_PI);
+  return 1.0; 
 }
 
 double StateEq(double D, double T) {
@@ -91,8 +127,8 @@ int main() {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
-    double CFL = 0.2;
-    double time = 0.5;
+    double CFL = 0.1;
+    double time = 0.15;
     IdealMHDSolver* a;
     a = new IdealMHDSolver(200, 200, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
@@ -116,11 +152,11 @@ int main() {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
-    a->SetLimiter("CharacteristicLimiter");
+    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("OrszagTang.vtk");
+    a->plot("RotorTest.vtk");
     
 
     delete a;
