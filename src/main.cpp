@@ -152,8 +152,8 @@ int main() {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
-    //a->SetLimiter("CharacteristicLimiter");
+    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("RotorTest.vtk");
