@@ -156,7 +156,7 @@ int main() {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("RotorTesttempChar.vtk");
+    a->plot("RotorTest.vtk");
     
 
     delete a;
