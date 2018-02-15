@@ -9,34 +9,32 @@ using namespace std;
 
 
 double U(double x, double y) {
-  double r0 = 0.1, r1 = 0.115, u0 = 2.0;
-  double r = sqrt( pow(x -0.5,2.0) + pow(y-0.5,2.0) );
-  double f = (r1 - r)/(r1 - r0);
-
-  if ( r < r0) {
-    return (u0/r0)*(-y + 0.5);
+  if ( x >= 0.0 && y >= 0.0) {
+    return 0.75;
   }
-  else if ( r >= r0  &&  r < r1){
-    return (f*u0/r)*(-y + 0.5);
+  else if ( x >= 0.0 && y < 0.0) {
+    return -0.75;
+  }
+  else if ( x < 0.0 && y >= 0.0) {
+    return 0.75;
   }
   else {
-    return 0.0;
+    return -0.75;
   }
 }
 
 double V(double x, double y) {
-  double r0 = 0.1, r1 = 0.115, u0 = 2.0;
-  double r = sqrt( pow(x -0.5,2.0) + pow(y-0.5,2.0) );
-  double f = (r1 - r)/(r1 - r0);
-
-  if ( r < r0) {
-    return (u0/r0)*(x - 0.5);
+  if ( x >= 0.0 && y >= 0.0) {
+    return -0.5;
   }
-  else if ( r >= r0  &&  r < r1){
-    return (f*u0/r)*(x - 0.5);
+  else if ( x >= 0.0 && y < 0.0) {
+    return -0.5;
+  }
+  else if ( x < 0.0 && y >= 0.0) {
+    return 0.5;
   }
   else {
-    return 0.0;
+    return 0.5;
   }
 }
 
@@ -45,7 +43,7 @@ double W(double x, double y) {
 }
 
 double BX(double x, double y) {
-  return 5.0/sqrt(4.0*M_PI);;
+  return 2.0/sqrt(8.0*M_PI);
 }
 
 double BY(double x, double y) {
@@ -53,7 +51,7 @@ double BY(double x, double y) {
 }
 
 double BZ(double x, double y) {
-  return 0.0 ;
+  return 1.0/sqrt(8.0*M_PI) ;
 }
 
 double SI(double x, double y) {
@@ -61,15 +59,14 @@ double SI(double x, double y) {
 }
 
 double IDensity(double x, double y) {
-  double r0 = 0.1, r1 = 0.115, u0 = 2.0;
-  double r = sqrt( pow(x -0.5,2.0) + pow(y-0.5,2.0) );
-  double f = (r1 - r)/(r1 - r0);
-
-  if ( r < r0) {
-    return 10;
+  if ( x >= 0.0 && y >= 0.0) {
+    return 1.0;
   }
-  else if ( r >= r0  &&  r < r1){
-    return 1.0 + 9.0*f;
+  else if ( x >= 0.0 && y < 0.0) {
+    return 3.0;
+  }
+  else if ( x < 0.0 && y >= 0.0) {
+    return 2.0;
   }
   else {
     return 1.0;
@@ -128,11 +125,11 @@ int main() {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.2;
-    double time = 0.15;
+    double time = 0.8;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(200, 200, 1);
-    a->setDomain(0.0, 0.0, 1.0, 1.0);
-    a->setBoundaryCondtions("periodic", "periodic", "periodic", "periodic");
+    a = new IdealMHDSolver(100, 100, 1);
+    a->setDomain(-0.4, -0.4, 0.4, 0.4);
+    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -156,7 +153,7 @@ int main() {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("RotorTest.vtk");
+    a->plot("2DRP6MHDminusByBx.vtk");
     
 
     delete a;

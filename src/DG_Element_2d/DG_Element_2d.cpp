@@ -994,8 +994,8 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   By = 0.5 * variable[V[6]][0];
   Bz = 0.5 * variable[V[7]][0];
   
-  dPdx = DVx;//0.5 * variable[V[8]][0];
-  dPdy = DVy;//0.5 * variable[V[9]][0];
+  dPdx = -By;//0.5 * variable[V[8]][0];
+  dPdy = Bx;//0.5 * variable[V[9]][0];
   
   u = DVx/D;
   v = DVy/D;

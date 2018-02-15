@@ -662,9 +662,9 @@ void IdealMHDSolver::Run_KXRCF() {
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
 
-  field->updateOutFlowBoundary(Vx, Vy);
-  field->updateCellMarker(D, CellMarker);
-  field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
+  //field->updateOutFlowBoundary(Vx, Vy);
+  //field->updateCellMarker(D, CellMarker);
+  //field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
   
   return ;
 }
@@ -822,8 +822,8 @@ void IdealMHDSolver::RunLimiter() {
     field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(BdotB, dPdx, "central");
-    field->delByDelY(BdotB, dPdy, "central");
+    field->delByDelX(Pt, dPdx, "central");
+    field->delByDelY(Pt, dPdy, "central");
     //field->scal(-1.0, dPdy);
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
