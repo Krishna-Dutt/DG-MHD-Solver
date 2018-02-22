@@ -792,9 +792,9 @@ void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
         for(i=(N+1)*(N+1)-1; (i > 0) && (counter == 0); i = i - (N+2)) {
           --count;
 
-          AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
+          //AlphaN = sqrt((2.0*(count)-1.0)/(2.0*(count)+1.0));
           //AlphaN = 0.5/sqrt(4.0*count*count -1.0);
-          //AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
+          AlphaN = 0.25*(4.0*count-1.0)/sqrt(4.0*count*count -1.0);
           for(j=0; (j < count) && (counter == 0); ++j) {
              Tempi = i-j;
              Tempj = i - j*(N+1);
@@ -994,8 +994,8 @@ void DG_Element_2d::findEigenMatricesMHD(int *V) {
   By = 0.5 * variable[V[6]][0];
   Bz = 0.5 * variable[V[7]][0];
   
-  dPdx = -By;//0.5 * variable[V[8]][0];
-  dPdy = Bx;//0.5 * variable[V[9]][0];
+  dPdx = 0.5 * variable[V[8]][0];
+  dPdy = 0.5 * variable[V[9]][0];
   
   u = DVx/D;
   v = DVy/D;

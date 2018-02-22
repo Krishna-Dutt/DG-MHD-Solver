@@ -822,8 +822,8 @@ void IdealMHDSolver::RunLimiter() {
     field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(Pt, dPdx, "central");
-    field->delByDelY(Pt, dPdy, "central");
+    field->delByDelX(BdotB, dPdx, "central");
+    field->delByDelY(BdotB, dPdy, "central");
     //field->scal(-1.0, dPdy);
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);

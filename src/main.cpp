@@ -127,7 +127,7 @@ int main() {
     double CFL = 0.2;
     double time = 0.8;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(100, 100, 1);
+    a = new IdealMHDSolver(200, 200, 1);
     a->setDomain(-0.4, -0.4, 0.4, 0.4);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
@@ -153,7 +153,7 @@ int main() {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("2DRP6MHDminusByBx.vtk");
+    a->plot("2DRP6MHD_gradBdotB_Diff.vtk");
     
 
     delete a;
