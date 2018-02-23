@@ -14,5 +14,7 @@ void IE(double a, double* rho, double b, double* Tp, double c, double* Pr, unsig
 void Temperature(double a, double* ie, double b, double* rho, unsigned index, unsigned size, double* Tp);
 void SoundSpeed(double a, double* rho, double b, double* Pr, unsigned index, unsigned size, double* c);
 void Pressure(double a, double* rho, double b, double* ie, unsigned index, unsigned size, double* Pr);
+void ThermoEntropy(double a, double* Pr, double b, double* rho, unsigned index, unsigned size, double* en);
+void EntropyVar(double a, double* rho, double b, double* Pr, double c, double* BdotB, unsigned index, unsigned size, double* en);
 
 #endif

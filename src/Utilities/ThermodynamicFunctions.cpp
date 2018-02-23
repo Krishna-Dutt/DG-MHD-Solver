@@ -84,3 +84,16 @@ void Pressure(double a, double* rho, double b, double* ie, unsigned index, unsig
   return ;
 }
 
+void ThermoEntropy(double a, double* Pr, double b, double* rho, unsigned index, unsigned size, double* en) {
+  for(int i=0; i < size; i+=index) {
+    en[i] =  log(Pr[i]*pow(rho[i], -gamma));
+  }
+  return ;
+}
+
+void EntropyVar(double a, double* rho, double b, double* Pr, double c, double* BdotB, unsigned index, unsigned size, double* en) {
+  for(int i=0; i < size; i+=index) {
+    en[i] =  rho[i]*sqrt(BdotB[i])/Pr[i];
+  }
+  return ;
+}

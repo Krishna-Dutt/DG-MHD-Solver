@@ -153,7 +153,7 @@ int main() {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("2DRP6MHD_gradBdotB_Diff.vtk");
+    a->plot("2DRP6MHD_gradEntropyVar.vtk");
     
 
     delete a;

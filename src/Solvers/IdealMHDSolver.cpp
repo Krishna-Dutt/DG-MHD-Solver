@@ -361,6 +361,7 @@ void IdealMHDSolver::setAuxillaryVariables() {
   BdotB = field->addVariable_withBounary("B.B");
   DeldotB = field->addVariable_withBounary("Del.B");
   BdotB_minus_BzBz = field->addVariable_withBounary("B.B_minus_BzBz");
+  Entropy = field->addVariable_withBounary("Entropy");
 
   K1D   = field->addVariable_withoutBounary();
   K1DVx = field->addVariable_withoutBounary();
@@ -822,8 +823,11 @@ void IdealMHDSolver::RunLimiter() {
     field->computeMoments(Var, AuxVarV, CellMarker, 8);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(BdotB, dPdx, "central");
-    field->delByDelY(BdotB, dPdy, "central");
+    //updatePrimitiveVariables();
+    //field->setFunctionsForVariables(1.0, P, 1.0, D, ThermoEntropy, Entropy);
+    field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, BdotB, EntropyVar, Entropy );
+    field->delByDelX(Entropy, dPdx, "central");
+    field->delByDelY(Entropy, dPdy, "central");
     //field->scal(-1.0, dPdy);
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
