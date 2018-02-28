@@ -619,7 +619,7 @@ void IdealMHDSolver::solve() {
    t += dt; 
    count += 1;       
     }
-    //updatePrimitiveGradient();
+    updatePrimitiveGradient();
     //field->setFunctionsForVariables(1.0, dBxdx, 1.0, dBydy, Addab, DeldotB);
 
 
