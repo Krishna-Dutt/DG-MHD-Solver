@@ -4,6 +4,8 @@
 
  
 void Product(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       z[i] = a * x[i] * b * y[i];
     }
@@ -12,6 +14,8 @@ void Product(double a, double* x, double b, double* y, unsigned index, unsigned 
 }
 
 void Addab(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       z[i] = (a * x[i]) + ( b * y[i]);
     }
@@ -20,6 +24,8 @@ void Addab(double a, double* x, double b, double* y, unsigned index, unsigned si
 }
 
 void Addabc(double a, double* x, double b, double* y, double c, double* z, unsigned index, unsigned size, double * Z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       Z[i] = (a * x[i]) + ( b * y[i]) + (c * z[i]);
     }
@@ -28,6 +34,8 @@ void Addabc(double a, double* x, double b, double* y, double c, double* z, unsig
 }
 
 void Addabcd(double a, double* p, double b, double* q, double c, double* r, double d, double* s, unsigned index, unsigned size, double * t) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       t[i] = (a * p[i]) + ( b * q[i]) + (c * r[i]) + (d * s[i]);
     }
@@ -36,6 +44,8 @@ void Addabcd(double a, double* p, double b, double* q, double c, double* r, doub
 }
 
 void Subtract(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       z[i] = (a * x[i]) - (b * y[i]);
     }
@@ -44,6 +54,8 @@ void Subtract(double a, double* x, double b, double* y, unsigned index, unsigned
 }
 
 void Divide(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       if (b*y[i] != 0)
           z[i] = (a * x[i]) / (b * y[i]);
@@ -56,6 +68,8 @@ void Divide(double a, double* x, double b, double* y, unsigned index, unsigned s
 }
  
 void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsigned size, double * z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       z[i] = abs(a * x[i]) + abs( b * y[i]);
     }
@@ -65,6 +79,8 @@ void ModulusAdd(double a, double* x, double b, double* y, unsigned index, unsign
 
 
 void Copy(double a, double* x, unsigned index, unsigned size, double* z) {
+    
+    #pragma omp parallel for
     for(int i=0; i< size; i+=index) {
       z[i] = (a * x[i]);
     }
@@ -74,6 +90,8 @@ void Copy(double a, double* x, unsigned index, unsigned size, double* z) {
 
 double Sum(unsigned index, unsigned size, double* z) {
   double s = 0;
+  
+  #pragma omp parallel for shared(z) reduction(+:s)
   for(int i=0; i<size; i+=index) {
     s += z[i];
   }
@@ -81,6 +99,7 @@ double Sum(unsigned index, unsigned size, double* z) {
   return s;
 }
 
+// How to thread these two functions ??
 // Functions for cell centered variables
 void Maximum( double a, double* x, double b, double* y, unsigned size_DV, unsigned size_CV, double* z, unsigned node) {
   int j =-1 , count = 0; 

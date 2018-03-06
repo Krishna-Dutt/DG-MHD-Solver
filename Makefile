@@ -14,7 +14,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   CC := clang++ -arch x86_64
 else
-  CC := g++  #-pg -g
+  CC := g++ -fopenmp #-pg -g
 endif
 
 # Folders
@@ -41,7 +41,7 @@ INCLIST := $(patsubst includes/%,-I include/%,$(INCDIRS))
 BUILDLIST := $(patsubst includes/%,$(BUILDDIR)/%,$(INCDIRS))
 
 # Shared Compiler Flags
-CFLAGS := -c #-pg
+CFLAGS := -c -fopenmp #-pg
 INC := -I include $(INCLIST) -I /usr/local/include
 LIB := -L /usr/local/lib -lblas -llapacke -lgsl -lgslcblas -lm
 
@@ -54,7 +54,7 @@ ifeq ($(UNAME_S),Linux)
     INC += -I /usr/pgsql-$(PG_VER)/include
     LIB += -L /usr/pgsql-$(PG_VER)/lib
 else
-  CFLAGS += -std=c++11 -stdlib=libc++ -O2
+  CFLAGS += -std=c++11 -stdlib=libc++ -O2 
 endif
 
 $(TARGET): $(OBJECTS)

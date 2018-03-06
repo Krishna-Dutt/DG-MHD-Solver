@@ -8,6 +8,7 @@
 #include <functional>
 #include <map>
 #include <initializer_list>
+#include <omp.h>
 
 #include <cblas.h>
 #include <fstream>

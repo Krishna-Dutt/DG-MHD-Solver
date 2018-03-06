@@ -4,6 +4,7 @@
 void zeros(double *x, unsigned n)
 {
     unsigned i;
+    #pragma omp parallel for
     for(i=0; i<n; i++)
         x[i]    =   0.0;
 }
@@ -11,6 +12,7 @@ void zeros(double *x, unsigned n)
 void zeros(double *A, unsigned m, unsigned n)
 {
     unsigned i;
+    #pragma omp parallel for
     for(i=0;i<m*n;i++)
             A[i] = 0.0;
 }

@@ -5,7 +5,8 @@ void transpose(double *A, unsigned N)
 {
     unsigned i,j;
     double B[N][N];
-    for(i=0;i<N;i++)
+    #pragma omp parallel for private(j) shared(A,B)
+    for(i=0;i<N;i++) 
         for(j=0;j<N;j++)
             B[j][i] =   A[i*N+j];
 
@@ -16,6 +17,7 @@ void transpose(double *A, unsigned N)
 void transpose(double *A, double *B, unsigned N)
 {
     unsigned i,j;
+    #pragma omp parallel for private(j) shared(A,B)
     for(i=0;i<N;i++)
         for(j=0;j<N;j++)
             B[j*N+i] =   A[i*N+j];

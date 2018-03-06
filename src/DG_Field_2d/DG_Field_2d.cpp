@@ -85,24 +85,29 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     //elements.
     
     // Setting the top elements of each of the elements.
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j=0; j < (ne_y-1); j++)
+        for(j=0; j < (ne_y-1); j++)
             elements[i][j]->setNeighboringElement('T', elements[i][j+1]);
         
 
     // Setting the right elements of each of the elements.
+    #pragma omp parallel for private(j)
     for(int i = 0; i < (ne_x-1); i++)
-        for(int j=0; j < (ne_y); j++)
+        for(j=0; j < (ne_y); j++)
             elements[i][j]->setNeighboringElement('R', elements[i+1][j]);
 
     // Setting the bottom elements of each of the elements.
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j=1; j < ne_y; j++)
+        for(j=1; j < ne_y; j++)
             elements[i][j]->setNeighboringElement('B', elements[i][j-1]);
     
     // Setting the left elements of each of the elements.
+    #pragma omp parallel for private(j)
     for(int i = 1; i < ne_x; i++)
-        for(int j=0; j < ne_y; j++)
+        for(j=0; j < ne_y; j++)
             elements[i][j]->setNeighboringElement('L', elements[i-1][j]);
     // All the neighboring elements have been set, except for the elements at the boundary.
     
@@ -137,8 +142,9 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     twoDFluxMatrix1(fluxMatrix_bottom, N);
 
     /// Assigning the computed matrices to each and every element.
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j=0; j < ne_y; j++){
+        for(j=0; j < ne_y; j++){
             elements[i][j]->setMassMatrix(massMatrix);
             elements[i][j]->setInverseMassMatrix(massInverse);
             elements[i][j]->setderivateMatrix_x(derivativeMatrix_x);
@@ -183,7 +189,7 @@ void DG_Field_2d::setVanderMandMatrix() {
   // Printing both matrices 
  /* cout << "Vander Mand Matrix  :: \n";
   for ( int i=0; i < (N+1)*(N+1) ; ++i) {
-      for (int j=0; j < (N+1)*(N+1); ++j) {
+      for (j=0; j < (N+1)*(N+1); ++j) {
           cout << vanderMand[i*(N+1)*(N+1) + j] << " : ";
       }
       cout << "\n";
@@ -191,14 +197,15 @@ void DG_Field_2d::setVanderMandMatrix() {
 
   cout << "Inverse Vander Mand Matrix  :: \n";
   for ( int i=0; i < (N+1)*(N+1) ; ++i) {
-      for (int j=0; j < (N+1)*(N+1); ++j) {
+      for (j=0; j < (N+1)*(N+1); ++j) {
           cout << inverseVanderMand[i*(N+1)*(N+1) + j] << " : ";
       }
       cout << "\n";
   }*/
-
+  int j;
+  #pragma omp parallel for private(j)
   for (int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
      elements[i][j]->setVanderMandMatrix(vanderMand);
      elements[i][j]->setInverseVanderMandMatrix(inverseVanderMand);
     }
@@ -243,8 +250,10 @@ DG_Field_2d::~DG_Field_2d() {
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setSystem(string S) {
     system = S;
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-    for (int j = 0; j < ne_y; j++) {
+    for (j = 0; j < ne_y; j++) {
       elements[i][j]->setSystem(S);
     }
 
@@ -508,19 +517,23 @@ void DG_Field_2d::setBoundaryNeighbours() {
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::updateBoundaryVariables(int v) {
         // Setting the boundary for the top elements.
+        #pragma omp parallel for 
         for(int i = 0; i < ne_x; i++)
             elements[i][ne_y-1]->updateBoundaryVariables(v);
 
 
         // Setting the boundary for the bottom elements.
+        #pragma omp parallel for 
         for(int i = 0; i < ne_x; i++)
             elements[i][0]->updateBoundaryVariables(v);
 
         // Setting the boundary for the right elements.
+        #pragma omp parallel for 
         for(int j=0; j < (ne_y); j++)
             elements[ne_x-1][j]->updateBoundaryVariables(v);
 
-        // Setting the boundary for the left elements..
+        // Setting the boundary for the left elements.
+        #pragma omp parallel for 
         for(int j=0; j < ne_y; j++)
             elements[0][j]->updateBoundaryVariables(v);
 
@@ -539,12 +552,12 @@ void DG_Field_2d::updateBoundaryVariables(int v) {
 /*void DG_Field_2d::addVariable_onlyBounary(int v) {
     
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
            elements[i][j]->addVariable_onlyBoundary(v); // Adding the variable for the (i, j) th element.
        }
    }
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
            elements[i][j]->setVariableNeighbors(v); // This is essential so that the addresses of the neighbors are stored in each and every element.
        }
    }
@@ -635,10 +648,10 @@ int DG_Field_2d::addVariable_CellCentered() {
 
 
 void DG_Field_2d::initializeVariable(int v, function<double(double, double)> f) {
-    
-
+   int j; 
+   #pragma omp parallel for private(j)
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
             elements[i][j]->initializeVariable(v, f); // Initializing the corresponding element by passing the same parameters to it.
        }
    }
@@ -655,8 +668,10 @@ void DG_Field_2d::initializeVariable(int v, function<double(double, double)> f) 
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::ResetVariables_CellCentered(int v, double value) {
+   int j;
+   #pragma omp parallel for private(j) 
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
             cellcenterVariable[v][i*ne_y + j] = value;
        }
    }
@@ -671,8 +686,10 @@ void DG_Field_2d::ResetVariables_CellCentered(int v, double value) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::ResetMap_OutFlow() {
+   int j;
+   #pragma omp parallel for private(j) 
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
             elements[i][j]->ResetMap_OutFlow();
        }
    }
@@ -689,8 +706,10 @@ void DG_Field_2d::ResetMap_OutFlow() {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::updateOutFlowBoundary(int u, int v) {
+   int j;
+   #pragma omp parallel for private(j)
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
             elements[i][j]->updateOutFlowBoundary(u, v);
        }
    }
@@ -707,8 +726,10 @@ void DG_Field_2d::updateOutFlowBoundary(int u, int v) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::updateCellMarker(int v, int m) {
+   int j;
+   #pragma omp parallel for private(j) 
    for (int i=0; i < ne_x; i++ ){
-       for (int j=0; j<ne_y; j++) {
+       for (j=0; j<ne_y; j++) {
             cellcenterVariable[m][i*ne_y + j] = elements[i][j]->updateCellMarker(v);
        }
    }
@@ -727,8 +748,10 @@ void DG_Field_2d::updateCellMarker(int v, int m) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::computeMoments(int v, int m, int cm) {
+  int j;
+  #pragma omp parallel for private(j)    
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
              elements[i][j]->computeMoments(v, m);
         }
@@ -748,8 +771,10 @@ void DG_Field_2d::computeMoments(int v, int m, int cm) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::limitMoments(int m, int modifiedm, int cm, unsigned Index) {
+  int j;
+  #pragma omp parallel for private(j)   
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
             elements[i][j]->limitMoments(m, modifiedm, Index);
         }
@@ -768,8 +793,10 @@ void DG_Field_2d::limitMoments(int m, int modifiedm, int cm, unsigned Index) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j] ) {
             elements[i][j]->convertMomentToVariable(m, v);
         }
@@ -788,8 +815,10 @@ void DG_Field_2d::convertMomentToVariable(int m, int v, int cm) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::computeMoments(int *v, int *m, int cm, unsigned size) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
              elements[i][j]->computeMoments(v, m, size);
         }
@@ -809,8 +838,10 @@ void DG_Field_2d::computeMoments(int *v, int *m, int cm, unsigned size) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::limitMoments(int *m, int *modifiedm, int cm, unsigned Index, unsigned size) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j]) {
             elements[i][j]->limitMoments(m, modifiedm, Index, size);
         }
@@ -829,8 +860,10 @@ void DG_Field_2d::limitMoments(int *m, int *modifiedm, int cm, unsigned Index, u
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::convertMomentToVariable(int *m, int *v, int cm, unsigned size) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         if ( cellcenterVariable[cm][i*ne_y + j] && PositivityMarker[i*ne_y + j] ) {
             elements[i][j]->convertMomentToVariable(m, v, size);
         }
@@ -850,8 +883,10 @@ void DG_Field_2d::convertMomentToVariable(int *m, int *v, int cm, unsigned size)
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::limitMoments(int *V, int *C, int cm, unsigned Index) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j)  {
+    for(j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
       elements[i][j]->limitMoments(V, C, Index);
       }
@@ -892,10 +927,11 @@ void DG_Field_2d::setEigenMatrices(unsigned _dimension) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::findEigenMatrices(int *V, int cm) {
-  
+  int j;
   if ( system == "EULER") {
+      #pragma omp parallel for private(j)
       for (int i=0; i < ne_x; ++i)
-      for(int j=0; j < ne_y; ++j)  {
+      for(j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
             elements[i][j]->findEigenMatricesEuler( V);
         }
@@ -903,8 +939,9 @@ void DG_Field_2d::findEigenMatrices(int *V, int cm) {
 
   }
   else if ( system == "MHD") {
+      #pragma omp parallel for private(j)
       for (int i=0; i < ne_x; ++i)
-      for(int j=0; j < ne_y; ++j)  {
+      for(j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
             elements[i][j]->findEigenMatricesMHD(V);
         }
@@ -927,8 +964,10 @@ void DG_Field_2d::findEigenMatrices(int *V, int cm) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::convertVariabletoCharacteristic(int *V, int *C, unsigned I, int cm) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j)  {
+    for(j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
               elements[i][j]->convertVariabletoCharacteristic(V, C, I);
         }
@@ -948,8 +987,10 @@ void DG_Field_2d::convertVariabletoCharacteristic(int *V, int *C, unsigned I, in
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::convertCharacteristictoVariable(int *C, int *V, unsigned I, int cm) {
+  int j;
+  #pragma omp parallel for private(j)  
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j)  {
+    for(j=0; j < ne_y; ++j)  {
         if ( cellcenterVariable[cm][i*ne_y + j] ) {
              elements[i][j]->convertCharacteristictoVariable(C, V, I);
         }
@@ -1054,8 +1095,10 @@ void DG_Field_2d::writeVTK(string fileName){
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++ )
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->delByDelX(v, vDash, conserVar, fluxType, fluxVariable);
 
     return ;
@@ -1072,8 +1115,10 @@ void DG_Field_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, in
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++ )
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->delByDelY(v, vDash, conserVar, fluxType, fluxVariable);
 
     return ;
@@ -1090,8 +1135,10 @@ void DG_Field_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, in
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxType, int *fluxVariable, unsigned size) {
+    int j; 
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++ )
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->delByDelX(V, VDash, ConserVar, fluxType, fluxVariable, size);
 
     return ;
@@ -1108,8 +1155,10 @@ void DG_Field_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxType,
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxType, int *fluxVariable, unsigned size) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++ )
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->delByDelY(V, VDash, ConserVar, fluxType, fluxVariable, size);
 
     return ;
@@ -1126,8 +1175,10 @@ void DG_Field_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxType,
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::delByDelX(int v, int vDash, string fluxType) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++ )
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->delByDelX(v, vDash, fluxType);
 
     return ;
@@ -1143,8 +1194,10 @@ void DG_Field_2d::delByDelX(int v, int vDash, string fluxType) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::delByDelY(int v, int vDash, string fluxType) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++ )
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->delByDelY(v, vDash, fluxType);
 
     return ;
@@ -1161,8 +1214,10 @@ void DG_Field_2d::delByDelY(int v, int vDash, string fluxType) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::updateDivergenceB(int Bx, int By, int DeldotB) {
+  int j;
+  #pragma omp parallel for private(j)
   for(int i=0; i < ne_x; ++i)
-    for(int j=0; j < ne_y; ++j) {
+    for(j=0; j < ne_y; ++j) {
         {
              elements[i][j]->updateDivergenceB(Bx, By, DeldotB);
         }
@@ -1181,9 +1236,10 @@ void DG_Field_2d::updateDivergenceB(int Bx, int By, int DeldotB) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::axpy(double a, int x, int y) {
-
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->axpy(a, x, y);
     
     return ;
@@ -1199,16 +1255,19 @@ void DG_Field_2d::axpy(double a, int x, int y) {
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::scal(double a, int x) {
     /*for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++) 
+        for(j = 0; j < ne_y; j++) 
             elements[i][j]->scal(a, x);*/
     double *domVar = domainVariable[x];
+    int j;
     if (!a) {
+        #pragma omp parallel for 
         for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i){
             domVar[i] = 0;
         }
         return ;
     }
     
+    #pragma omp parallel for 
     for(int i=0 ; i< (N+1)*(N+1)*ne_x*ne_y ; ++i) {
         domVar[i] = a * domVar[i];
     }
@@ -1226,10 +1285,11 @@ void DG_Field_2d::scal(double a, int x) {
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setConstant(double a, int v) {
     /*for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++) 
+        for(j = 0; j < ne_y; j++) 
             elements[i][j]->scal(a, x);*/
     double *domVar = domainVariable[v];
     
+    #pragma omp parallel for 
     for(int i=0 ; i< (N+1)*(N+1)*ne_x*ne_y ; ++i) {
         domVar[i] = a;
     }
@@ -1390,8 +1450,10 @@ void DG_Field_2d::setFunctionsforDomainVariablesfromCellCenterVariables(double a
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int x, double b, int y, function<void(double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForBoundaryVariables(a, x, b, y, f, z);
     return;
 }
@@ -1411,8 +1473,10 @@ void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int x, double b, in
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::setFunctionsForBoundaryVariables(double a, int w, double b, int x, double c, int y, function<void(double, double*, double, double*, double, double*, unsigned, unsigned, double*)> f, int z) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             elements[i][j]->setFunctionsForBoundaryVariables(a, w, b, x, c, y, f, z);
     return ;
 }
@@ -1458,8 +1522,10 @@ void DG_Field_2d::setFunctionsForCellCenterVariablesfromDomainVariables(double a
 double DG_Field_2d::l2Norm(int v1, int v2) {
     double norm = 0.0;
     double elementNorm;
+    int j;
+    #pragma omp parallel for private(j, elementNorm) reduction(+:norm)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++){
+        for(j = 0; j < ne_y; j++){
             elementNorm = elements[i][j]->l2Norm(v1, v2);
             norm += (elementNorm*elementNorm);
         }
@@ -1482,8 +1548,10 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
      //if( level == "One")
       {
          double *domVar = domainVariable[v]; 
+         int j;
+         #pragma omp parallel for private(j,a,k)
          for(int i=0; i <ne_x; ++i) {
-             for(int j=0; j<ne_y; ++j) {
+             for(j=0; j<ne_y; ++j) {
                  a = (N+1)*(N+1)*(i*ne_y + j);
                  k = 0;
                  while( (k < (N+1)*(N+1)) && !PositivityMarker[i*ne_y + j] ) {
@@ -1494,7 +1562,7 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
          }
      }
      /*for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
            // if ( cellcenterVariable[cm][i*ne_y + j]) 
             { 
                 if ( level == "One" )
@@ -1517,8 +1585,10 @@ void DG_Field_2d::checkPositivity(int v, int cm, string level) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::resetPositivity( bool v) {
+    int j;
+    #pragma omp parallel for private(j)
      for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             PositivityMarker[i*ne_y + j] = v;
 
     return;
@@ -1557,8 +1627,10 @@ void DG_Field_2d::addConservativeVariables(vector<int> V) {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::updateBoundary(double time) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-    for (int j = 0; j < ne_y; j++) {
+    for (j = 0; j < ne_y; j++) {
       elements[i][j]->updateBoundary(time);
     }
 
@@ -1575,6 +1647,7 @@ void DG_Field_2d::updateBoundary(double time) {
 double DG_Field_2d::FindMax(int v) {
     double *domVar = domainVariable[v];
     double Max = domVar[0]; 
+    #pragma omp parallel for reduction(max:Max)
     for(int i=0; i< (N+1)*(N+1)*ne_x*ne_y; ++i) {
         Max  = max(Max, domVar[i]);
     }
@@ -1591,6 +1664,7 @@ double DG_Field_2d::FindMax(int v) {
 double DG_Field_2d::FindMaxCellCentered(int v) {
     double *CCVar = cellcenterVariable[v];
     double Max = CCVar[0]; 
+    #pragma omp parallel for reduction(max:Max)
     for(int i=0; i< ne_x*ne_y; ++i) {
         Max  = max(Max, CCVar[i]);
     }
@@ -1604,8 +1678,10 @@ double DG_Field_2d::FindMaxCellCentered(int v) {
 /* ----------------------------------------------------------------------------*/
 double DG_Field_2d::FindMindx() {
     double Min = min(elements[0][0]->dxMin, elements[0][0]->dyMin) ; 
+    int j;
+    #pragma omp parallel for private(j) reduction(min:Min)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             Min = min(min(elements[i][j]->dxMin, elements[i][j]->dyMin), Min);
     return Min;
 }
@@ -1618,8 +1694,10 @@ double DG_Field_2d::FindMindx() {
  */
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::FindMindx(int dx) {
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             cellcenterVariable[dx][i*ne_y + j] = min(elements[i][j]->dxMin, elements[i][j]->dyMin);
 
     return ;
@@ -1635,8 +1713,10 @@ void DG_Field_2d::FindMindx(int dx) {
 double DG_Field_2d::FindMindt(int dt) {
     double *CCVar = cellcenterVariable[dt];
     double Mini = CCVar[0];
+    int j;
+    #pragma omp parallel for private(j) reduction(min:Mini)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             Mini = min(CCVar[i*ne_y + j] , Mini);
 
     return Mini;
@@ -1654,8 +1734,10 @@ double DG_Field_2d::FindMindt(int dt) {
 /* ----------------------------------------------------------------------------*/
 void DG_Field_2d::FindTimestep(int dt, int dx, int U, double CFL) {
     double *CCVar_dt = cellcenterVariable[dt], *CCVar_dx = cellcenterVariable[dx], *CCVarU = cellcenterVariable[U];
+    int j;
+    #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
-        for(int j = 0; j < ne_y; j++)
+        for(j = 0; j < ne_y; j++)
             CCVar_dt[i*ne_y + j] = CFL * (CCVar_dx[i*ne_y + j]/ CCVarU[i*ne_y + j] );
 
     return ;

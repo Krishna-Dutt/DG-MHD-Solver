@@ -120,14 +120,14 @@ double AnalyticalVelocity(double x, double y) {
   }
 }
 
-int main() {
+int main(int argc, char **argv) {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.2;
     double time = 0.8;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(100, 100, 1);
+    a = new IdealMHDSolver(50, 50, 1);
     a->setDomain(-0.4, -0.4, 0.4, 0.4);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
