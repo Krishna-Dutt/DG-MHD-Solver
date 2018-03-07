@@ -563,6 +563,7 @@ void IdealMHDSolver::solve() {
   
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
+  //for(int tt = 0; tt< 100; ++tt){
   while(t <= time) {
     // First Step of RK3
     updateEigenValues();

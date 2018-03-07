@@ -14,7 +14,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   CC := clang++ -arch x86_64
 else
-  CC := g++ -fopenmp #-pg -g
+  CC := g++ #-fopenmp #-pg -g # -fopenmp
 endif
 
 # Folders
@@ -41,9 +41,9 @@ INCLIST := $(patsubst includes/%,-I include/%,$(INCDIRS))
 BUILDLIST := $(patsubst includes/%,$(BUILDDIR)/%,$(INCDIRS))
 
 # Shared Compiler Flags
-CFLAGS := -c -fopenmp #-pg
+CFLAGS := -c #-fopenmp #-pg
 INC := -I include $(INCLIST) -I /usr/local/include
-LIB := -L /usr/local/lib -lblas -llapacke -lgsl -lgslcblas -lm
+LIB := -L /usr/local/lib -lblas -llapacke -lgsl -lgslcblas -lm -lpthread
 
 # Platform Specific Compiler Flags
 ifeq ($(UNAME_S),Linux)
@@ -64,7 +64,7 @@ $(TARGET): $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDLIST)
-	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	@echo "Compiling $<..."; $(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 clean:
 	@echo "Cleaning $(TARGET)..."; $(RM) -r $(BUILDDIR) $(TARGET)
