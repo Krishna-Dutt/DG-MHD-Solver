@@ -430,6 +430,7 @@ void IdealMHDSolver::setEigenValues() {
 
 void IdealMHDSolver::updateEigenValues() {
  // cout << " Calling updateEigenValues " << endl;
+  field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
   field->setFunctionsForVariables(1.0, Bx, 1.0, By, 1.0, Bz, 1.0, Bx, 1.0, By, 1.0, Bz, AdotB3d, BdotB);
   field->setFunctionsForVariables(1.0, Bx, 1.0, By, 0.0, Bz, 1.0, Bx, 1.0, By, 0.0, Bz, AdotB3d, BdotB_minus_BzBz);
   field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, Bx, 1.0, BdotB, MHDMaxEigenValue, Cx);
@@ -825,8 +826,8 @@ void IdealMHDSolver::RunLimiter() {
 
     // Finding gradient of  Density //Pressure
     //updatePrimitiveVariables();
-    //field->setFunctionsForVariables(1.0, P, 1.0, D, ThermoEntropy, Entropy);
-    field->setFunctionsForVariables(1.0, D, 1.0, P, 1.0, BdotB, EntropyVar, Entropy );
+    field->setFunctionsForVariables(1.0, Pt, 1.0, DAnalytical, ThermoEntropy, Entropy);
+    //field->setFunctionsForVariables(1.0, DAnalytical, 1.0, P, 1.0, BdotB, EntropyVar, Entropy );
     field->delByDelX(Entropy, dPdx, "central");
     field->delByDelY(Entropy, dPdy, "central");
     //field->scal(-1.0, dPdy);
