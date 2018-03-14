@@ -9,35 +9,17 @@
 
 using namespace std;
 
-
 double U(double x, double y) {
-  if ( x >= 0.0 && y >= 0.0) {
-    return 0.75;
-  }
-  else if ( x >= 0.0 && y < 0.0) {
-    return -0.75;
-  }
-  else if ( x < 0.0 && y >= 0.0) {
-    return 0.75;
+  if( x >= 0.6) {
+    return -11.2536;
   }
   else {
-    return -0.75;
+    return 0.0;
   }
 }
 
 double V(double x, double y) {
-  if ( x >= 0.0 && y >= 0.0) {
-    return -0.5;
-  }
-  else if ( x >= 0.0 && y < 0.0) {
-    return -0.5;
-  }
-  else if ( x < 0.0 && y >= 0.0) {
-    return 0.5;
-  }
-  else {
-    return 0.5;
-  }
+  return 0.0;
 }
 
 double W(double x, double y) {
@@ -45,15 +27,25 @@ double W(double x, double y) {
 }
 
 double BX(double x, double y) {
-  return 2.0/sqrt(8.0*M_PI);
-}
-
-double BY(double x, double y) {
   return 0.0;
 }
 
+double BY(double x, double y) {
+  if( x >= 0.6) {
+    return 0.56418958;
+  }
+  else {
+    return  2.1826182;
+  }
+}
+
 double BZ(double x, double y) {
-  return 1.0/sqrt(8.0*M_PI) ;
+  if( x >= 0.6) {
+    return 0.56418958;
+  }
+  else {
+    return -2.1826182;
+  }
 }
 
 double SI(double x, double y) {
@@ -61,22 +53,29 @@ double SI(double x, double y) {
 }
 
 double IDensity(double x, double y) {
-  if ( x >= 0.0 && y >= 0.0) {
+  double r0 = 0.15, r = sqrt( pow(x-0.8,2.0) + pow(y-0.5,2.0));
+  double r1 = 0.15;
+  if ( r <= r1) {
+    return 10.0;
+  }
+  else if ( r <= r0) {
+    return 1.0 + 9.0*(r0 - r)/(r0 - r1);
+  }
+  if( x > 0.6) {
     return 1.0;
-  }
-  else if ( x >= 0.0 && y < 0.0) {
-    return 3.0;
-  }
-  else if ( x < 0.0 && y >= 0.0) {
-    return 2.0;
   }
   else {
-    return 1.0;
+    return 3.86859;
   }
 }
 
 double IPressure(double x, double y) {
-  return 1.0; 
+   if( x >= 0.6) {
+    return 1.0;
+  }
+  else {
+    return  167.345;
+  }
 }
 
 double StateEq(double D, double T) {
@@ -126,12 +125,12 @@ int main(int argc, char **argv) {
     if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 10;
-    double CFL = 0.2;
-    double time = 0.8;
+    int time_steps = 1;
+    double CFL = 0.1;
+    double time = 0.06;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(200, 200, 2);
-    a->setDomain(-0.4, -0.4, 0.4, 0.4);
+    a = new IdealMHDSolver(200, 200, 1);
+    a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
