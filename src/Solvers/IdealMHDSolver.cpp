@@ -664,10 +664,11 @@ void IdealMHDSolver::Run_KXRCF() {
  
   field->ResetVariables_CellCentered(CellMarker, 1.5);
   field->ResetMap_OutFlow();
-
-  //field->updateOutFlowBoundary(Vx, Vy);
-  //field->updateCellMarker(D, CellMarker);
-  //field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
+  field->setFunctionsForVariables(1.0, Pt, 1.0, DAnalytical, ThermoEntropy, Entropy);
+  //field->setFunctionsForVariables(1.0, D, 1.0, BdotB, Addab, Entropy);  
+  field->updateOutFlowBoundary(Vx, Vy);
+  field->updateCellMarker(Entropy, CellMarker);
+  field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
   
   return ;
 }
@@ -826,10 +827,12 @@ void IdealMHDSolver::RunLimiter() {
 
     // Finding gradient of  Density //Pressure
     //updatePrimitiveVariables();
-    field->setFunctionsForVariables(1.0, Pt, 1.0, DAnalytical, ThermoEntropy, Entropy);
+    //field->setFunctionsForVariables(1.0, Pt, 1.0, DAnalytical, ThermoEntropy, Entropy);
     //field->setFunctionsForVariables(1.0, DAnalytical, 1.0, P, 1.0, BdotB, EntropyVar, Entropy );
-    field->delByDelX(Entropy, dPdx, "central");
-    field->delByDelY(Entropy, dPdy, "central");
+    //field->setFunctionsForVariables(1.0, D, 1.0, BdotB, Addab, Entropy);  
+  
+    field->delByDelX(BdotB, dPdx, "central");
+    field->delByDelY(BdotB, dPdy, "central");
     //field->scal(-1.0, dPdy);
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
