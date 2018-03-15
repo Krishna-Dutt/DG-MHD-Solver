@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
     double CFL = 0.1;
     double time = 0.06;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(200, 200, 2);
+    a = new IdealMHDSolver(200, 200, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockCloudInteraction_N2.vtk");
+    a->plot("ShockCloudInteraction_N1_LDAlphaN.vtk");
     
 
     delete a;
