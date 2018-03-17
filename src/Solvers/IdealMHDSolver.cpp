@@ -667,7 +667,7 @@ void IdealMHDSolver::Run_KXRCF() {
   //field->setFunctionsForVariables(1.0, Pt, 1.0, DAnalytical, ThermoEntropy, Entropy);
   //field->setFunctionsForVariables(1.0, D, 1.0, BdotB, Addab, Entropy);  
   field->updateOutFlowBoundary(Vx, Vy);
-  field->updateCellMarker(Pt, CellMarker);
+  field->updateCellMarker(P, CellMarker);
   field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
   
   return ;
