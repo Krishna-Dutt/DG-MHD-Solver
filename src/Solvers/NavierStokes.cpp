@@ -37,7 +37,7 @@ void NSSolver::setPrimitiveVariables(){
   return ;
 }
 
-/*void NSSolver::setGradientPrimitiveVariables(){
+void NSSolver::setGradientPrimitiveVariables(){
   field->addVariable_withoutBounary("dqdx");
   field->addVariable_withoutBounary("dudx");
   field->addVariable_withoutBounary("dvdx");
@@ -51,7 +51,7 @@ void NSSolver::setPrimitiveVariables(){
   field->addVariable_withoutBounary("dTdy");
 
   return ;
-}*/
+}
 
 
 void NSSolver::setConservativeVariables(){
