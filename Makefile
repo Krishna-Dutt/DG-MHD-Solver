@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := IdealMHD
+EXECUTABLE := NavierStokes
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths
