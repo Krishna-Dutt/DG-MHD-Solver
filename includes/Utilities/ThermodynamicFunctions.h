@@ -17,4 +17,6 @@ void Pressure(double a, double* rho, double b, double* ie, unsigned index, unsig
 void ThermoEntropy(double a, double* Pr, double b, double* rho, unsigned index, unsigned size, double* en);
 void EntropyVar(double a, double* rho, double b, double* Pr, double c, double* BdotB, unsigned index, unsigned size, double* en);
 
+void ViscousStress(double a,  double* x, double b, double* y, unsigned index, unsigned size, double* z);
+void EnergyViscous(double a, double* u, double b, double* uTau, double c, double* v, double d, double* vTau, unsigned index, unsigned size, double* Evisc);
 #endif

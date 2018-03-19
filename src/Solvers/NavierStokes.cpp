@@ -1,4 +1,4 @@
-#include "../../includes/Solvers/NSSolver.h"
+#include "../../includes/Solvers/NavierStokesSolver.h"
 #include "../../includes/Utilities/HeaderFiles.h"
 #include "../../includes/Utilities/MaterialProperties.h"
 #include "../../includes/Utilities/MathOperators.h"
@@ -38,17 +38,17 @@ void NSSolver::setPrimitiveVariables(){
 }
 
 void NSSolver::setGradientPrimitiveVariables(){
-  field->addVariable_withoutBounary("dqdx");
-  field->addVariable_withoutBounary("dudx");
-  field->addVariable_withoutBounary("dvdx");
-  field->addVariable_withoutBounary("dPdx");
-  field->addVariable_withoutBounary("dTdx");
+  dDdx = field->addVariable_withBounary("dqdx");
+  dVxdx = field->addVariable_withBounary("dudx");
+  dVydx = field->addVariable_withBounary("dvdx");
+  dPdx = field->addVariable_withBounary("dPdx");
+  //field->addVariable_withoutBounary("dTdx");
 
-  field->addVariable_withoutBounary("dqdy");
-  field->addVariable_withoutBounary("dudy");
-  field->addVariable_withoutBounary("dvdy");
-  field->addVariable_withoutBounary("dPdy");
-  field->addVariable_withoutBounary("dTdy");
+  dDdy = field->addVariable_withBounary("dqdy");
+  dVxdy = field->addVariable_withBounary("dudy");
+  dVydy = field->addVariable_withBounary("dvdy");
+  dPdy = field->addVariable_withBounary("dPdy");
+  //field->addVariable_withoutBounary("dTdy");
 
   return ;
 }
@@ -220,7 +220,7 @@ void NSSolver::setInviscidFlux() {
   DE_plus_P_Vx = field->addVariable_withBounary("qE_plus_P_u");
   DE_plus_P_Vy = field->addVariable_withBounary("qE_plus_P_v");
 
-  updateInviscidFlux();
+  //updateInviscidFlux();
   return ;
 }
 
@@ -234,39 +234,42 @@ void NSSolver::updateInviscidFlux() {
   return ;
 }
 
-/*void NSSolver::setViscousFlux() {
-  field->addVariable_withBounary("Tauxx");
-  field->addVariable_withBounary("Tauxy");
-  field->addVariable_withBounary("Tauyy");
-  field->addVariable_withBounary("Eviscousx");
-  field->addVariable_withBounary("Eviscousy");
+void NSSolver::setViscousFlux() {
+  TauXX = field->addVariable_withBounary("Tauxx");
+  TauXY = field->addVariable_withBounary("Tauxy");
+  TauYY = field->addVariable_withBounary("Tauyy");
+  EViscX = field->addVariable_withBounary("Eviscousx");
+  EViscY = field->addVariable_withBounary("Eviscousy");
 
-  updateInviscidFlux();
+  //updateInviscidFlux();
   return ;
-}*/
+}
 
-/*void NSSolver::updateViscousFlux() {
-  field->setFunctionsForVariables("meu", "dudx", "dvdy", NormalViscousStress, "Tauxx");
-  field->setFunctionsForVariables("meu", "dvdy", "dudx", NormalViscousStress, "Tauyy");
-  field->setFunctionsForVariables("meu", "dudy", "dvdx", TangentialViscousStress, "Tauxy");
-  field->setFunctionsForVariables(Vx, "Tauxx", Vy, "Tauxy", EnergyViscous, "Eviscousx");
-  field->setFunctionsForVariables(Vx, "Tauxy", Vy, "Tauyy", EnergyViscous, "Eviscousy");
+void NSSolver::updateViscousFlux() {
+  field->setFunctionsForVariables((4.0/3.0), dVxdx, (-2.0/3.0), dVydy, ViscousStress, TauXX);
+  field->setFunctionsForVariables((4.0/3.0), dVydy, (-2.0/3.0), dVxdx, ViscousStress, TauYY);
+  field->setFunctionsForVariables(1.0, dVxdy, 1.0, dVydx, ViscousStress, TauXY);
+  field->setFunctionsForVariables(1.0, Vx, 1.0, TauXX, 1.0, Vy, 1.0, TauXY, EnergyViscous, EViscX);
+  field->setFunctionsForVariables(1.0, Vx, 1.0, TauXY, 1.0, Vy, 1.0, TauYY, EnergyViscous, EViscY);
+  
   return ;
-}*/
+}
 
-/*void NSSolver::updatePrimitiveGradient() {
-  field->delByDelX(D, "dqdx", "central");
-  field->delByDelX(Vx, "dudx", "central");
-  field->delByDelX(Vy, "dvdx", "central");
-  field->delByDelX(P, "dPdx", "central");
-  field->delByDelX(T, "dTdx", "central");
+void NSSolver::updatePrimitiveGradient() {
+  field->delByDelX(D, dDdx, "central");
+  field->delByDelX(Vx, dVxdx, "central");
+  field->delByDelX(Vy, dVydx, "central");
+  field->delByDelX(P, dPdx, "central");
+  //field->delByDelX(T, "dTdx", "central");
 
-  field->delByDelY(D, "dqdy", "central");
-  field->delByDelY(Vx, "dudy", "central");
-  field->delByDelY(Vy, "dvdy", "central");
-  field->delByDelY(P, "dPdy", "central");
-  field->delByDelY(T, "dTdy", "central");
-}*/
+  field->delByDelY(D, dDdy, "central");
+  field->delByDelY(Vx, dVxdy, "central");
+  field->delByDelY(Vy, dVydy, "central");
+  field->delByDelY(P, dPdy, "central");
+  //field->delByDelY(T, "dTdy", "central");
+
+  return ;
+}
 
 void NSSolver::setAuxillaryVariables() {
  // cout << " Calling setAuxillaryVariables " << endl;
@@ -580,8 +583,8 @@ void NSSolver::SetLimiterVariables() {
     field->scal(0.0, Char3);
     field->scal(0.0, Char4);
 
-    dPdx = field->addVariable_withBounary("dPdx");
-    dPdy = field->addVariable_withBounary("dPdy");
+    //dPdx = field->addVariable_withBounary("dPdx");
+    //dPdy = field->addVariable_withBounary("dPdy");
     dPdxMoment = field->addVariable_withoutBounary();
     dPdyMoment = field->addVariable_withoutBounary();
     field->scal(0.0, dPdxMoment);
