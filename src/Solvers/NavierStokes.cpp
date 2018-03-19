@@ -321,13 +321,15 @@ void NSSolver::updateEigenValues() {
 }
 
 void NSSolver::RK_Step1() {
-  int FluxX[] = {DVx, DVxVx_plus_P, DVxVy, DE_plus_P_Vx};
-  int FluxY[] = {DVy, DVxVy, DVyVy_plus_P, DE_plus_P_Vy};
+
+  // Inviscid Flux
+  int FluxX[] = { DVxVx_plus_P, DVxVy, DE_plus_P_Vx, DVx};
+  int FluxY[] = { DVxVy, DVyVy_plus_P, DE_plus_P_Vy, DVy};
   int FluxVarx[] = {Vx_plus_C};
   int FluxVary[] = {Vy_plus_C};
-  int Var[] = {D, DVx, DVy, DE};
-  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDE};
-  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDE};
+  int Var[] = { DVx, DVy, DE, D};
+  int DbyDx[] = { dbydxDVx, dbydxDVy, dbydxDE, dbydxD};
+  int DbyDy[] = { dbydyDVx, dbydyDVy, dbydyDE, dbydyD};
 
   field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 4);
   field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 4);
@@ -336,6 +338,19 @@ void NSSolver::RK_Step1() {
   field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K1DVx);
   field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K1DVy);
   field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K1DE);
+
+  // Viscous Flux
+  int VFluxX[] = { TauXX, TauXY, EViscX};
+  int VFluxY[] = { TauXY, TauYY, EViscY};
+
+  field->delByDelX(VFluxX, DbyDx, Var, "central", FluxVarx, 3);
+  field->delByDelY(VFluxY, DbyDy, Var, "central", FluxVary, 3);
+
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, 1.0, K1DVx, Addabc, K1DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, 1.0, K1DVy, Addabc, K1DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, 1.0, K1DE, Addabc, K1DE);
+
+
   
   field->setFunctionsForVariables(0.5*dt, K1D, 1.0, D, Addab, D);
   field->setFunctionsForVariables(0.5*dt, K1DVx, 1.0, DVx, Addab, DVx);
@@ -346,13 +361,14 @@ void NSSolver::RK_Step1() {
 }
 
 void NSSolver::RK_Step2() {
-  int FluxX[] = {DVx, DVxVx_plus_P, DVxVy, DE_plus_P_Vx};
-  int FluxY[] = {DVy, DVxVy, DVyVy_plus_P, DE_plus_P_Vy};
+  // Inviscid Flux
+  int FluxX[] = { DVxVx_plus_P, DVxVy, DE_plus_P_Vx, DVx};
+  int FluxY[] = { DVxVy, DVyVy_plus_P, DE_plus_P_Vy, DVy};
   int FluxVarx[] = {Vx_plus_C};
   int FluxVary[] = {Vy_plus_C};
-  int Var[] = {D, DVx, DVy, DE};
-  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDE};
-  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDE};
+  int Var[] = { DVx, DVy, DE, D};
+  int DbyDx[] = { dbydxDVx, dbydxDVy, dbydxDE, dbydxD};
+  int DbyDy[] = { dbydyDVx, dbydyDVy, dbydyDE, dbydyD};
 
   field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 4);
   field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 4);
@@ -361,6 +377,18 @@ void NSSolver::RK_Step2() {
   field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K2DVx);
   field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K2DVy);
   field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K2DE);
+
+  // Viscous Flux
+  int VFluxX[] = { TauXX, TauXY, EViscX};
+  int VFluxY[] = { TauXY, TauYY, EViscY};
+
+  field->delByDelX(VFluxX, DbyDx, Var, "central", FluxVarx, 3);
+  field->delByDelY(VFluxY, DbyDy, Var, "central", FluxVary, 3);
+
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, 1.0, K2DVx, Addabc, K2DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, 1.0, K2DVy, Addabc, K2DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, 1.0, K2DE, Addabc, K2DE);
+
   
   field->setFunctionsForVariables(-1.5*dt, K1D, 2.0*dt, K2D, 1.0, D, Addabc, D);
   field->setFunctionsForVariables(-1.5*dt, K1DVx, 2.0*dt, K2DVx, 1.0, DVx, Addabc, DVx);
@@ -371,13 +399,14 @@ void NSSolver::RK_Step2() {
 }
 
 void NSSolver::RK_Step3() {
-  int FluxX[] = {DVx, DVxVx_plus_P, DVxVy, DE_plus_P_Vx};
-  int FluxY[] = {DVy, DVxVy, DVyVy_plus_P, DE_plus_P_Vy};
+  // Inviscid Flux
+  int FluxX[] = { DVxVx_plus_P, DVxVy, DE_plus_P_Vx, DVx};
+  int FluxY[] = { DVxVy, DVyVy_plus_P, DE_plus_P_Vy, DVy};
   int FluxVarx[] = {Vx_plus_C};
   int FluxVary[] = {Vy_plus_C};
-  int Var[] = {D, DVx, DVy, DE};
-  int DbyDx[] = {dbydxD, dbydxDVx, dbydxDVy, dbydxDE};
-  int DbyDy[] = {dbydyD, dbydyDVx, dbydyDVy, dbydyDE};
+  int Var[] = { DVx, DVy, DE, D};
+  int DbyDx[] = { dbydxDVx, dbydxDVy, dbydxDE, dbydxD};
+  int DbyDy[] = { dbydyDVx, dbydyDVy, dbydyDE, dbydyD};
 
   field->delByDelX(FluxX, DbyDx, Var, "rusanov", FluxVarx, 4);
   field->delByDelY(FluxY, DbyDy, Var, "rusanov", FluxVary, 4);
@@ -386,7 +415,18 @@ void NSSolver::RK_Step3() {
   field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, Addab, K3DVx);
   field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, Addab, K3DVy);
   field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, Addab, K3DE);
-  
+
+  // Viscous Flux
+  int VFluxX[] = { TauXX, TauXY, EViscX};
+  int VFluxY[] = { TauXY, TauYY, EViscY};
+
+  field->delByDelX(VFluxX, DbyDx, Var, "central", FluxVarx, 3);
+  field->delByDelY(VFluxY, DbyDy, Var, "central", FluxVary, 3);
+
+  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, 1.0, K3DVx, Addabc, K3DVx);
+  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, 1.0, K3DVy, Addabc, K3DVy);
+  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, 1.0, K3DE, Addabc, K3DE);
+
   
   field->setFunctionsForVariables((7.0/6.0)*dt, K1D, -(4.0/3.0)*dt, K2D, (1.0/6.0)*dt, K3D, 1.0, D, Addabcd, D);
   field->setFunctionsForVariables((7.0/6.0)*dt, K1DVx, -(4.0/3.0)*dt, K2DVx, (1.0/6.0)*dt, K3DVx, 1.0, DVx, Addabcd, DVx);
@@ -415,8 +455,10 @@ void NSSolver::solve() {
   // For loop to march in time !!
   while(t <= time) {
     // First Step of RK3
-    
+
     updateInviscidFlux();
+    updatePrimitiveGradient(); 
+    updateViscousFlux();
     updateEigenValues();
 
     if ( count%no_of_time_steps == 0) {
@@ -437,6 +479,8 @@ void NSSolver::solve() {
     
     // Second Step of RK3
     updateInviscidFlux();
+    updatePrimitiveGradient(); 
+    updateViscousFlux();
     updateEigenValues();
     
     RK_Step2();
@@ -450,6 +494,8 @@ void NSSolver::solve() {
 
    // Third (Final) Step of RK3
     updateInviscidFlux();
+    updatePrimitiveGradient(); 
+    updateViscousFlux();
     updateEigenValues();
 
     RK_Step3();
