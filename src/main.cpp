@@ -11,72 +11,23 @@
 using namespace std;
 
 double U(double x, double y) {
-  if( x >= 0.6) {
-    return -11.2536;
-  }
-  else {
-    return 0.0;
-  }
+  if ( x < 1e-6) return 0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
+  return 0.0;
 }
 
 double V(double x, double y) {
   return 0.0;
 }
 
-double W(double x, double y) {
-  return 0.0;
-}
-
-double BX(double x, double y) {
-  return 0.0;
-}
-
-double BY(double x, double y) {
-  if( x >= 0.6) {
-    return 0.56418958;
-  }
-  else {
-    return  2.1826182;
-  }
-}
-
-double BZ(double x, double y) {
-  if( x >= 0.6) {
-    return 0.56418958;
-  }
-  else {
-    return -2.1826182;
-  }
-}
-
-double SI(double x, double y) {
-  return 0.0 ;
-}
 
 double IDensity(double x, double y) {
-  double r0 = 0.15, r = sqrt( pow(x-0.8,2.0) + pow(y-0.5,2.0));
-  double r1 = 0.15;
-  if ( r <= r1) {
-    return 10.0;
-  }
-  else if ( r <= r0) {
-    return 1.0 + 9.0*(r0 - r)/(r0 - r1);
-  }
-  if( x > 0.6) {
-    return 1.0;
-  }
-  else {
-    return 3.86859;
-  }
+  return 1.0;
 }
 
 double IPressure(double x, double y) {
-   if( x >= 0.6) {
-    return 1.0;
-  }
-  else {
-    return  167.345;
-  }
+  if( x < 0.999) return 7.142857142857143e+01;
+  return 69.70057142;
+  //return 7.142857142857143e+01 + x * (69.70057142 - 7.142857142857143e+01 );
 }
 
 double StateEq(double D, double T) {
@@ -84,7 +35,7 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  return 3.0/(5.0*R);
+  return 1.0/(R*1.4) ;
 }
 
 
@@ -128,9 +79,9 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 1;
     double CFL = 0.1;
-    double time = 0.004;
-    IdealMHDSolver* a;
-    a = new IdealMHDSolver(10, 10, 1);
+    double time = 0.01;
+    NSSolver* a;
+    a = new NSSolver(10, 10, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
@@ -138,17 +89,15 @@ int main(int argc, char **argv) {
     a->setConservativeVariables();
     a->setInviscidFlux();
     a->setEigenValues();
-    a->setSourceTerms();
+    //a->setSourceTerms();
     a->setAuxillaryVariables();
     a->setGradientPrimitiveVariables();
-    //a->setMaterialPropertyVariables();
+    a->setViscousFlux();
 
-    a->setInitialVelocity(U, V, W);
+    a->setInitialVelocity(U, V);
     a->setInitialDensity(IDensity);
     a->setInitialPressure(IPressure);
     a->setInitialTemperature(ITemperature);
-    a->setInitialMagneticField(BX, BY, BZ);
-    //a->setInitialSi(SI);
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");

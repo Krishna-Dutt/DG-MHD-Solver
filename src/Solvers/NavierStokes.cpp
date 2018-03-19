@@ -308,7 +308,7 @@ void NSSolver::setEigenValues() {
   Vx_plus_C = field->addVariable_withBounary("u_plus_c");
   Vy_plus_C = field->addVariable_withBounary("v_plus_c");// Recheck formulation of eigen value !!
 
-  updateEigenValues();
+  //updateEigenValues();
   return ;
 }
 
