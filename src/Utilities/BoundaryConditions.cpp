@@ -8,7 +8,9 @@ double BoundaryDensity(double x, double y) {
 } 
 
 double BoundaryU(double x, double y){
-     if ( y > 1e-6) return 0.135;
+    // if ( y > 1e-6) return 0.135;
+  //return 0.0;
+  if ( x < 1e-6) return 0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
   return 0.0;
 }
 
@@ -18,7 +20,7 @@ double BoundaryV(double x, double y) {
 
 
 double BoundaryPressure(double x, double y) {
-     if( x < 0.999) return 7.142857142857143e+01;
+     if( x < 1e-6) return 7.142857142857143e+01;
   return 69.70057142;
   //return 7.142857142857143e+01 + x * (69.70057142 - 7.142857142857143e+01 );
 }

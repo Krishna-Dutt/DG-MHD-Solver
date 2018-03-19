@@ -1357,10 +1357,10 @@ void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI
     else if(BoundaryPosition == "inflow") {
         AdjustCornerElement(Ind, B);
         for(int i=Ind[0]; i<=Ind[1]; ++i) {
-            variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
-            variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
-            variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
-            variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            //variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            //variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            //variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
+            //variable[Energy][Index1 + ScaleI*i] = BoundaryEnergy(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
             
             if( BoundaryMachNo(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) < 1.0) {
                 //cout << "Called Inflow BC !!" << endl;

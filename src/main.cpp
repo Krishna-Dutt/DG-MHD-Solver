@@ -80,9 +80,9 @@ int main(int argc, char **argv) {
     double CFL = 0.3;
     double time = 0.01;
     NSSolver* a;
-    a = new NSSolver(80, 30, 1);
-    a->setDomain(0.0, 0.0, 1.0, 0.05);
-    a->setBoundaryCondtions("noslipWall", "outflow", "noslipWall", "inflow");
+    a = new NSSolver(80, 20, 1);
+    a->setDomain(0.0, 0.0, 1.0, 0.025);
+    a->setBoundaryCondtions("noslipWall", "outflow", "slipWall", "inflow");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
