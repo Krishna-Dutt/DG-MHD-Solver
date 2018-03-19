@@ -78,9 +78,9 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 1;
     double CFL = 0.1;
-    double time = 0.001;
+    double time = 0.01;
     NSSolver* a;
-    a = new NSSolver(50, 40, 1);
+    a = new NSSolver(80, 30, 1);
     a->setDomain(0.0, 0.0, 1.0, 0.05);
     a->setBoundaryCondtions("noslipWall", "outflow", "noslipWall", "inflow");
     a->setSolver(CFL, time, time_steps);
@@ -100,8 +100,8 @@ int main(int argc, char **argv) {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
-    a->SetLimiter("CharacteristicLimiter");
+    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
     a->plot("PipeTest.vtk");
