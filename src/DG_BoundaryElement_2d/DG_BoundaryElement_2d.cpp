@@ -1232,8 +1232,8 @@ void DG_BoundaryElement_2d:: EulerSubsonicOutflowBoundary(int Index1, int Index2
 
     Pb =  BoundaryPressure(X[Index1], Y[Index1]);
     rb = r + ( -P + Pb)/(c*c);
-    ub = u*r/rb ;//+ nx*( P - Pb )/(r*c);
-    vb = v*r/rb;// + ny*( P - Pb )/(r*c);
+    ub = u*r/rb + nx*( P - Pb )/(r*c);
+    vb = v*r/rb + ny*( P - Pb )/(r*c);
 
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
@@ -1346,7 +1346,7 @@ void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
         }
     }
-    if ( BoundaryPosition == "noslipWall" ) {
+    else if ( BoundaryPosition == "noslipWall" ) {
         for(int i=0; i<=N; ++i) {
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
             variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
@@ -1480,7 +1480,7 @@ void DG_BoundaryElement_2d::setBoundaryMHD(string BoundaryPosition, int ScaleI, 
             variable[Bz][Index1 + ScaleI*i] = variable[Bz][ScaleI*i + Index2];
         }
     }
-    if ( BoundaryPosition == "noslipWall" ) {
+    else if ( BoundaryPosition == "noslipWall" ) {
         for(int i=0; i<=N; ++i) {
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
             variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
