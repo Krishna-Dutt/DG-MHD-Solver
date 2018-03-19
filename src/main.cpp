@@ -19,7 +19,6 @@ double V(double x, double y) {
   return 0.0;
 }
 
-
 double IDensity(double x, double y) {
   return 1.0;
 }
