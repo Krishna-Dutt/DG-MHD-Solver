@@ -78,11 +78,11 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 1;
     double CFL = 0.1;
-    double time = 0.01;
+    double time = 0.0;
     NSSolver* a;
-    a = new NSSolver(10, 10, 1);
-    a->setDomain(0.0, 0.0, 1.0, 1.0);
-    a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
+    a = new NSSolver(50, 20, 1);
+    a->setDomain(0.0, 0.0, 1.0, 0.025);
+    a->setBoundaryCondtions("noslipWall", "outflow", "slipWall", "inflow");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();

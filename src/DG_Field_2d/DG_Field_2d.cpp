@@ -60,11 +60,11 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
 
     DeltaX = (x2-x1);
     Beta_x = 1.05;
-    //dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
+    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){
         y_curr = y1;
-        //dy = DeltaY * (Beta_y - 1.0 + epsilon)/(pow(Beta_y, ne_y) -1.0 + epsilon);
+        dy = DeltaY * (Beta_y - 1.0 + epsilon)/(pow(Beta_y, ne_y) -1.0 + epsilon);
         for(int j=0; j<ne_y; j++){
             if ( i == 0 || i == ne_x-1 || j == 0 || j == ne_y-1) {
                 elements[i].push_back( new DG_BoundaryElement_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
@@ -75,10 +75,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             }
 
             y_curr += dy;
-            //dy = Beta_y*dy;
+            dy = Beta_y*dy;
         }
         x_curr += dx;
-        //dx = Beta_x*dx;
+        dx = Beta_x*dx;
     } // All the elements have been initialized.
 
     /// Setting the interaction between the elements by passing their neighboring elements addresses to each of the
