@@ -1,11 +1,12 @@
 #include "../includes/Solvers/IdealMHDSolver.h"
 #include "../includes/Solvers/EulerSolver.h"
+#include "../includes/Solvers/NavierStokesSolver.h"
 #include "../includes/Solvers/AdvectionSolver.h"
 #include <iostream>
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL true
+#define PARALLEL false
 
 using namespace std;
 
@@ -127,9 +128,9 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 1;
     double CFL = 0.1;
-    double time = 0.06;
+    double time = 0.004;
     IdealMHDSolver* a;
-    a = new IdealMHDSolver(200, 200, 3);
+    a = new IdealMHDSolver(10, 10, 1);
     a->setDomain(0.0, 0.0, 1.0, 1.0);
     a->setBoundaryCondtions("neumann", "neumann", "neumann", "neumann");
     a->setSolver(CFL, time, time_steps);
@@ -154,8 +155,8 @@ int main(int argc, char **argv) {
     //a->SetLimiter("LiliaMoment");
     a->SetLimiter("CharacteristicLimiter");
     a->solve();
-    a->FindL2Norm(IDensity, U);
-    a->plot("ShockCloudInteraction_N3.vtk");
+    //a->FindL2Norm(IDensity, U);
+    //a->plot("Test.vtk");
     
 
     delete a;
