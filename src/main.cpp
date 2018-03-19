@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 1;
-    double CFL = 0.1;
+    double CFL = 0.3;
     double time = 0.01;
     NSSolver* a;
     a = new NSSolver(80, 30, 1);
