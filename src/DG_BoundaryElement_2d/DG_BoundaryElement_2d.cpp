@@ -1181,10 +1181,10 @@ void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2,
     P = ReturnPressure(r, IE);
     c = ReturnSoundSpeed(r, P);
 
-    Pb = 0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
-    rb = BoundaryDensity(X[Index1], Y[Index1])  + ( -BoundaryPressure(X[Index1], Y[Index1]) + Pb)/(c*c);
-    ub =  BoundaryDensity(X[Index1], Y[Index1]) *BoundaryU(X[Index1], Y[Index1])/rb ;//- nx*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
-    vb =  BoundaryDensity(X[Index1], Y[Index1]) *BoundaryV(X[Index1], Y[Index1])/rb ;//- ny*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
+    Pb = P;//0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
+    rb = BoundaryDensity(X[Index1], Y[Index1]);//  + ( -BoundaryPressure(X[Index1], Y[Index1]) + Pb)/(c*c);
+    ub = BoundaryDensity(X[Index1], Y[Index1]) *BoundaryU(X[Index1], Y[Index1])/rb;// - nx*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
+    vb = BoundaryDensity(X[Index1], Y[Index1]) *BoundaryV(X[Index1], Y[Index1])/rb;// - ny*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
 
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;

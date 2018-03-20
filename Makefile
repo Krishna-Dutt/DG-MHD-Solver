@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := NavierStokes
+EXECUTABLE := Pipeflow
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths

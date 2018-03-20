@@ -59,7 +59,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     Beta_y = 1.01;
 
     DeltaX = (x2-x1);
-    Beta_x = 1.05;
+    Beta_x = 1.01;
     dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){

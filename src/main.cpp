@@ -25,7 +25,7 @@ double IDensity(double x, double y) {
 
 double IPressure(double x, double y) {
   if( x < 0.999) return 7.142857142857143e+01;
-  return 69.70057142;
+  return 70.78057142;
   //return 7.142857142857143e+01 + x * (69.70057142 - 7.142857142857143e+01 );
 }
 
@@ -76,9 +76,9 @@ int main(int argc, char **argv) {
     if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 1;
+    int time_steps = 10;
     double CFL = 0.3;
-    double time = 0.10;
+    double time = 4.0;
     NSSolver* a;
     a = new NSSolver(80, 20, 1);
     a->setDomain(0.0, 0.0, 1.0, 0.025);
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("PipeTest.vtk");
+    a->plot("PipeTest_t4.vtk");
     
 
     delete a;

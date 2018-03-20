@@ -346,9 +346,9 @@ void NSSolver::RK_Step1() {
   field->delByDelX(VFluxX, DbyDx, Var, "central", FluxVarx, 3);
   field->delByDelY(VFluxY, DbyDy, Var, "central", FluxVary, 3);
 
-  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, 1.0, K1DVx, Addabc, K1DVx);
-  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, 1.0, K1DVy, Addabc, K1DVy);
-  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, 1.0, K1DE, Addabc, K1DE);
+  field->setFunctionsForVariables(1.0, dbydxDVx, 1.0, dbydyDVx, 1.0, K1DVx, Addabc, K1DVx);
+  field->setFunctionsForVariables(1.0, dbydxDVy, 1.0, dbydyDVy, 1.0, K1DVy, Addabc, K1DVy);
+  field->setFunctionsForVariables(1.0, dbydxDE, 1.0, dbydyDE, 1.0, K1DE, Addabc, K1DE);
 
 
   
@@ -385,9 +385,9 @@ void NSSolver::RK_Step2() {
   field->delByDelX(VFluxX, DbyDx, Var, "central", FluxVarx, 3);
   field->delByDelY(VFluxY, DbyDy, Var, "central", FluxVary, 3);
 
-  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, 1.0, K2DVx, Addabc, K2DVx);
-  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, 1.0, K2DVy, Addabc, K2DVy);
-  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, 1.0, K2DE, Addabc, K2DE);
+  field->setFunctionsForVariables(1.0, dbydxDVx, 1.0, dbydyDVx, 1.0, K2DVx, Addabc, K2DVx);
+  field->setFunctionsForVariables(1.0, dbydxDVy, 1.0, dbydyDVy, 1.0, K2DVy, Addabc, K2DVy);
+  field->setFunctionsForVariables(1.0, dbydxDE, 1.0, dbydyDE, 1.0, K2DE, Addabc, K2DE);
 
   
   field->setFunctionsForVariables(-1.5*dt, K1D, 2.0*dt, K2D, 1.0, D, Addabc, D);
@@ -423,9 +423,9 @@ void NSSolver::RK_Step3() {
   field->delByDelX(VFluxX, DbyDx, Var, "central", FluxVarx, 3);
   field->delByDelY(VFluxY, DbyDy, Var, "central", FluxVary, 3);
 
-  field->setFunctionsForVariables(-1.0, dbydxDVx, -1.0, dbydyDVx, 1.0, K3DVx, Addabc, K3DVx);
-  field->setFunctionsForVariables(-1.0, dbydxDVy, -1.0, dbydyDVy, 1.0, K3DVy, Addabc, K3DVy);
-  field->setFunctionsForVariables(-1.0, dbydxDE, -1.0, dbydyDE, 1.0, K3DE, Addabc, K3DE);
+  field->setFunctionsForVariables(1.0, dbydxDVx, 1.0, dbydyDVx, 1.0, K3DVx, Addabc, K3DVx);
+  field->setFunctionsForVariables(1.0, dbydxDVy, 1.0, dbydyDVy, 1.0, K3DVy, Addabc, K3DVy);
+  field->setFunctionsForVariables(1.0, dbydxDE, 1.0, dbydyDE, 1.0, K3DE, Addabc, K3DE);
 
   
   field->setFunctionsForVariables((7.0/6.0)*dt, K1D, -(4.0/3.0)*dt, K2D, (1.0/6.0)*dt, K3D, 1.0, D, Addabcd, D);
