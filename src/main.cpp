@@ -78,9 +78,9 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.3;
-    double time = 4.0;
+    double time = 0.5;
     NSSolver* a;
-    a = new NSSolver(80, 20, 1);
+    a = new NSSolver(40, 10, 1);
     a->setDomain(0.0, 0.0, 1.0, 0.025);
     a->setBoundaryCondtions("noslipWall", "outflow", "slipWall", "inflow");
     a->setSolver(CFL, time, time_steps);
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("PipeTest_t4.vtk");
+    a->plot("PipeTest.vtk");
     
 
     delete a;
