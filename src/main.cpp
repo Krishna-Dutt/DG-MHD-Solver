@@ -6,12 +6,13 @@
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL false
+#define PARALLEL true
 
 using namespace std;
 
 double U(double x, double y) {
-  if ( x < 1e-6) return 0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
+  if ( x < 1e-6) 
+  return 0.2025*y*(0.05-y)/(0.025*0.025); //0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
   return 0.0;
 }
 
@@ -78,9 +79,9 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.3;
-    double time = 0.5;
+    double time = 2.0;
     NSSolver* a;
-    a = new NSSolver(40, 10, 1);
+    a = new NSSolver(80, 20, 1);
     a->setDomain(0.0, 0.0, 1.0, 0.025);
     a->setBoundaryCondtions("noslipWall", "outflow", "slipWall", "inflow");
     a->setSolver(CFL, time, time_steps);
@@ -104,7 +105,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("PipeTest.vtk");
+    a->plot("PipeTest_t2_parabolicU.vtk");
     
 
     delete a;
