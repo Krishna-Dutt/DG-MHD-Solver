@@ -3,7 +3,8 @@
 
 double ReturnPressure(double Rho, double IE);
 double ReturnSoundSpeed( double Rho, double Pr);
-double ReturnInternalEnergy(double Rho, double Pr);
+double ReturnInternalEnergy(double Pr);
+double ReturnInternalEnergy(double Rho, double T);
 
 void KineticEnergy(double a, double* rho, double b, double* u, double c, double* v, unsigned index, unsigned size, double* ke);
 void KineticEnergy3d(double a, double* rho, double b, double* u, double c, double* v, double d, double* w, unsigned index, unsigned size, double* ke);

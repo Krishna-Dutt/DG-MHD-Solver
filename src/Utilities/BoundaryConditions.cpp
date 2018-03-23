@@ -27,6 +27,12 @@ double BoundaryPressure(double x, double y) {
   //return 7.142857142857143e+01 + x * (69.70057142 - 7.142857142857143e+01 );
 }
 
+double BoundaryTemperature(double x, double y) {
+     if( x < 1e-6) return 7.142857142857143e+01;
+  return 70.78057142;
+  //return 7.142857142857143e+01 + x * (69.70057142 - 7.142857142857143e+01 );
+}
+
 double BoundaryGamma(double x, double y) {
     return gamma;
 }
@@ -61,6 +67,10 @@ double BoundaryV(double x, double y, double t) {
 }
 
 double BoundaryPressure(double x, double y, double t) {
+     return 1.0;
+}
+
+double BoundaryTemperature(double x, double y, double t) {
      return 1.0;
 }
 

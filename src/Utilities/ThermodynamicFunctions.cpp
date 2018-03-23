@@ -14,8 +14,12 @@ double ReturnSoundSpeed( double Rho, double Pr) {
     return sqrt(gamma * Pr/Rho);
 }
 
-double ReturnInternalEnergy(double Rho, double Pr) {
+double ReturnInternalEnergy(double Pr) {
     return Pr/(gamma -1.0);
+}
+
+double ReturnInternalEnergy(double Rho, double T) {
+  return Rho*R*T/(gamma -1.0);
 }
 
 void KineticEnergy(double a, double* rho, double b, double* u, double c, double* v, unsigned index, unsigned size, double* ke) {

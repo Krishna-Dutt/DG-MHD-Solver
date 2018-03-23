@@ -1181,7 +1181,7 @@ void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2,
     P = ReturnPressure(r, IE);
     c = ReturnSoundSpeed(r, P);
 
-    Pb = P;//BoundaryPressure(X[Index1], Y[Index1]);//P;//0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
+    Pb = P;//0.5 * ( BoundaryPressure(X[Index1], Y[Index1]) + P - r*c * (nx*(BoundaryU(X[Index1], Y[Index1]) - u) + nx*(BoundaryV(X[Index1], Y[Index1]) - v) ) );
     rb = BoundaryDensity(X[Index1], Y[Index1]);//  + ( -BoundaryPressure(X[Index1], Y[Index1]) + Pb)/(c*c);
     ub = BoundaryDensity(X[Index1], Y[Index1]) *BoundaryU(X[Index1], Y[Index1])/rb;// - nx*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
     vb = BoundaryDensity(X[Index1], Y[Index1]) *BoundaryV(X[Index1], Y[Index1])/rb;// - ny*( BoundaryPressure(X[Index1], Y[Index1]) - Pb )/(r*c);
@@ -1189,7 +1189,7 @@ void DG_BoundaryElement_2d:: EulerSubsonicInflowBoundary(int Index1, int Index2,
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
     variable[ConservativeVariables[2]][Index1] = rb * vb;
-    variable[ConservativeVariables[3]][Index1] = ReturnInternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
+    variable[ConservativeVariables[3]][Index1] = ReturnInternalEnergy(Pb) + 0.5 * rb * (ub*ub + vb*vb);
 
     return ;
 }
@@ -1238,7 +1238,7 @@ void DG_BoundaryElement_2d:: EulerSubsonicOutflowBoundary(int Index1, int Index2
     variable[ConservativeVariables[0]][Index1] = rb;
     variable[ConservativeVariables[1]][Index1] = rb * ub;
     variable[ConservativeVariables[2]][Index1] = rb * vb;
-    variable[ConservativeVariables[3]][Index1] = ReturnInternalEnergy(rb, Pb) + 0.5 * rb * (ub*ub + vb*vb);
+    variable[ConservativeVariables[3]][Index1] = ReturnInternalEnergy(Pb) + 0.5 * rb * (ub*ub + vb*vb);
 
     return ;
 }
@@ -1347,6 +1347,22 @@ void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI
         }
     }
     else if ( BoundaryPosition == "noslipWall" ) {
+        for(int i=0; i<=N; ++i) {
+            variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
+            variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
+            variable[Ymom][Index1 + ScaleI*i] = 0.0;
+            variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
+        }
+    }
+    else if ( BoundaryPosition == "IsothermalWall") {
+        for(int i=0; i<=N; ++i) {
+            variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
+            variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
+            variable[Ymom][Index1 + ScaleI*i] = 0.0;
+            variable[Energy][Index1 + ScaleI*i] = ReturnInternalEnergy( variable[D][Index1 + ScaleI*i], BoundaryTemperature(X[Index1], Y[Index1]));
+        }
+    }
+    else if ( BoundaryPosition == "AdiabaticWall") {
         for(int i=0; i<=N; ++i) {
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
             variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
