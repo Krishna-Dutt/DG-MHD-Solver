@@ -246,9 +246,9 @@ void NSSolver::setViscousFlux() {
 }
 
 void NSSolver::updateViscousFlux() {
-  field->setFunctionsForVariables((4.0/3.0), dVxdx, (-2.0/3.0), dVydy, ViscousStress, TauXX);
-  field->setFunctionsForVariables((4.0/3.0), dVydy, (-2.0/3.0), dVxdx, ViscousStress, TauYY);
-  field->setFunctionsForVariables(1.0, dVxdy, 1.0, dVydx, ViscousStress, TauXY);
+  field->setFunctionsForVariables((4.0/3.0), dVxdx, (-2.0/3.0), dVydy, 1.0, T, ViscousStress, TauXX);
+  field->setFunctionsForVariables((4.0/3.0), dVydy, (-2.0/3.0), dVxdx, 1.0, T, ViscousStress, TauYY);
+  field->setFunctionsForVariables(1.0, dVxdy, 1.0, dVydx, 1.0, T, ViscousStress, TauXY);
   field->setFunctionsForVariables(1.0, Vx, 1.0, TauXX, 1.0, Vy, 1.0, TauXY, EnergyViscous, EViscX);
   field->setFunctionsForVariables(1.0, Vx, 1.0, TauXY, 1.0, Vy, 1.0, TauYY, EnergyViscous, EViscY);
   field->setFunctionsForVariables(1.0, T, 1.0, dTdx, HeatFlux, Qx);

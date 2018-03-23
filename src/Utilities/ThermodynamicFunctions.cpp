@@ -123,11 +123,11 @@ void EntropyVar(double a, double* rho, double b, double* Pr, double c, double* B
 
 // Navier-Stokes
 
-void ViscousStress(double a,  double* x, double b, double* y, unsigned index, unsigned size, double* z) {
+void ViscousStress(double a,  double* x, double b, double* y, double c, double* t, unsigned index, unsigned size, double* z) {
   
   #pragma omp parallel for
   for(int i=0; i < size; i+=index) {
-    z[i] = meu * (x[i]*a  + y[i]*b) ;
+    z[i] = Meu(a*t[i]) * (x[i]*a  + y[i]*b) ;
   }
   return ;
 }
