@@ -6,13 +6,13 @@
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL true
+#define PARALLEL false
 
 using namespace std;
 
 double U(double x, double y) {
   if ( x < 1e-6) 
-  return 0.2025*y*(0.05-y)/(0.025*0.025); //0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
+  return 0.135;//0.2025*y*(0.05-y)/(0.025*0.025); //0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
   return 0.0;
 }
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("PipeTest_t2_parabolicU.vtk");
+    a->plot("PipeTest.vtk");
     
 
     delete a;

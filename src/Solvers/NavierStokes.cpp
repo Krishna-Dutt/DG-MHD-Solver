@@ -256,7 +256,15 @@ void NSSolver::updateViscousFlux() {
 }
 
 void NSSolver::updatePrimitiveGradient() {
-  field->delByDelX(D, dDdx, "central");
+  int Var[] = {D, Vx, Vy, P};
+  int dbydx[] = {dDdx, dVxdx, dVydx, dPdx};
+  int dbydy[] = {dDdy, dVxdy, dVydy, dPdy};
+  int FluxVarx[] = {D};
+
+  field->delByDelX(Var, dbydx, Var, "central", FluxVarx, 4);
+  field->delByDelY(Var, dbydy, Var, "central", FluxVarx, 4);
+  
+  /*field->delByDelX(D, dDdx, "central");
   field->delByDelX(Vx, dVxdx, "central");
   field->delByDelX(Vy, dVydx, "central");
   field->delByDelX(P, dPdx, "central");
@@ -266,7 +274,7 @@ void NSSolver::updatePrimitiveGradient() {
   field->delByDelY(Vx, dVxdy, "central");
   field->delByDelY(Vy, dVydy, "central");
   field->delByDelY(P, dPdy, "central");
-  //field->delByDelY(T, "dTdy", "central");
+  //field->delByDelY(T, "dTdy", "central");*/
 
   return ;
 }
