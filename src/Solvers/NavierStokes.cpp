@@ -42,13 +42,13 @@ void NSSolver::setGradientPrimitiveVariables(){
   dVxdx = field->addVariable_withBounary("dudx");
   dVydx = field->addVariable_withBounary("dvdx");
   dPdx = field->addVariable_withBounary("dPdx");
-  //field->addVariable_withoutBounary("dTdx");
+  dTdx = field->addVariable_withBounary("dTdx");
 
   dDdy = field->addVariable_withBounary("dqdy");
   dVxdy = field->addVariable_withBounary("dudy");
   dVydy = field->addVariable_withBounary("dvdy");
   dPdy = field->addVariable_withBounary("dPdy");
-  //field->addVariable_withoutBounary("dTdy");
+  dTdy = field->addVariable_withBounary("dTdy");
 
   return ;
 }
@@ -220,7 +220,6 @@ void NSSolver::setInviscidFlux() {
   DE_plus_P_Vx = field->addVariable_withBounary("qE_plus_P_u");
   DE_plus_P_Vy = field->addVariable_withBounary("qE_plus_P_v");
 
-  //updateInviscidFlux();
   return ;
 }
 
@@ -240,8 +239,9 @@ void NSSolver::setViscousFlux() {
   TauYY = field->addVariable_withBounary("Tauyy");
   EViscX = field->addVariable_withBounary("Eviscousx");
   EViscY = field->addVariable_withBounary("Eviscousy");
+  Qx = field->addVariable_withBounary("qx");
+  Qy = field->addVariable_withBounary("qy");
 
-  //updateInviscidFlux();
   return ;
 }
 
@@ -251,14 +251,18 @@ void NSSolver::updateViscousFlux() {
   field->setFunctionsForVariables(1.0, dVxdy, 1.0, dVydx, ViscousStress, TauXY);
   field->setFunctionsForVariables(1.0, Vx, 1.0, TauXX, 1.0, Vy, 1.0, TauXY, EnergyViscous, EViscX);
   field->setFunctionsForVariables(1.0, Vx, 1.0, TauXY, 1.0, Vy, 1.0, TauYY, EnergyViscous, EViscY);
-  
+  field->setFunctionsForVariables(1.0, T, 1.0, dTdx, HeatFlux, Qx);
+  field->setFunctionsForVariables(1.0, T, 1.0, dTdy, HeatFlux, Qy);
+  field->setFunctionsForVariables(1.0, Qx, 1.0, EViscX, Addab, EViscX);
+  field->setFunctionsForVariables(1.0, Qy, 1.0, EViscY, Addab, EViscY);
+    
   return ;
 }
 
 void NSSolver::updatePrimitiveGradient() {
-  int Var[] = {D, Vx, Vy, P};
-  int dbydx[] = {dDdx, dVxdx, dVydx, dPdx};
-  int dbydy[] = {dDdy, dVxdy, dVydy, dPdy};
+  int Var[] = {D, Vx, Vy, P, T};
+  int dbydx[] = {dDdx, dVxdx, dVydx, dPdx, dTdx};
+  int dbydy[] = {dDdy, dVxdy, dVydy, dPdy, dTdy};
   int FluxVarx[] = {D};
 
   field->delByDelX(Var, dbydx, Var, "central", FluxVarx, 4);

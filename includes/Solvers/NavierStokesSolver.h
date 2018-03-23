@@ -30,11 +30,13 @@ private:
     // Conservative Variables
     int DVx, DVy, DE, De, KE;
     // Gradient Variables
-    int dDdx, dVxdx, dVydx, dPdx, dDdy, dVxdy, dVydy, dPdy; 
+    int dDdx, dVxdx, dVydx, dPdx, dTdx, dDdy, dVxdy, dVydy, dPdy, dTdy; 
     // Inviscid Flux
     int DVxVx_plus_P, DVxVy, DVyVy_plus_P, DE_plus_P_Vx, DE_plus_P_Vy;
     // Viscous Flux
     int TauXX, TauXY, TauYY, EViscX, EViscY;
+    // Heat Flux
+    int Qx, Qy;
     // Eigen Values
     int C, Vx_plus_C, Vy_plus_C;
     // Aux. Variables // Define all auxillary (needed or not here)

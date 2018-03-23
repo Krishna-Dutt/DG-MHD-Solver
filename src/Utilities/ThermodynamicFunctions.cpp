@@ -141,3 +141,12 @@ void EnergyViscous(double a, double* u, double b, double* uTau, double c, double
   }
   return ;
 }
+
+void HeatFlux(double a, double *T, double b, double *gradT, unsigned index, unsigned size, double *z) {
+  
+  #pragma omp parallel for
+  for(int i=0; i < size; i+=index) {
+    z[i] =  a*ThermalConductivity(T[i])* b*gradT[i] ;
+  }
+  return ;
+}

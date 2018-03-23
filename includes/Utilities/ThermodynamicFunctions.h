@@ -19,4 +19,5 @@ void EntropyVar(double a, double* rho, double b, double* Pr, double c, double* B
 
 void ViscousStress(double a,  double* x, double b, double* y, unsigned index, unsigned size, double* z);
 void EnergyViscous(double a, double* u, double b, double* uTau, double c, double* v, double d, double* vTau, unsigned index, unsigned size, double* Evisc);
+void HeatFlux(double a, double *T, double b, double *gradT, unsigned index, unsigned size, double *z);
 #endif
