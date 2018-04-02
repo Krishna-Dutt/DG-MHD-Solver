@@ -83,7 +83,7 @@ void Temperature(double a, double* ie, double b, double* rho, unsigned index, un
   
   #pragma omp parallel for
   for(int i=0; i < size; i+=index) {
-    Tp[i] = ie[i]*( gamma - 1.0 )/(rho[i] * R) ;
+    Tp[i] = a*ie[i]*( gamma - 1.0 )/(b*rho[i] * R) ;
   }
   return ;
 }

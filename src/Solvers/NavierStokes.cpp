@@ -265,8 +265,8 @@ void NSSolver::updatePrimitiveGradient() {
   int dbydy[] = {dDdy, dVxdy, dVydy, dPdy, dTdy};
   int FluxVarx[] = {D};
 
-  field->delByDelX(Var, dbydx, Var, "central", FluxVarx, 4);
-  field->delByDelY(Var, dbydy, Var, "central", FluxVarx, 4);
+  field->delByDelX(Var, dbydx, Var, "central", FluxVarx, 5);
+  field->delByDelY(Var, dbydy, Var, "central", FluxVarx, 5);
   
   /*field->delByDelX(D, dDdx, "central");
   field->delByDelX(Vx, dVxdx, "central");
@@ -487,7 +487,6 @@ void NSSolver::solve() {
 
     field->updateBoundary(t);
     updatePrimitiveVariables();
-   
     
     // Second Step of RK3
     updateInviscidFlux();
@@ -564,7 +563,7 @@ void NSSolver::Run_KXRCF() {
   field->ResetMap_OutFlow();
 
   field->updateOutFlowBoundary(Vx, Vy);
-  field->updateCellMarker(D, CellMarker);
+  field->updateCellMarker(P, CellMarker);
   field->setFunctionsforDomainVariablesfromCellCenterVariables(1.0, CellMarker, SetAverage, CellMarkerG);
   
   return ;

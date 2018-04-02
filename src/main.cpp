@@ -6,14 +6,14 @@
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL false
+#define PARALLEL true
 
 using namespace std;
 
 double U(double x, double y) {
-  if ( x < 1e-6) 
-  return 0.135;//0.2025*y*(0.05-y)/(0.025*0.025); //0.135*1;//return (0.27/(0.025*0.025)) * y *( 0.05 - y);
+  if ( y < 1e-10) 
   return 0.0;
+  return 597.3;
 }
 
 double V(double x, double y) {
@@ -21,13 +21,11 @@ double V(double x, double y) {
 }
 
 double IDensity(double x, double y) {
-  return 1.0;
+  return 0.0404;
 }
 
 double IPressure(double x, double y) {
-  if( x < 0.999) return 7.142857142857143e+01;
-  return 70.78057142;
-  //return 7.142857142857143e+01 + x * (69.70057142 - 7.142857142857143e+01 );
+  return 0.0404*R*222.0;
 }
 
 double StateEq(double D, double T) {
@@ -35,7 +33,7 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  return 1.0/(R*1.4) ;
+  return 222.0 ;
 }
 
 
@@ -79,11 +77,11 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.3;
-    double time = 2.0;
+    double time = 7e-3;
     NSSolver* a;
-    a = new NSSolver(80, 20, 1);
-    a->setDomain(0.0, 0.0, 1.0, 0.025);
-    a->setBoundaryCondtions("noslipWall", "outflow", "slipWall", "inflow");
+    a = new NSSolver(50, 100, 1);
+    a->setDomain(0.0, 0.0, 1.0, 0.7);
+    a->setBoundaryCondtions("IsothermalWall", "outflow", "neumann", "inflow");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -101,11 +99,11 @@ int main(int argc, char **argv) {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
-    //a->SetLimiter("CharacteristicLimiter");
+    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("PipeTest.vtk");
+    a->plot("SupersonicLaminarBLTest.vtk");
     
 
     delete a;

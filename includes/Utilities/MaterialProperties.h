@@ -2,12 +2,12 @@
 #define THERMODYNAMICS_H
 
 #define gamma (1.4)
-#define R     1.0
+#define R     287.0
 #define Cp    (gamma*R/(gamma - 1.0))
 
 // Navier-Stokes
 #define meu 1e-3
-#define PrandtlNo  0.7
+#define PrandtlNo  0.72
 
 // Sutherland's Coefficients
 #define meu_ref 1.716e-5
