@@ -1379,7 +1379,8 @@ void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI
                 //EulerCharacteristicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
                 EulerSubsonicInflowBoundary(Index1 + ScaleI*i, ScaleI*i + Index2, B);
             }
-            else {
+            else 
+            {
                 variable[D][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
                 variable[Xmom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);
                 variable[Ymom][Index1 + ScaleI*i] = BoundaryDensity(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]) * BoundaryV(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]);

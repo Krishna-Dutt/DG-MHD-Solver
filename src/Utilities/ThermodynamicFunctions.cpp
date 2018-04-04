@@ -131,7 +131,7 @@ void ViscousStress(double a,  double* x, double b, double* y, double c, double* 
   
   #pragma omp parallel for
   for(int i=0; i < size; i+=index) {
-    z[i] = Meu(a*t[i]) * (x[i]*a  + y[i]*b) ;
+    z[i] = Meu(c*t[i]) * (x[i]*a  + y[i]*b) ;
   }
   return ;
 }

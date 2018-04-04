@@ -690,8 +690,8 @@ void NSSolver::RunLimiter() {
     field->computeMoments(DE, HMoment, CellMarker);
 
     // Finding gradient of  Density //Pressure
-    field->delByDelX(P, dPdx, P, "central", Vx_plus_C);
-    field->delByDelY(P, dPdy, P, "central", Vy_plus_C);
+    field->delByDelX(D, dPdx, D, "central", Vx_plus_C);
+    field->delByDelY(D, dPdy, D, "central", Vy_plus_C);
     field->computeMoments(dPdx, dPdxMoment, CellMarker);
     field->computeMoments(dPdy, dPdyMoment, CellMarker);
 

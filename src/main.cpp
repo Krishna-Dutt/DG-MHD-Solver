@@ -6,13 +6,13 @@
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL true
+#define PARALLEL false
 
 using namespace std;
 
 double U(double x, double y) {
-  if ( y < 1e-10) 
-  return 0.0;
+  //if ( y < 1e-10) 
+  //return 0.0;
   return 597.3;
 }
 
@@ -21,11 +21,11 @@ double V(double x, double y) {
 }
 
 double IDensity(double x, double y) {
-  return 0.0404;
+  return 0.00404;
 }
 
 double IPressure(double x, double y) {
-  return 0.0404*R*222.0;
+  return 0.00404*R*222.0;
 }
 
 double StateEq(double D, double T) {
@@ -72,16 +72,16 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(8);
+    if(PARALLEL) omp_set_num_threads(16);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
-    double CFL = 0.3;
-    double time = 7e-3;
+    double CFL = 0.6;
+    double time = 8e-3;
     NSSolver* a;
-    a = new NSSolver(50, 100, 1);
+    a = new NSSolver(50, 50, 1);
     a->setDomain(0.0, 0.0, 1.0, 0.7);
-    a->setBoundaryCondtions("IsothermalWall", "outflow", "neumann", "inflow");
+    a->setBoundaryCondtions("IsothermalWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -99,13 +99,12 @@ int main(int argc, char **argv) {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
-    a->SetLimiter("CharacteristicLimiter");
+    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("SupersonicLaminarBLTest.vtk");
+    a->plot("SupersonicLaminarBLTest_CFLpoint6.vtk");
     
-
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
     return 0 ;

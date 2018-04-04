@@ -457,7 +457,7 @@ double DG_Element_2d::updateCellMarker(int v) {
   radius = MIN(abs(x_start-x_end),abs(y_start-y_end)) * 0.5;
 
   Marker = abs(VariableFlux) / ( abs(OutflowSize) * MaxVariable * pow(radius, 0.5 * (N+1)));
-  if (Marker >= 1.0) {
+  if (Marker > 1.0) {
     Marker = 1.0;
   }
   else {
