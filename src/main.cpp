@@ -72,14 +72,14 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(8);
+    if(PARALLEL) omp_set_num_threads(16);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.4;
-    double time = 8e-3;
+    double time = 1*8e-3;
     NSSolver* a;
-    a = new NSSolver(25, 25, 2);
+    a = new NSSolver(17, 17, 3);
     a->setDomain(0.0, 0.0, 1.0, 0.7);
     a->setBoundaryCondtions("IsothermalWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
@@ -99,11 +99,11 @@ int main(int argc, char **argv) {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    a->SetLimiter("LiliaMoment");
+    //a->SetLimiter("LiliaMoment");
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("SupersonicLaminarBLTest_N2_Beta1point143_Char.vtk");
+    a->plot("SupersonicLaminarBLTest_N3_Beta1point68.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
