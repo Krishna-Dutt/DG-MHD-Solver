@@ -6,7 +6,7 @@
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL false
+#define PARALLEL true
 
 using namespace std;
 
@@ -72,11 +72,11 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(16);
+    if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
-    double CFL = 0.6;
+    double CFL = 0.4;
     double time = 8e-3;
     NSSolver* a;
     a = new NSSolver(25, 25, 2);
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("SupersonicLaminarBLTest_N2_Beta1point143.vtk");
+    a->plot("SupersonicLaminarBLTest_N2_Beta1point143_Char.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
