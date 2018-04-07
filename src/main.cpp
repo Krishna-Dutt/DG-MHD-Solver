@@ -11,21 +11,23 @@
 using namespace std;
 
 double U(double x, double y) {
-  //if ( y < 1e-10) 
-  //return 0.0;
-  return 597.3;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0) ) return 680.525;
+  return 658.653*cos(3.1081827*M_PI/180.0);
 }
 
 double V(double x, double y) {
-  return 0.0;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0) ) return 0.0;
+  return -658.653*sin(3.1081827*M_PI/180.0);
 }
 
 double IDensity(double x, double y) {
-  return 0.00404;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0)) return 7.78e-3;
+  return 8.797e-3;
 }
 
 double IPressure(double x, double y) {
-  return 0.00404*R*222.0;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0)) return 7.78e-3*R*288.15;
+  return 8.797e-3*R*302.728;
 }
 
 double StateEq(double D, double T) {
@@ -33,7 +35,8 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  return 222.0 ;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0) ) return 288.15;
+  return 302.728;
 }
 
 
@@ -72,16 +75,16 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(16);
+    if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
-    double CFL = 0.4;
+    double CFL = 0.6;
     double time = 1*8e-3;
     NSSolver* a;
-    a = new NSSolver(17, 17, 3);
-    a->setDomain(0.0, 0.0, 1.0, 0.7);
-    a->setBoundaryCondtions("IsothermalWall", "neumann", "dirichlet", "dirichlet");
+    a = new NSSolver(90, 70, 1);
+    a->setDomain(0.0, 0.0, 1.6, 1.0);
+    a->setBoundaryCondtions("AdiabaticWall", "neumann", "neumann", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
