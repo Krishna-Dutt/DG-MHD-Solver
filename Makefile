@@ -14,7 +14,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
   CC := clang++ -arch x86_64
 else
-  CC := g++ -fopenmp #-pg -g # -fopenmp
+  CC := g++ #-fopenmp #-pg -g # -fopenmp
 endif
 
 # Folders
@@ -41,7 +41,7 @@ INCLIST := $(patsubst includes/%,-I include/%,$(INCDIRS))
 BUILDLIST := $(patsubst includes/%,$(BUILDDIR)/%,$(INCDIRS))
 
 # Shared Compiler Flags
-CFLAGS := -c -fopenmp#-pg #-fopenmp
+CFLAGS := -c #-fopenmp#-pg #-fopenmp
 INC := -I include $(INCLIST) -I /usr/local/include
 LIB := -L /usr/local/lib -lblas -llapacke -lgsl -lgslcblas -lm -lpthread
 
