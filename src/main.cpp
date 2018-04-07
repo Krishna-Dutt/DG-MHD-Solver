@@ -6,7 +6,7 @@
 #include <cmath>
 #include <ctime>
 
-#define PARALLEL false
+#define PARALLEL true
 
 using namespace std;
 
@@ -100,10 +100,10 @@ int main(int argc, char **argv) {
 
     a->SetShockDetector("KXRCF");
     //a->SetLimiter("LiliaMoment");
-    a->SetLimiter("CharacteristicLimiter");
+    //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("SupersonicLaminarBLTest_N3_Beta1point68_Char.vtk");
+    a->plot("ShockBLInteractionTest.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
