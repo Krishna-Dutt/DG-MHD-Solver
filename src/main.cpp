@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 0*8e-3;
+    double time = 8e-3;
     NSSolver* a;
     a = new NSSolver(30, 23, 3);
     a->setDomain(0.0, 0.0, 1.6, 1.0);
