@@ -1365,7 +1365,7 @@ void DG_BoundaryElement_2d::setBoundaryEuler(string BoundaryPosition, int ScaleI
     else if ( BoundaryPosition == "AdiabaticWall") {
         for(int i=0; i<=N; ++i) {
             variable[D][Index1 + ScaleI*i] = variable[D][ScaleI*i + Index2];
-            variable[Xmom][Index1 + ScaleI*i] = 0.0; // Change later to ensure proper BC for moving Wall!!
+            variable[Xmom][Index1 + ScaleI*i] =  variable[D][ScaleI*i + Index2]*BoundaryU(X[Index1 + ScaleI*i], Y[Index1 + ScaleI*i]); // Change later to ensure proper BC for moving Wall!!
             variable[Ymom][Index1 + ScaleI*i] = 0.0;
             variable[Energy][Index1 + ScaleI*i] = variable[Energy][ScaleI*i + Index2];
         }
