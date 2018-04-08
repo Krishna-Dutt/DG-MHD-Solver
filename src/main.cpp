@@ -75,14 +75,14 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(1);
+    if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 8e-3;
+    double time = 5*8e-3;
     NSSolver* a;
-    a = new NSSolver(30, 23, 3);
+    a = new NSSolver(45, 35, 2);
     a->setDomain(0.0, 0.0, 1.6, 1.0);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "neumann", "dirichlet");
     a->setSolver(CFL, time, time_steps);
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest_N3_t8eminus3.vtk");
+    a->plot("ShockBLInteractionTest_N2_t4eminus2.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
