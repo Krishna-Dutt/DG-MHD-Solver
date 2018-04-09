@@ -80,10 +80,10 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 1e-1*8e-3;
+    double time = 3*8e-3;
     NSSolver* a;
-    a = new NSSolver(45, 35, 2);
-    a->setDomain(0.0, 0.0, 1.6, 1.0);
+    a = new NSSolver(45, 40, 2);
+    a->setDomain(0.0, 0.0, 1.6, 1.1);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
