@@ -11,23 +11,22 @@
 using namespace std;
 
 double U(double x, double y) {
-  if ( y < 1e-10 && x >= 0.2) return 0.0;
-  else if ( y <= -tan(32.6*M_PI/180.0)*(x -1.2) ) return 680.525;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0) ) return 680.525;
   return 658.653*cos(3.1081827*M_PI/180.0);
 }
 
 double V(double x, double y) {
-  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.2) ) return 0.0;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0) ) return 0.0;
   return -658.653*sin(3.1081827*M_PI/180.0);
 }
 
 double IDensity(double x, double y) {
-  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.2)) return 7.78e-3;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0)) return 7.78e-3;
   return 8.797e-3;
 }
 
 double IPressure(double x, double y) {
-  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.2)) return 7.78e-3*R*288.15;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0)) return 7.78e-3*R*288.15;
   return 8.797e-3*R*302.728;
 }
 
@@ -36,7 +35,7 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.2) ) return 288.15;
+  if ( y <= -tan(32.6*M_PI/180.0)*(x -1.0) ) return 288.15;
   return 302.728;
 }
 
@@ -76,16 +75,16 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(1);
+    if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 5e-2*8e-3;
+    double time = 5*8e-3;
     NSSolver* a;
-    a = new NSSolver(60, 35, 2);
-    a->setDomain(0.0, 0.0, 1.8, 1.0);
-    a->setBoundaryCondtions("AdiabaticWall", "neumann", "neumann", "dirichlet");
+    a = new NSSolver(70, 35, 2);
+    a->setDomain(0.0, 0.0, 1.6, 1.0);
+    a->setBoundaryCondtions("AdiabaticWall", "NIL", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
     a->setConservativeVariables();
@@ -107,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest_N2_t4eminus2_modBC.vtk");
+    a->plot("ShockBLInteractionTest_N2_t4eminus2_modBC_70x35.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
