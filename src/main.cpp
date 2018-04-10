@@ -75,12 +75,12 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(8);
+    if(PARALLEL) omp_set_num_threads(1);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 2*8e-3;
+    double time = 1e-1*8e-3;
     NSSolver* a;
     a = new NSSolver(45, 40, 2);
     a->setDomain(0.0, 0.0, 1.6, 1.1);
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
     a->updateConservativeVariables();
 
     a->SetShockDetector("KXRCF");
-    //a->SetLimiter("LiliaMoment");
+    a->SetLimiter("LiliaMoment");
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);

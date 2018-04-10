@@ -664,7 +664,7 @@ void NSSolver::RunLimiter() {
     Run_LiliaMomentLimiter(D);
     */
     //Run_LiliaMomentLimiter(T); // If needed, else compute it later using q and P ..
-    int Var[] ={D, DVx, DVy, DE};
+   /* int Var[] ={D, DVx, DVy, DE};
     int Mom[] = {qMoment, uMoment, vMoment, HMoment};
     int ModMom[] = {qModMoment, uModMoment, vModMoment, HModMoment}; 
     field->computeMoments(Var, Mom, CellMarker, 4);
@@ -676,6 +676,7 @@ void NSSolver::RunLimiter() {
 
     field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 4);
     field->convertMomentToVariable(ModMom, Var, CellMarker, 4);
+    */
 
   }
 
@@ -744,7 +745,7 @@ void NSSolver::RunPositivityLimiter() {
     Run_PositivityMomentLimiter(DE, N+2);
     Run_PositivityMomentLimiter(D, N+2);*/
 
-    field->computeMoments(Var, Mom, CellMarker, 4);
+    /*field->computeMoments(Var, Mom, CellMarker, 4);
     field->scal(0.0, qModMoment);
     field->scal(0.0, uModMoment);
     field->scal(0.0, vModMoment);
@@ -755,7 +756,7 @@ void NSSolver::RunPositivityLimiter() {
 
     updatePrimitiveVariables();
     field->resetPositivity(false);
-    checkPositivity();
+    checkPositivity();*/
     /*Run_PositivityMomentLimiter(DVx, 0);
     Run_PositivityMomentLimiter(DVy, 0);
     Run_PositivityMomentLimiter(DE, 0);
