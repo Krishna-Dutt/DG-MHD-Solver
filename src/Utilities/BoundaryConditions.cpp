@@ -4,29 +4,29 @@
  
 
 double BoundaryDensity(double x, double y) {
-    if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 3.929*7.78e-3;
-  return 3.929*9.107e-3;
+    if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 0.03011;
+  return 0.035247;
 } 
 
 double BoundaryU(double x, double y){
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 731.564;
-  return 705.165*cos(3.813*M_PI/180.0);
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 721.269;
+  return 686.571*cos(3.813*M_PI/180.0);
 }
 
 double BoundaryV(double x, double y) {
     if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 0.0;
-  return -705.165*sin(3.813*M_PI/180.0);
+  return -686.571*sin(3.813*M_PI/180.0);
 }
 
 
 double BoundaryPressure(double x, double y) {
-     if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 3.929*7.78e-3*R*288.15;
-  return 3.929*9.107e-3*R*307.025;
+     if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 0.03011*R*273.15;
+  return 0.035247*R*291.0429;
 }
 
 double BoundaryTemperature(double x, double y) {
-    if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 288.15;
-  return 307.025;
+    if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 273.15;
+  return 291.0429;
 }
 
 double BoundaryGamma(double x, double y) {

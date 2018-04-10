@@ -11,23 +11,23 @@
 using namespace std;
 
 double U(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 731.564;
-  return 705.165*cos(3.813*M_PI/180.0);
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 712.269;
+  return 686.571*cos(3.813*M_PI/180.0);
 }
 
 double V(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 0.0;
-  return -705.165*sin(3.813*M_PI/180.0);
+  return -686.571*sin(3.813*M_PI/180.0);
 }
 
 double IDensity(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 3.929*7.78e-3;
-  return 3.929*9.107e-3;
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 0.03011;//3.929*7.78e-3;
+  return 0.035247;
 }
 
 double IPressure(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 3.929*7.78e-3*R*288.15;
-  return 3.929*9.107e-3*R*307.025;
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8)) return 0.03011*R*273.15;
+  return 0.035247*R*291.0429;
 }
 
 double StateEq(double D, double T) {
@@ -35,8 +35,8 @@ double StateEq(double D, double T) {
 }
 
 double ITemperature(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 288.15;
-  return 307.025;
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -0.8) ) return 273.15;
+  return 291.0429;
 }
 
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 3*8e-3;
+    double time = 2*8e-3;
     NSSolver* a;
     a = new NSSolver(45, 40, 2);
     a->setDomain(0.0, 0.0, 1.6, 1.1);
