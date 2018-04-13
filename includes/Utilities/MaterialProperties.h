@@ -2,7 +2,7 @@
 #define THERMODYNAMICS_H
 
 #define gamma (1.4)
-#define R     287.0
+#define R     287.15
 #define Cp    (gamma*R/(gamma - 1.0))
 
 // Navier-Stokes

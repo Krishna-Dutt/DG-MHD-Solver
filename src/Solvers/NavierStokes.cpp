@@ -664,7 +664,7 @@ void NSSolver::RunLimiter() {
     Run_LiliaMomentLimiter(D);
     */
     //Run_LiliaMomentLimiter(T); // If needed, else compute it later using q and P ..
-   /* int Var[] ={D, DVx, DVy, DE};
+    int Var[] ={D, DVx, DVy, DE};
     int Mom[] = {qMoment, uMoment, vMoment, HMoment};
     int ModMom[] = {qModMoment, uModMoment, vModMoment, HModMoment}; 
     field->computeMoments(Var, Mom, CellMarker, 4);
@@ -676,7 +676,7 @@ void NSSolver::RunLimiter() {
 
     field->limitMoments(Mom, ModMom, CellMarker, (N+1)*(N+1)-1, 4);
     field->convertMomentToVariable(ModMom, Var, CellMarker, 4);
-    */
+    
 
   }
 

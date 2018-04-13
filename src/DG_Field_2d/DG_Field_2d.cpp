@@ -56,10 +56,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up exponential grid (noo-uniform grid) along y direction
     double Beta_y, Beta_x, DeltaX, DeltaY, epsilon = 1e-10;
     DeltaY = (y2-y1);
-    Beta_y = 1.15;
+    Beta_y = 1.17;
 
     DeltaX = (x2-x1);
-    Beta_x = 1.04;
+    Beta_x = 1.0001;
     dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){
