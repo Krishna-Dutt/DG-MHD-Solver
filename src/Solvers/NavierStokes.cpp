@@ -462,7 +462,8 @@ void NSSolver::solve() {
   double t = 0.0;
   int count = 0;
   
- 
+  ofstream Ofile;
+  Ofile.open("Residue.dat");
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
   field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
@@ -477,7 +478,8 @@ void NSSolver::solve() {
       field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
     }
     else if( count%100 == 0) {
-      cout << "\n Density Residue : " << field->l2Norm(D, DAnalytical) << "\n";
+      //cout << "\n Density Residue : " << field->l2Norm(D, DAnalytical) << "\n";
+      Ofile << count << "   " << field->l2Norm(D,DAnalytical) << "\n";
     }
 
     if ( count%no_of_time_steps == 0) {
@@ -528,6 +530,8 @@ void NSSolver::solve() {
    t += dt; 
    count += 1;       
     }
+
+    Ofile.close();
 
   return ;
 }
