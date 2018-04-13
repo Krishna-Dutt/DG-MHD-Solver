@@ -465,6 +465,7 @@ void NSSolver::solve() {
  
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
+  field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
   while(t <= time) {
     // First Step of RK3
 
@@ -472,11 +473,17 @@ void NSSolver::solve() {
     updatePrimitiveGradient(); 
     updateViscousFlux();
     updateEigenValues();
+    if( count%100 == 1) {
+      field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
+    }
+    else if( count%100 == 0) {
+      cout << "\n Density Residue : " << field->l2Norm(D, DAnalytical) << "\n";
+    }
 
     if ( count%no_of_time_steps == 0) {
       setTimeStep();
       cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
-      count = 0;
+      //count = 0;
     }
 
     RK_Step1();
