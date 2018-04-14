@@ -478,7 +478,7 @@ void NSSolver::solve() {
       field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
     }
     else if( count%100 == 0) {
-      //cout << "\n Density Residue : " << field->l2Norm(D, DAnalytical) << "\n";
+      cout << "\n Density Residue : " << field->l2Norm(D, DAnalytical) << "\n";
       Ofile << count << "   " << field->l2Norm(D,DAnalytical) << "\n";
     }
 
