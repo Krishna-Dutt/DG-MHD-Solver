@@ -49,7 +49,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     /// Setting the grid, by setting the elements. The elements are set by providing their end points for the quads.
     elements.resize(ne_x);
 
-    double x_curr,y_curr, dx = (x2-x1)/ne_x, dy = (y2-y1)/ne_y;
+    double x_curr,y_curr, dx2, dx = (x2-x1)/ne_x, dy = (y2-y1)/ne_y;
     x_curr = x1;
     y_curr = y1;
 
@@ -57,10 +57,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     double Beta_y, Beta_x, DeltaX, DeltaY, epsilon = 1e-10;
     DeltaY = (y2-y1);
     Beta_y = 1.17;
-
-    DeltaX = (x2-x1);
-    Beta_x = 1.0001;
-    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x) -1.0 + epsilon);
+    // Hyperbolic Grids about midpoint along x direction
+    DeltaX = (x2-x1)*0.5;
+    Beta_x = 1/1.08;
+    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x/2) -1.0 + epsilon);
 
     for(int i=0; i<ne_x; i++){
         y_curr = y1;
@@ -78,7 +78,13 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             dy = Beta_y*dy;
         }
         x_curr += dx;
-        dx = Beta_x*dx;
+        if( i < ne_x/2){
+            dx = Beta_x*dx;
+        }
+        else {
+            dx = (1.0/Beta_x)*dx;
+        }
+        
     } // All the elements have been initialized.
 
     /// Setting the interaction between the elements by passing their neighboring elements addresses to each of the
