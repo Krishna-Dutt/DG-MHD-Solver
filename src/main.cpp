@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     //double dt = 0.5e-3;
     int time_steps = 10;
     double CFL = 0.6;
-    double time = 7*8e-3;
+    double time = 0*1*7*8e-3;
     NSSolver* a;
     a = new NSSolver(60, 40, 2);
     a->setDomain(0.0, 0.0, 2.0, 1.1);
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest_60x40_HGBeta1point08_times7.vtk");
+    a->plot("ShockBLInteractionTest_60x40_HGBeta1point04_times7.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";

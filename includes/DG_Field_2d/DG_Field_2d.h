@@ -25,6 +25,8 @@ private:
     int Dimension; // Variable to store the dimension of system of equation
     string system;
 
+    double scale_b;
+
 
 public:
     vector< vector<DG_Element_2d*> > elements;

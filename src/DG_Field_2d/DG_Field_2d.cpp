@@ -54,15 +54,17 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     y_curr = y1;
 
     // Setting up exponential grid (noo-uniform grid) along y direction
-    double Beta_y, Beta_x, DeltaX, DeltaY, epsilon = 1e-10;
+    double Beta_y, Beta_x1, Beta_x2, DeltaX1, DeltaX2, DeltaY, epsilon = 1e-10;
+    // Setting up Hyperbolic grids along x-direction about scale_b X (x2-x1)
+    scale_b = 0.4;
     DeltaY = (y2-y1);
     Beta_y = 1.17;
-    // Hyperbolic Grids about midpoint along x direction
-    DeltaX = (x2-x1)*0.5;
-    Beta_x = 1/1.08;
-    dx = DeltaX * (Beta_x - 1.0 + epsilon)/(pow(Beta_x, ne_x/2) -1.0 + epsilon);
-
-    for(int i=0; i<ne_x; i++){
+    
+    DeltaX1 = (x2-x1)*scale_b;
+    Beta_x1 = 1/1.04;
+    dx = DeltaX1 * (Beta_x1 - 1.0 + epsilon)/(pow(Beta_x1, ne_x*scale_b) -1.0 + epsilon);
+    
+    for(int i=0; i<ne_x*scale_b; i++){
         y_curr = y1;
         dy = DeltaY * (Beta_y - 1.0 + epsilon)/(pow(Beta_y, ne_y) -1.0 + epsilon);
         for(int j=0; j<ne_y; j++){
@@ -78,13 +80,30 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             dy = Beta_y*dy;
         }
         x_curr += dx;
-        if( i < ne_x/2){
-            dx = Beta_x*dx;
+        dx = Beta_x1*dx;
+    } // All the elements have been initialized.
+
+    DeltaX2 = (x2-x1)*(1-scale_b);
+    Beta_x2 = 1.04;
+    dx = DeltaX2 * (Beta_x2 - 1.0 + epsilon)/(pow(Beta_x2, ne_x*(1-scale_b)) -1.0 + epsilon);
+
+    for(int i=ne_x*scale_b; i<ne_x; i++){
+        y_curr = y1;
+        dy = DeltaY * (Beta_y - 1.0 + epsilon)/(pow(Beta_y, ne_y) -1.0 + epsilon);
+        for(int j=0; j<ne_y; j++){
+            if ( i == 0 || i == ne_x-1 || j == 0 || j == ne_y-1) {
+                elements[i].push_back( new DG_BoundaryElement_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
+            }
+            else
+             {
+                elements[i].push_back( new DG_Element_2d(N, x_curr, y_curr, x_curr + dx, y_curr + dy) );
+            }
+
+            y_curr += dy;
+            dy = Beta_y*dy;
         }
-        else {
-            dx = (1.0/Beta_x)*dx;
-        }
-        
+        x_curr += dx;
+        dx = Beta_x2*dx;
     } // All the elements have been initialized.
 
     /// Setting the interaction between the elements by passing their neighboring elements addresses to each of the
