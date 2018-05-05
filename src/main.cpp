@@ -79,10 +79,10 @@ int main(int argc, char **argv) {
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
-    double CFL = 0.4;
-    double time = 7*8e-3;
+    double CFL = 0.6;
+    double time = 0*7*8e-3;
     NSSolver* a;
-    a = new NSSolver(100, 40, 2);
+    a = new NSSolver(80, 30, 3);
     a->setDomain(0.0, 0.0, 2.0, 1.1);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest_N2_100x40.vtk");
+    a->plot("ShockBLInteractionTest_N3.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
