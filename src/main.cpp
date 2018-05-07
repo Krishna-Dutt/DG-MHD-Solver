@@ -75,7 +75,7 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(1);
+    if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
     int time_steps = 10;
