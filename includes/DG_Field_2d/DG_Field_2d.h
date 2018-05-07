@@ -147,6 +147,7 @@ public:
     void FindMindx(int v);
     void FindTimestep(int dt, int dx, int U, double CFL);
     double FindMindt(int dt);
+    void FindUMax(int U, int V, int D, int T, int UMax);
 };
 
 #endif

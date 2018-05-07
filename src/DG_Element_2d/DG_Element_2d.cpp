@@ -2080,6 +2080,26 @@ void DG_Element_2d::setFunctionsForBoundaryVariables(double a, int w, double b, 
 }*/
 
 
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function finds the maximum U in each element in the field.
+ *
+ * @Param U Index of Max Eigen in x direction
+ * @Param V Index of Max Eigen in y direction
+ * @Param D Index of Density
+ * @Param T Index of Temperature
+ */
+/* ----------------------------------------------------------------------------*/
+double DG_Element_2d::FindUMax(int U, int V, int D, int T) {
+    double temp,UMax = 0.0, C = 4.0;
+    double *VarU = variable[U], *VarV = variable[V], *VarD = variable[D], *VarT = variable[T];
+    for(int i =0 ; i< (N+1)*(N+1); ++i) {
+       temp = abs(VarU[i])/dyMin + abs(VarV[i])/dxMin + C*(max(4.0/3, gamma)/VarD[i])*(Meu(VarT[i])/PrandtlNo)*(0.5*(1/pow(dxMin,2)+ 1/pow(dyMin,2) ) );
+       UMax = max(UMax, temp);
+    }
+
+    return UMax;
+}
 
 double DG_Element_2d::l2Norm(int v1, int v2) {
     double* diff = new double[(N+1)*(N+1)];

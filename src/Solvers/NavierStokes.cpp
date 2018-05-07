@@ -449,7 +449,8 @@ void NSSolver::RK_Step3() {
 }
 
 void NSSolver::setTimeStep() {
-  field->setFunctionsForCellCenterVariablesfromDomainVariables(1.0, Vx_plus_C, 1.0, Vy_plus_C, Maximum, UMax);
+  //field->setFunctionsForCellCenterVariablesfromDomainVariables(1.0, Vx_plus_C, 1.0, Vy_plus_C, Maximum, UMax);
+  field->FindUMax(Vx_plus_C, Vy_plus_C, D, T, UMax);
   field->FindTimestep(Dt, Dx, UMax, CFL);
   dt = field->FindMindt(Dt);
 

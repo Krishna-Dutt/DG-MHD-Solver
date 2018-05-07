@@ -58,7 +58,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up Hyperbolic grids along x-direction about scale_b X (x2-x1)
     scale_b = 0.5;
     DeltaY = (y2-y1);
-    Beta_y = 1.22;
+    Beta_y = 1.2;
     
     DeltaX1 = (x2-x1)*scale_b;
     Beta_x1 = 1/1.00004;
@@ -1749,6 +1749,23 @@ double DG_Field_2d::FindMindt(int dt) {
 
 /* ----------------------------------------------------------------------------*/
 /**
+ * @Synopsis  This function finds the maximum U in each element int the field.
+ *
+ * @Param dx To store the max U in the element
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::FindUMax(int U, int V, int D, int T, int UMax) {
+    int j;
+    #pragma omp parallel for private(j)
+    for(int i = 0; i < ne_x; i++)
+        for(j = 0; j < ne_y; j++)
+            cellcenterVariable[UMax][i*ne_y + j] = elements[i][j]->FindUMax(U, V, D, T);
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
  * @Synopsis  This function finds the minimum dt in the field.
  *
  * @Param dx To store the minimum dx in the element
@@ -1763,7 +1780,8 @@ void DG_Field_2d::FindTimestep(int dt, int dx, int U, double CFL) {
     #pragma omp parallel for private(j)
     for(int i = 0; i < ne_x; i++)
         for(j = 0; j < ne_y; j++)
-            CCVar_dt[i*ne_y + j] = CFL * (CCVar_dx[i*ne_y + j]/ CCVarU[i*ne_y + j] );
+            //CCVar_dt[i*ne_y + j] = CFL * (CCVar_dx[i*ne_y + j]/ CCVarU[i*ne_y + j] );
+            CCVar_dt[i*ne_y + j] = CFL * 1.0/ CCVarU[i*ne_y + j];
 
     return ;
 }

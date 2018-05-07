@@ -176,6 +176,7 @@ public:
     void FindMindx(int v);
     void FindTimestep(int dt, int dx, int U, double CFL);
     double FindMindt(int dt);
+    double FindUMax(int U, int V, int D, int T);
 
     // Function to compute divergence of Magnetic field !!
     void updateDivergenceB(int Bx, int By, int DeldotB);
