@@ -52,6 +52,8 @@ private:
     int uMoment, vMoment, qMoment, HMoment, dPdxMoment, dPdyMoment;
     int Char1, Char2, Char3, Char4;
     //int dPdx, dPdy;
+    // Handling Local Time Stepping
+    int Time;
 
     // cell centered variables
     int Dx, Dt, UMax, CellMarker; 

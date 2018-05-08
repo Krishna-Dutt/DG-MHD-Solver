@@ -58,7 +58,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up Hyperbolic grids along x-direction about scale_b X (x2-x1)
     scale_b = 0.5;
     DeltaY = (y2-y1);
-    Beta_y = 1.2;
+    Beta_y = 1.17;
     
     DeltaX1 = (x2-x1)*scale_b;
     Beta_x1 = 1/1.00004;
@@ -1782,6 +1782,42 @@ void DG_Field_2d::FindTimestep(int dt, int dx, int U, double CFL) {
         for(j = 0; j < ne_y; j++)
             //CCVar_dt[i*ne_y + j] = CFL * (CCVar_dx[i*ne_y + j]/ CCVarU[i*ne_y + j] );
             CCVar_dt[i*ne_y + j] = CFL * 1.0/ CCVarU[i*ne_y + j];
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the total runtime of the simulation.
+ *
+ * @Param t T Final.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::SetFinalTime(double t) {
+    int j;
+    #pragma omp parallel for private(j)
+    for(int i = 0; i < ne_x; i++)
+        for(j = 0; j < ne_y; j++)
+            elements[i][j]->SetFinalTime(t);
+
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the runtime of the simulation.
+ *
+ * @Param dt Stores the minimum dt in an element
+ * @Param Time Current dt
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Field_2d::updateTime(int dt, int Time) {
+    double *CCVar_dt = cellcenterVariable[dt];
+    int j;
+    #pragma omp parallel for private(j)
+    for(int i = 0; i < ne_x; i++)
+        for(j = 0; j < ne_y; j++)
+            elements[i][j]->updateTime(CCVar_dt[i*ne_y + j], Time);
 
     return ;
 }

@@ -3,6 +3,7 @@
 #include "../../includes/Utilities/MaterialProperties.h"
 #include "../../includes/Utilities/MathOperators.h"
 #include "../../includes/Utilities/ThermodynamicFunctions.h"
+#include "../../includes/Utilities/TimeIntegrators.h"
 
 
 NSSolver::NSSolver(int _ne_x, int _ne_y, int _N) {
@@ -108,6 +109,8 @@ void NSSolver::setSolver(double _CFL, double _time, int _no_of_time_steps) {
    CFL = _CFL;
    time = _time;
    no_of_time_steps = _no_of_time_steps;
+
+   field->SetFinalTime(_time);
    Dx   = field->addVariable_CellCentered();
    field->FindMindx(Dx);
    Dt   = field->addVariable_CellCentered();
@@ -308,6 +311,8 @@ void NSSolver::setAuxillaryVariables() {
 
   DAnalytical  = field->addVariable_withBounary("qAnalytic");
   VxAnalytical = field->addVariable_withBounary("uAnalytic");
+
+  Time = field->addVariable_withBounary("time");
   
   ZERO = field->addVariable_withoutBounary();
   
@@ -364,10 +369,10 @@ void NSSolver::RK_Step1() {
 
 
   
-  field->setFunctionsForVariables(0.5*dt, K1D, 1.0, D, Addab, D);
-  field->setFunctionsForVariables(0.5*dt, K1DVx, 1.0, DVx, Addab, DVx);
-  field->setFunctionsForVariables(0.5*dt, K1DVy, 1.0, DVy, Addab, DVy);
-  field->setFunctionsForVariables(0.5*dt, K1DE, 1.0, DE, Addab, DE);
+  field->setFunctionsForVariables(1.0, Time, 0.5, K1D, 1.0, D, RK3step1, D);
+  field->setFunctionsForVariables(1.0, Time, 0.5, K1DVx, 1.0, DVx, RK3step1, DVx);
+  field->setFunctionsForVariables(1.0, Time, 0.5, K1DVy, 1.0, DVy, RK3step1, DVy);
+  field->setFunctionsForVariables(1.0, Time, 0.5, K1DE, 1.0, DE, RK3step1, DE);
 
   return;
 }
@@ -402,10 +407,10 @@ void NSSolver::RK_Step2() {
   field->setFunctionsForVariables(1.0, dbydxDE, 1.0, dbydyDE, 1.0, K2DE, Addabc, K2DE);
 
   
-  field->setFunctionsForVariables(-1.5*dt, K1D, 2.0*dt, K2D, 1.0, D, Addabc, D);
-  field->setFunctionsForVariables(-1.5*dt, K1DVx, 2.0*dt, K2DVx, 1.0, DVx, Addabc, DVx);
-  field->setFunctionsForVariables(-1.5*dt, K1DVy, 2.0*dt, K2DVy, 1.0, DVy, Addabc, DVy);
-  field->setFunctionsForVariables(-1.5*dt, K1DE, 2.0*dt, K2DE, 1.0, DE, Addabc, DE);
+  field->setFunctionsForVariables(1.0, Time, -1.5, K1D, 2.0, K2D, 1.0, D, RK3step2, D);
+  field->setFunctionsForVariables(1.0, Time, -1.5, K1DVx, 2.0, K2DVx, 1.0, DVx, RK3step2, DVx);
+  field->setFunctionsForVariables(1.0, Time, -1.5, K1DVy, 2.0, K2DVy, 1.0, DVy, RK3step2, DVy);
+  field->setFunctionsForVariables(1.0, Time, -1.5, K1DE, 2.0, K2DE, 1.0, DE, RK3step2, DE);
 
   return;
 }
@@ -440,10 +445,10 @@ void NSSolver::RK_Step3() {
   field->setFunctionsForVariables(1.0, dbydxDE, 1.0, dbydyDE, 1.0, K3DE, Addabc, K3DE);
 
   
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1D, -(4.0/3.0)*dt, K2D, (1.0/6.0)*dt, K3D, 1.0, D, Addabcd, D);
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1DVx, -(4.0/3.0)*dt, K2DVx, (1.0/6.0)*dt, K3DVx, 1.0, DVx, Addabcd, DVx);
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1DVy, -(4.0/3.0)*dt, K2DVy, (1.0/6.0)*dt, K3DVy, 1.0, DVy, Addabcd, DVy);
-  field->setFunctionsForVariables((7.0/6.0)*dt, K1DE, -(4.0/3.0)*dt, K2DE, (1.0/6.0)*dt, K3DE, 1.0, DE, Addabcd, DE);
+  field->setFunctionsForVariables(1.0, Time, (7.0/6.0), K1D, -(4.0/3.0), K2D, (1.0/6.0), K3D, 1.0, D, RK3step3, D);
+  field->setFunctionsForVariables(1.0, Time, (7.0/6.0), K1DVx, -(4.0/3.0), K2DVx, (1.0/6.0), K3DVx, 1.0, DVx, RK3step3, DVx);
+  field->setFunctionsForVariables(1.0, Time, (7.0/6.0), K1DVy, -(4.0/3.0), K2DVy, (1.0/6.0), K3DVy, 1.0, DVy, RK3step3, DVy);
+  field->setFunctionsForVariables(1.0, Time, (7.0/6.0), K1DE, -(4.0/3.0), K2DE, (1.0/6.0), K3DE, 1.0, DE, RK3step3, DE);
 
   return;
 }
@@ -462,13 +467,15 @@ void NSSolver::solve() {
   // Requires all Primitive and Conservative Variables to be setup and initialised.
   double t = 0.0;
   int count = 0;
+  double residueNorm, residue = 1.0;
+  double tolerance = 5e-6;
   
   ofstream Ofile;
   Ofile.open("Residue.dat");
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
   field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
-  while(t <= time) {
+  while( (residue > tolerance) && (count < no_of_time_steps)  ) {
     // First Step of RK3
 
     updateInviscidFlux();
@@ -478,16 +485,20 @@ void NSSolver::solve() {
     if( count%100 == 1) {
       field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);
     }
-    else if( count%100 == 0) {
-      cout << "\n Density Residue : " << field->l2Norm(D, DAnalytical) << "\n";
-      Ofile << count << "   " << field->l2Norm(D,DAnalytical) << "\n";
+    else if( count%100 == 0 && count != 0) {
+        if(count == 100) residueNorm = field->l2Norm(D, DAnalytical);
+      residue = field->l2Norm(D, DAnalytical)/ residueNorm;
+      cout << "\n Density Residue : " <<  residue << "\n";
+      Ofile << count << "   " << residue << "\n";
     }
-
-    if ( count%no_of_time_steps == 0) {
+    
+    // Time Increments
+    if ( count%10 == 0) {
       setTimeStep();
       cout << "Time Step : " << dt << " , Time : " << t << "\n"; 
       //count = 0;
     }
+    field->updateTime(Dt, Time);
 
     RK_Step1();
     

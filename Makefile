@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := SBLI2
+EXECUTABLE := SBLILTP
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths

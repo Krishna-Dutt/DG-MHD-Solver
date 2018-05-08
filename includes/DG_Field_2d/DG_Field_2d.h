@@ -148,6 +148,10 @@ public:
     void FindTimestep(int dt, int dx, int U, double CFL);
     double FindMindt(int dt);
     void FindUMax(int U, int V, int D, int T, int UMax);
+
+    // Functions to support Local Time Stepping
+    void SetFinalTime(double t);
+    void updateTime(int dt, int Time);
 };
 
 #endif

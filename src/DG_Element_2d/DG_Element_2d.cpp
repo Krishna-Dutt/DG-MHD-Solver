@@ -92,6 +92,10 @@ DG_Element_2d::DG_Element_2d(int _N, double x1, double y1, double x2, double y2)
     
     Dimension = 4;
 
+    RunTime = 0.0;
+    TFinal = 0.0;
+    RunTimeFLAG = true;
+
 
 }
 
@@ -347,6 +351,8 @@ void DG_Element_2d::ResetMap_OutFlow() {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
+  if(!RunTimeFLAG) return;
+
   double start = -1.0;
   double end = 1.0;
   
@@ -376,6 +382,8 @@ void DG_Element_2d::updateOutFlowBoundary(int u, int v) {
 */
 /* ----------------------------------------------------------------------------*/
 double DG_Element_2d::updateCellMarker(int v) {
+  if(!RunTimeFLAG) return 0.0;
+
   double radius = 1.0;
   double OutflowSize = 0.0;
   double MaxVariable = 0.0;
@@ -558,8 +566,10 @@ void DG_Element_2d::convertMomentToVariable(int m, int v) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
+  
+  if(!RunTimeFLAG) return;
 
-  { // Checking if cell marker is not equal to zero
+   // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
     count = N+1;
     double Temp1, Temp2, AlphaN;
@@ -625,7 +635,6 @@ void DG_Element_2d::limitMoments(int m, int modm, unsigned Index) {
        }
     }
 
- }
 
   return ;
 }
@@ -680,6 +689,7 @@ void DG_Element_2d::convertMomentToVariable(int *m, int *v, unsigned size) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned size ) {
+    if(!RunTimeFLAG) return;
 
    // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j, m, modm;
@@ -769,6 +779,8 @@ void DG_Element_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned siz
 */
 /* ----------------------------------------------------------------------------*/
 void DG_Element_2d::limitMoments(int *V, int *C, unsigned Index) {
+    if(!RunTimeFLAG) return;
+    
     int count, Tempi, Tempj, i, j;
     double Temp1, Temp2, AlphaN;
     double epsilon = 1e-13;
@@ -1442,8 +1454,9 @@ void DG_Element_2d::setNeighboringElement(char type, DG_Element_2d* neighbor) {
 void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, int fluxVariable = 999) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
-    
-    if(fluxType == "central") {
+
+    if(RunTimeFLAG) {
+        if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1)); 
@@ -1467,9 +1480,9 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
 
         delete[] numericalFlux;
         delete[] auxillaryVariable;
-    }
+      }
 
-    else if(fluxType == "rusanov") {
+      else if(fluxType == "rusanov") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1)); 
@@ -1493,8 +1506,13 @@ void DG_Element_2d::delByDelX(int v, int vDash, int conserVar, string fluxType, 
 
         delete[] numericalFlux;
         delete[] auxillaryVariable;
-
+      }
     }
+    else {
+            zeros(variable[vDash], (N+1)*(N+1));                                                       
+    }
+    
+    
     return ;
 }
 
@@ -1514,7 +1532,8 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
-    if(fluxType == "central") {
+    if(RunTimeFLAG) {
+        if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));     
@@ -1538,9 +1557,9 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
 
         delete[] numericalFlux;
         delete[] auxillaryVariable;
-    }
+      }
     
-    else if(fluxType == "rusanov") {
+      else if(fluxType == "rusanov") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));     
@@ -1563,7 +1582,12 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
 
         delete[] numericalFlux;
         delete[] auxillaryVariable;
+      }
     }
+    else {
+            zeros(variable[vDash], (N+1)*(N+1));                                                       
+    }
+    
     return ;
 }
 
@@ -1583,8 +1607,9 @@ void DG_Element_2d::delByDelY(int v, int vDash, int conserVar, string fluxType, 
 void DG_Element_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxType, int *FluxVariable, unsigned size) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
-    
-    if(fluxType == "central") {
+
+    if(RunTimeFLAG) {
+        if(fluxType == "central") {
         int v, vDash, conserVar, fluxVariable = FluxVariable[0];
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
@@ -1610,11 +1635,11 @@ void DG_Element_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxTyp
             cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
         }
         
-        delete[] numericalFlux;
-        delete[] auxillaryVariable;
-    }
+         delete[] numericalFlux;
+         delete[] auxillaryVariable;
+      }
 
-    else if(fluxType == "rusanov") {
+       else if(fluxType == "rusanov") {
         int v, vDash, conserVar, fluxVariable = FluxVariable[0];
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
@@ -1640,11 +1665,20 @@ void DG_Element_2d::delByDelX(int *V, int *VDash, int *ConserVar, string fluxTyp
             /// Multiplying my Mass Inverse, this is the final step in getting the derivative.
             cblas_dgemv(CblasRowMajor, CblasNoTrans, (N+1)*(N+1),(N+1)*(N+1), 4.0/(dx*dy), inverseMassMatrix,(N+1)*(N+1), auxillaryVariable,1,0,variable[vDash],1);
         }
-    
         delete[] numericalFlux;
         delete[] auxillaryVariable;
+      }
 
     }
+    else {
+          int vDash;
+        for(int temp =0 ; temp < size; ++temp) {
+            vDash = VDash[temp];
+            zeros(variable[vDash], (N+1)*(N+1)); 
+        }                                                      
+    }
+    
+    
     return ;
 }
 
@@ -1664,7 +1698,8 @@ void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxTyp
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
 
-    if(fluxType == "central") {
+    if(RunTimeFLAG) {
+        if(fluxType == "central") {
         int v, vDash, conserVar, fluxVariable = FluxVariable[0];
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
@@ -1691,9 +1726,9 @@ void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxTyp
         
         delete[] numericalFlux;
         delete[] auxillaryVariable;
-    }
+       }
     
-    else if(fluxType == "rusanov") {
+      else if(fluxType == "rusanov") {
         int v, vDash, conserVar, fluxVariable = FluxVariable[0];
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
@@ -1720,7 +1755,16 @@ void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxTyp
         }
         delete[] numericalFlux;
         delete[] auxillaryVariable;
+      }
     }
+    else {
+          int vDash;
+        for(int temp =0 ; temp < size; ++temp) {
+            vDash = VDash[temp];
+            zeros(variable[vDash], (N+1)*(N+1));   
+        }                                                    
+    }
+    
     return ;
 }
 
@@ -1738,8 +1782,9 @@ void DG_Element_2d::delByDelY(int *V, int *VDash, int *ConserVar, string fluxTyp
 void DG_Element_2d::delByDelX(int v, int vDash, string fluxType) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
-    
-    if(fluxType == "central") {
+
+    if(RunTimeFLAG) {
+        if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1));   
@@ -1763,8 +1808,11 @@ void DG_Element_2d::delByDelX(int v, int vDash, string fluxType) {
 
         delete[] numericalFlux;
         delete[] auxillaryVariable;
-    }
+      }
 
+    }
+    
+    
     return ;
 }
 
@@ -1782,8 +1830,8 @@ void DG_Element_2d::delByDelX(int v, int vDash, string fluxType) {
 void DG_Element_2d::delByDelY(int v, int vDash, string fluxType) {
     double dy = (y_end - y_start);
     double dx = (x_end - x_start);
-
-    if(fluxType == "central") {
+    if(RunTimeFLAG) {
+        if(fluxType == "central") {
         double* numericalFlux        =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable.
         double* auxillaryVariable    =   new double[(N+1)*(N+1)]; /// Creating a temporary new variable, auxiallary variable
         zeros(numericalFlux, (N+1)*(N+1)); 
@@ -1807,8 +1855,9 @@ void DG_Element_2d::delByDelY(int v, int vDash, string fluxType) {
 
         delete[] numericalFlux;
         delete[] auxillaryVariable;
+      }
     }
-    
+
     return ;
 }
 
@@ -2099,6 +2148,42 @@ double DG_Element_2d::FindUMax(int U, int V, int D, int T) {
     }
 
     return UMax;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function sets the total runtime of the simulation.
+ *
+ * @Param t T Final.
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::SetFinalTime(double t) {
+    TFinal = t;
+    
+    return ;
+}
+
+/* ----------------------------------------------------------------------------*/
+/**
+ * @Synopsis  This function updates the runtime of the simulation.
+ *
+ * @Param dt Stores the minimum dt in an element
+ * @Param Time Current dt
+ */
+/* ----------------------------------------------------------------------------*/
+void DG_Element_2d::updateTime(double dt, int Time) {
+    // Add additional check for last dt : Min(dt, TFinal-Runtime)
+    if( RunTime < TFinal) {
+        RunTime += dt;
+        double *Vardt = variable[Time];
+        for(int i=0; i<(N+1)*(N+1); ++i){
+            Vardt[i] = dt;
+        }
+    }
+    else {
+        RunTimeFLAG = false;
+    }
+    return ;
 }
 
 double DG_Element_2d::l2Norm(int v1, int v2) {
