@@ -2182,6 +2182,10 @@ void DG_Element_2d::updateTime(double dt, int Time) {
     }
     else {
         RunTimeFLAG = false;
+        double *Vardt = variable[Time];
+        for(int i=0; i<(N+1)*(N+1); ++i){
+            Vardt[i] = 0.0;
+        }
     }
     return ;
 }

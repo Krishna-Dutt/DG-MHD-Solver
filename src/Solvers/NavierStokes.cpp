@@ -468,7 +468,7 @@ void NSSolver::solve() {
   double t = 0.0;
   int count = 0;
   double residueNorm, residue = 1.0;
-  double tolerance = 5e-6;
+  double tolerance = 1e-7;
   
   ofstream Ofile;
   Ofile.open("Residue.dat");
