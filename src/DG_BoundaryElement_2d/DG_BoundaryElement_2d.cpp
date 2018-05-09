@@ -487,6 +487,7 @@ void DG_BoundaryElement_2d::assignBoundary(string type, char b) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
+  if(!RunTimeFLAG) return;
 
   { // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j;
@@ -567,6 +568,7 @@ void DG_BoundaryElement_2d::limitMoments(int m, int modm, unsigned Index) {
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsigned size ) {
+    if(!RunTimeFLAG) return;
 
    // Checking if cell marker is not equal to zero
     int count, Tempi, Tempj, i, j, m, modm;
@@ -655,6 +657,8 @@ void DG_BoundaryElement_2d::limitMoments(int *M, int *Modm, unsigned Index, unsi
 */
 /* ----------------------------------------------------------------------------*/
 void DG_BoundaryElement_2d::limitMoments(int *V, int *C, unsigned Index) {
+    if(!RunTimeFLAG) return;
+
     int count, Tempi, Tempj, i, j;
     double Temp1, Temp2, AlphaN, Sums;
     double epsilon = 1e-13;

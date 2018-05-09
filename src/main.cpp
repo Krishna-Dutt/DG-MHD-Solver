@@ -11,32 +11,32 @@
 using namespace std;
 
 double U(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 731.756;
-  return 705.355*cos(3.813*M_PI/180.0);
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 540;
+  return 520.487*cos(3.813*M_PI/180.0);
 }
 
 double V(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 0.0;
-  return -705.355*sin(3.813*M_PI/180.0);
+  return -520.487*sin(3.813*M_PI/180.0);
 }
 
 double IDensity(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0)) return 2.445e-3;
-  return 2.862e-3;
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0)) return 1.985e-3;
+  return 2.324e-3;
 }
 
 double IPressure(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0)) return 2.445e-3*R*288.15;
-  return 2.862e-3*R*307.025;
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0)) return 1.985e-3*R*156.9;
+  return 2.324e-3*R*167.178;
 }
 
 double StateEq(double D, double T) {
-  return D*R*T;
+  return D*R*T; //5.2963 ; // 1.7892976; // 2.1733;
 }
 
 double ITemperature(double x, double y) {
-  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 288.15;
-  return 307.025;
+  if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 156.9;
+  return 167.178;
 }
 
 
@@ -78,11 +78,11 @@ int main(int argc, char **argv) {
     if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 1*1e3;
+    int time_steps = 1*1e7;
     double CFL = 0.2;
     double time = 7*8e-3;
     NSSolver* a;
-    a = new NSSolver(60, 40, 2);
+    a = new NSSolver(45, 30, 3);
     a->setDomain(0.0, 0.0, 2.0, 1.1);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest.vtk");
+    a->plot("ShockBLInteractionTest_N3_45x30_LTDegrez.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
