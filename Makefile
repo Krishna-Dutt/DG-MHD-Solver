@@ -23,7 +23,7 @@ BUILDDIR := build
 TARGETDIR := bin
 
 # Targets
-EXECUTABLE := SBLILTPDegrez_N3
+EXECUTABLE := SBLILTPDegrez
 TARGET := $(TARGETDIR)/$(EXECUTABLE)
 
 # Final Paths

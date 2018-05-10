@@ -78,12 +78,12 @@ int main(int argc, char **argv) {
     if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 1*1e7;
+    int time_steps = 1e7;
     double CFL = 0.2;
     double time = 7*8e-3;
     NSSolver* a;
-    a = new NSSolver(45, 30, 3);
-    a->setDomain(0.0, 0.0, 2.0, 1.1);
+    a = new NSSolver(60, 40, 2);
+    a->setDomain(0.0, 0.0, 2.0, 1.3);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest_N3_45x30_LTDegrez.vtk");
+    a->plot("ShockBLInteractionTest_LTDegrez.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
