@@ -75,15 +75,15 @@ double AnalyticalVelocity(double x, double y) {
 }
 
 int main(int argc, char **argv) {
-    if(PARALLEL) omp_set_num_threads(1);
+    if(PARALLEL) omp_set_num_threads(8);
     clock_t tstart = clock();
     //double dt = 0.5e-3;
-    int time_steps = 1;
+    int time_steps = 1e7;
     double CFL = 0.2;
     double time = 7*8e-3;
     NSSolver* a;
-    a = new NSSolver(60, 70, 2);
-    a->setDomain(0.0, 0.0, 2.0, 1.3);
+    a = new NSSolver(60, 60, 2);
+    a->setDomain(0.0, 0.0, 2.0, 0.94);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
