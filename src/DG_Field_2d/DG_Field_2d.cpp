@@ -58,11 +58,11 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up Hyperbolic grids along x-direction about scale_b X (x2-x1)
     scale_b = 1;//0.5;
     DeltaY = (y2-y1);
-    Beta_y = 1.205;
+    Beta_y = 1.113;
     
     DeltaX1 = (x2-x1)*scale_b;
-    Beta_x1 = 1/1.00004;
-    //dx = DeltaX1 * (Beta_x1 - 1.0 + epsilon)/(pow(Beta_x1, ne_x*scale_b) -1.0 + epsilon);
+    Beta_x1 = 1.04;//1/1.00004;
+    dx = DeltaX1 * (Beta_x1 - 1.0 + epsilon)/(pow(Beta_x1, ne_x*scale_b) -1.0 + epsilon);
     
     for(int i=0; i<ne_x*scale_b; i++){
         y_curr = y1;
@@ -80,7 +80,7 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
             dy = Beta_y*dy;
         }
         x_curr += dx;
-        //dx = Beta_x1*dx;
+        dx = Beta_x1*dx;
     } // All the elements have been initialized.
 
     DeltaX2 = (x2-x1)*(1-scale_b);
