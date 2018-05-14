@@ -58,10 +58,10 @@ DG_Field_2d::DG_Field_2d(int _nex, int _ney, int _N, double _x1, double _y1, dou
     // Setting up Hyperbolic grids along x-direction about scale_b X (x2-x1)
     scale_b = 1;//0.5;
     DeltaY = (y2-y1);
-    Beta_y = 1.117;
+    Beta_y = 1.2;
     
     DeltaX1 = (x2-x1)*scale_b;
-    Beta_x1 = 1.017;//1/1.00004;
+    Beta_x1 = 1.03;//1/1.00004;
     dx = DeltaX1 * (Beta_x1 - 1.0 + epsilon)/(pow(Beta_x1, ne_x*scale_b) -1.0 + epsilon);
     
     for(int i=0; i<ne_x*scale_b; i++){

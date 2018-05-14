@@ -471,7 +471,7 @@ void NSSolver::solve() {
   double tolerance = 3.5e-6;
   
   ofstream Ofile;
-  Ofile.open("Residue.dat");
+  Ofile.open("Residue_60x40_gradX.dat");
   // Till Now all variables have to be initialised !!
   // For loop to march in time !!
   field->setFunctionsForVariables(1.0, D, Copy, DAnalytical);

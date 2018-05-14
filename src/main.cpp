@@ -82,8 +82,8 @@ int main(int argc, char **argv) {
     double CFL = 0.2;
     double time = 7*8e-3;
     NSSolver* a;
-    a = new NSSolver(100, 60, 2);
-    a->setDomain(0.0, 0.0, 2.0, 0.94);
+    a = new NSSolver(60, 40, 2);
+    a->setDomain(0.0, 0.0, 2.0, 1.1);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
     a->setPrimitiveVariables();
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     //a->SetLimiter("CharacteristicLimiter");
     a->solve();
     a->FindL2Norm(IDensity, U);
-    a->plot("ShockBLInteractionTest_100x60_LTDegrez.vtk");
+    a->plot("ShockBLInteractionTest_60x40_gradX_LTDegrez.vtk");
     
     delete a;
     cout << "Time Taken :: "<< (double)(clock() - tstart)/CLOCKS_PER_SEC <<"\n";
