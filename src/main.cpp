@@ -12,22 +12,26 @@ using namespace std;
 
 double U(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 540;
-  return 520.487*cos(3.813*M_PI/180.0);
+  else if ( y <= tan(29.274*M_PI/180.0)*(x-1.0)) return 499.93; 
+  else return 520.487*cos(3.813*M_PI/180.0);
 }
 
 double V(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 0.0;
-  return -520.487*sin(3.813*M_PI/180.0);
+  else if ( y <= tan(29.274*M_PI/180.0)*(x-1.0)) return 0.0; 
+  else return -520.487*sin(3.813*M_PI/180.0);
 }
 
 double IDensity(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0)) return 1.985e-3;
-  return 2.324e-3;
+  else if ( y <= tan(29.274*M_PI/180.0)*(x-1.0)) return 2.701e-3; 
+  else return 2.324e-3;
 }
 
 double IPressure(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0)) return 1.985e-3*R*156.9;
-  return 2.324e-3*R*167.178;
+  else if ( y <= tan(29.274*M_PI/180.0)*(x-1.0)) return 2.701e-3*R*177.613; 
+  else return 2.324e-3*R*167.178;
 }
 
 double StateEq(double D, double T) {
@@ -36,7 +40,8 @@ double StateEq(double D, double T) {
 
 double ITemperature(double x, double y) {
   if ( y <= -tan(30.8*M_PI/180.0)*(x -1.0) ) return 156.9;
-  return 167.178;
+  else if ( y <= tan(29.274*M_PI/180.0)*(x-1.0)) return 177.613; 
+  else return 167.178;
 }
 
 
@@ -82,7 +87,7 @@ int main(int argc, char **argv) {
     double CFL = 0.2;
     double time = 7*8e-3;
     NSSolver* a;
-    a = new NSSolver(60, 80, 2);
+    a = new NSSolver(180, 120, 1);
     a->setDomain(0.0, 0.0, 2.0, 1.1);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
