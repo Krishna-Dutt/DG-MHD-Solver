@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
     double CFL = 0.2;
     double time = 7*8e-3;
     NSSolver* a;
-    a = new NSSolver(180, 120, 1);
+    a = new NSSolver(60, 56, 2);
     a->setDomain(0.0, 0.0, 2.0, 1.1);
     a->setBoundaryCondtions("AdiabaticWall", "neumann", "dirichlet", "dirichlet");
     a->setSolver(CFL, time, time_steps);
